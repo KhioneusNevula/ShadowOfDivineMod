@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#minecraft:flowers",
+    "#minecraft:logs",
+    "#minecraft:leaves",
+    "#minecraft:saplings",
+    "#minecraft:villager_plantable_seeds",
+    "minecraft:wheat",
+    "minecraft:apple"
+  ]
+}

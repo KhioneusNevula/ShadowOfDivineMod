@@ -1,0 +1,5 @@
+{
+  "banner_pattern": "sotdivine:crystal",
+  "preferred_spheres":["sotdivine:earth"],
+  "allowed_spheres":"#sotdivine:conceptual"
+}

@@ -1,0 +1,5 @@
+{
+  "banner_pattern": "sotdivine:flame",
+  "preferred_spheres":["sotdivine:fire"],
+  "allowed_spheres":"#sotdivine:conceptual"
+}

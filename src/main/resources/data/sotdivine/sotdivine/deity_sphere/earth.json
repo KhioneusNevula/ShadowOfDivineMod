@@ -1,0 +1,42 @@
+{
+	"translation_key": "sotd.sphere.earth",
+	"genres":{
+		"sotdivine:offering":[
+			{
+				"items":"#minecraft:dirt"
+			},
+			{
+				"items":"#minecraft:stone_tool_materials"
+			}
+		]
+	},
+	"emanations":{
+		"spell":[ 
+			{
+				"type":"sotdivine:spawn",
+				"data": {
+					"name":"smite_lightning",
+					"entities": [
+						{"data":"minecraft:lightning_bolt","weight":1}
+					],
+					"spell_properties": {
+						"alignment":"curse"
+					}
+				}
+			},
+			{
+				"type":"sotdivine:give_effect",
+				"data": {
+					"effect": {
+						"id":"minecraft:resistance",
+						"show_icon":true,
+						"duration":200
+					},
+					"spell_properties": {
+						"alignment":"blessing"
+					}
+				}
+			}
+		]
+	}
+}

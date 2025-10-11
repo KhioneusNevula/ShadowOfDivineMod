@@ -1,0 +1,71 @@
+{
+	"eval_order":"rtl", // whether to select items from left to right (ltr) or right to left (rtl),
+	"protocols":{ // required features for picking first, based on the 'kind' of selection
+		"deity_title": [{"category":["NP"], "features":{ // when picking a deity title
+				"animacy":["person","creature"], // requires the first standalone picked to be of this kind of animacy
+				"number":{"value":"plural","opposite":true}
+			},
+			"capitalize":["N","A","V"], // which elements to capitalize
+			"semantics":{"prominence":{"disallowed":["general"],"specified":true}},
+			"adjunct-semantics":true // element is based on a variable given by calling the protocol
+		}],
+		"village_name": {"category":"NP", "features":{
+				"animacy":["person", {"value":"creature", "opposite":true}] // can pick person, but not creature
+			}, 
+			"capitalize":["N","A","V"], // which elements to capitalize
+			"semantics":{"place":{"specified":true, "disallowed":"natural"}, "people":true}, // word must be specified for both place and people
+			"adjunct-semantics":true // adjunct semantics is exclusively from environment of calling the protocol
+		}
+	}, // non-specified properties will be picked based on relevant semantic categories
+
+	"phonotactics": [ // phonotactic rules
+		// no three things of the same closure-degree in a row (stops, fricatives, etc).
+		{"disallowed":[{"closure":{"var":"a"}},{"$copy":0},{"$copy":0}]},
+		// no three vowels in a row that have all the same features (specified).alternative way of writing rules
+		{"disallowed":[{"vowel":true},{"$identical":0},{"$identical":0}]}, 
+		// no four vowels in a row of any kind (note the difference between identical and copy)
+		{"disallowed":[{"vowel":true},{"$copy":0},{"$copy":0},{"$copy":0}]}, 
+		// no two non-approximant elements in a row that have different voicing
+		{"disallowed":[{"voiced":{"var":"b"}, "closure":{"value":"approximant","opposite":true}},{"$copy":0, "voiced":{"var":"b","opposite":true}}]},
+		// no two fricatives in a row that share the same place features
+		{"disallowed":[
+						{"closure":"fricative","labial":{"var":"a"},"coronal":{"var":"b"},"dorsal":{"var":"c"}},
+						{"$copy":0}]},
+		// no two affricates in a row
+		{"disallowed":[{"closure":"affricate"},{"$copy":0}]},
+		// cannot have two stops word initially
+		{"disallowed":["#", {"closure":"stop"},{"$copy":1}]},
+		// cannot have stop before affricate word initially
+		{"disallowed":["#", {"closure":"stop"},{"closure":"affricate"}]},
+		// cannot have a labial or dental fricative before a stop word-initially,
+		{"disallowed":["#", {"closure":"fricative","labial":true},{"closure":"stop"}]},
+		{"disallowed":["#", {"closure":"fricative","dental":true},{"closure":"stop"}]},
+		// cannot have a voiced fricative before a stop word-initially,
+		{"disallowed":["#", {"closure":"fricative","voiced":true},{"closure":"stop"}]},
+		
+		 // sequence "k, c" is disallowed for aesthetics
+		{"disallowed": ["k", "c"]},
+		// sequence ii, yy, xx, and qq is disallowed
+		{"disallowed": [{"$var":"a"}, {"$var":"a"}], "variables":{"a":["i", "y-cons", "y-vow", "x-aff", "x-fric", "q"]}},
+		// indicates that after the engma sound, the letter g is forbidden.
+		{"disallowed":["ng", "g"]},
+		// indicates engma cannot be word-initial
+		{"disallowed":["#", "ng"]},
+		// indicates that a sequence of q and any other letter than u is disallowed
+		{"disallowed":["q",{"$id":"u", "$opposite":true}]},
+		/** y-consonant and y-vowel cannot go together in either direction */
+		{"disallowed": ["y-cons", "y-vow"]},
+		{"disallowed": ["y-vow", "y-cons"]},
+		/** forbid word-initial h*/
+		{"disallowed":["#", "h", {"$id":"r","$opposite":true}]},
+		// glottal stop can only occur between two vowels
+		{"disallowed":[{"vowel":false},"glottal-stop",{"$copy":0}]},
+		// disallow c-hard before a high nonlow vowel
+		{"disallowed":["c-hard",{"low":false,"round":false}]},
+		// disallow c-soft before a low vowel or a round vowel
+		{"disallowed":["c-soft",{"low":true}]},
+		{"disallowed":["c-soft",{"round":true}]}
+		
+		
+	]
+}

@@ -1,0 +1,5 @@
+{
+  "banner_pattern": "minecraft:flower",
+  "preferred_spheres":["sotdivine:life", "sotdivine:vegetation"],
+  "allowed_spheres":"#sotdivine:conceptual"
+}

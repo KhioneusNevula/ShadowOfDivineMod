@@ -1,0 +1,27 @@
+{
+	"translation_key": "sotd.sphere.life",
+	"genres":{
+		"sotdivine:offering":[
+			{
+				"items":"#sotdivine:vegetation"
+			}
+		]
+	},
+	"emanations":{
+		"spell":[ 
+			{
+				"type":"sotdivine:spawn",
+				"data": {
+					"name":"undead",
+					"entities": [
+						{"data":"minecraft:skeleton","weight":2},
+						{"data":"minecraft:zombie","weight":10}
+					],
+					"spell_properties": {
+						"alignment":"curse"
+					}
+				}
+			}
+		]
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"sotd.cmd.parties.line": "Name: \"%s\", %s",
+  	"sotd.cmd.party.invalid": "Unrecognized party id \"{0}\"",
+  	"sotd.cmd.owners.list": "Owners: {0}",
+  	"sotd.cmd.entity.invalid": "Entity {0} is incapable of being in party",
+  	"sotd.cmd.entity.showparty": "Party: {0} (uniqueName: {1})",
+  	"sotd.cmd.entity.showleader": "Leader: {0} (UUID: {1})",
+  	"sotd.cmd.entity.showleaderid": "Leader UUID: {0}",
+  	"sotd.cmd.entity.noparty": "Party: Entity has no party",
+  	"sotd.cmd.entity.noleader": "Leader: Entity has no leader",
+  	"sotd.cmd.noname": "<no name>",
+  	"sotd.cmd.relationship": "Relationship with \"{0}\" ({1}) with stats {2}",
+  	"sotd.cmd.partyinfo.group": "group with {0} relations",
+  	"sotd.cmd.partyinfo.entity": "individual entity with {0} relations",
+  	"sotd.cmd.partyinfo.other": "party with {0} relations",
+  	"sotd.cmd.partyinfo.group.worshiper": "worshiper group with {0} relations",
+  	"sotd.cmd.partyinfo.entity.worshiper": "individual worshiper with {0} relations",
+  	"sotd.cmd.partyinfo.other.worshiper": "worshiper party with {0} relations",
+  	"sotd.cmd.deityinfo": "deity of %s with symbol %s",
+
+  	"sotd.sphere.death": "Death",
+  	"sotd.sphere.earth": "Earth",
+  	"sotd.sphere.fire": "Fire",
+  	"sotd.sphere.life": "Life",
+  	"sotd.sphere.vegetation": "Vegetation",
+  	"sotd.sphere.water": "Water",
+
+  	"sotd.deity.deity": "Unnamed Deity",
+  	"sotd.deity.accept_offering": "%s has accepted your offering of %s",
+
+	"item.sotdivine.divine_banner_pattern": "Divine Banner Pattern"
+  	
+}

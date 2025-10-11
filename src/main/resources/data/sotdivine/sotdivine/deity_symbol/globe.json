@@ -1,0 +1,5 @@
+{
+  "banner_pattern": "minecraft:globe",
+  "preferred_spheres":["sotdivine:earth"],
+  "allowed_spheres":"#sotdivine:conceptual"
+}
