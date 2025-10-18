@@ -10,25 +10,25 @@ import com.gm910.sotdivine.language.feature.ISpecificationValue;
  */
 public interface IConstituent {
 
-	/** the unique id of this element */
+	/** the unique id of this provider */
 	public String id();
 
 	/**
-	 * Return the form of this element
+	 * Return the form of this provider
 	 * 
 	 * @return
 	 */
 	public String form();
 
 	/**
-	 * The syntactic category of this element
+	 * The syntactic category of this provider
 	 * 
 	 * @return
 	 */
 	public String category();
 
 	/**
-	 * The (specified) features of this element
+	 * The (specified) features of this provider
 	 * 
 	 * @return
 	 */

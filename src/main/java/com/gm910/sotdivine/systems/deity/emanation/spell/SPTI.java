@@ -1,17 +1,18 @@
 package com.gm910.sotdivine.systems.deity.emanation.spell;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.gm910.sotdivine.systems.deity.type.IDeity;
+import com.gm910.sotdivine.systems.deity.IDeity;
 
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
 
-public record SPTI(@Nullable IDeity deity, @Nullable ServerLevel level, Optional<EntityReference<Entity>> opCaster,
+public record SPTI(@Nullable IDeity deity, @Nullable ServerLevel level, Optional<UUID> opCaster,
 		Optional<EntityReference<Entity>> opTargetEntity, Optional<GlobalPos> opTargetPos) implements ISpellTargetInfo {
 
 	@Override
@@ -34,7 +35,7 @@ public record SPTI(@Nullable IDeity deity, @Nullable ServerLevel level, Optional
 	@Override
 	public final String toString() {
 		return "Target" + (opCaster.isEmpty() && opTargetEntity.isEmpty() && opTargetPos.isEmpty() ? "Target(World)"
-				: "Target{" + (opCaster.map((x) -> "caster=" + x.getUUID() + ",")).orElse("")
+				: "Target{" + (opCaster.map((x) -> "caster=" + x + ",")).orElse("")
 						+ (opTargetEntity.map((x) -> "targetEntity=" + x.getUUID() + ",").orElse(""))
 						+ (opTargetPos.map((x) -> "targetPos=" + x).orElse("")) + "}");
 	}

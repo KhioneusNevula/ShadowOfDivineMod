@@ -10,13 +10,18 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import com.gm910.sotdivine.systems.deity.emanation.EmanationDataType;
+import com.gm910.sotdivine.systems.deity.emanation.EmanationDataType.IEmanationInstanceData;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationInstance;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
 import com.gm910.sotdivine.systems.deity.emanation.IEmanation;
 import com.gm910.sotdivine.systems.deity.emanation.spell.ISpellProperties;
 import com.gm910.sotdivine.systems.deity.emanation.spell.SpellAlignment;
+import com.gm910.sotdivine.util.ModUtils;
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
@@ -24,10 +29,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  * sequence or simultaneously
  */
 public class CombinedEmanation implements IEmanation {
-	public static final Codec<CombinedEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
+	public static final Codec<CombinedEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(Codec.list(IEmanation.codec()).fieldOf("values").forGetter(CombinedEmanation::getEmanationsList),
-			Codec.STRING.xmap(ExecutionOrder::valueOf, ExecutionOrder::name).fieldOf("order")
-					.forGetter(CombinedEmanation::getOrder),
+			Codec.STRING.comapFlatMap((s) -> {
+				var out = ExecutionOrder.valueOf(s);
+				if (out == null)
+					return DataResult.error(() -> "Invalid execution order " + s);
+				return DataResult.success(out);
+			}, ExecutionOrder::name).fieldOf("order").forGetter(CombinedEmanation::getOrder),
 			Codec.BOOL.optionalFieldOf("conditional").forGetter((x) -> Optional.of(x.getConditionality())),
 			Codec.STRING.xmap(SpellAlignment::valueOf, SpellAlignment::name).optionalFieldOf("alignment")
 					.forGetter((x) -> x.optionalSpellProperties().map(ISpellProperties::alignment)))
@@ -81,7 +90,7 @@ public class CombinedEmanation implements IEmanation {
 
 	@Override
 	public boolean checkIfCanTrigger(EmanationInstance instance) {
-		return this.checkIfCanTick(new EmanationInstance(instance.emanation, instance.targetInfo(), -1));
+		return this.checkIfCanTick(new EmanationInstance(instance.emanation(), instance.targetInfo(), -1));
 	}
 
 	@Override
@@ -159,7 +168,7 @@ public class CombinedEmanation implements IEmanation {
 
 	@Override
 	public boolean trigger(EmanationInstance mainInstance) {
-		EmanationInstance copy = new EmanationInstance(mainInstance.emanation, mainInstance.targetInfo(), -1);
+		EmanationInstance copy = new EmanationInstance(mainInstance.emanation(), mainInstance.targetInfo(), -1);
 		boolean out = tick(copy);
 		mainInstance.extraData = copy.extraData;
 		return out;
@@ -173,8 +182,8 @@ public class CombinedEmanation implements IEmanation {
 			SimultaneousInstance simult = (SimultaneousInstance) mainInstance.extraData;
 			Set<IEmanation> toRemove = new HashSet<>();
 			for (int i = 0; i < simult.list.size(); i++) {
-				Entry<IEmanation, Object> entry = simult.list.get(i);
-				EmanationInstance newInst = new EmanationInstance(mainInstance.emanation, mainInstance.targetInfo(),
+				Entry<IEmanation, IEmanationInstanceData> entry = simult.list.get(i);
+				EmanationInstance newInst = new EmanationInstance(mainInstance.emanation(), mainInstance.targetInfo(),
 						mainInstance.getTicks());
 				newInst.extraData = entry.getValue();
 				boolean out = trigger ? entry.getKey().trigger(newInst) : entry.getKey().tick(newInst);
@@ -220,7 +229,7 @@ public class CombinedEmanation implements IEmanation {
 		switch (order) {
 		case simultaneous:
 			SimultaneousInstance simult = (SimultaneousInstance) instance.extraData;
-			for (Entry<IEmanation, Object> emanation : simult.list) {
+			for (Entry<IEmanation, IEmanationInstanceData> emanation : simult.list) {
 				EmanationInstance instance2 = new EmanationInstance(emanation.getKey(), instance.targetInfo(),
 						instance.getTicks());
 				instance2.extraData = emanation.getValue();
@@ -260,17 +269,42 @@ public class CombinedEmanation implements IEmanation {
 				+ (this.optionalSpellProperties().map((x) -> "_" + x.alignment()).orElse("")) + this.emanations;
 	}
 
-	private static record SequentialInstance(List<IEmanation> list, EmanationInstance instance) {
+	private static record SequentialInstance(List<IEmanation> list, EmanationInstance instance)
+			implements IEmanationInstanceData {
+
+		public static final EmanationDataType<SequentialInstance> TYPE = new EmanationDataType<SequentialInstance>(
+				ModUtils.path("sequential"),
+				Codec.pair(Codec.list(IEmanation.codec()).fieldOf("list").codec(),
+						EmanationInstance.CODEC.fieldOf("emanation").codec())
+						.xmap((p) -> new SequentialInstance(p.getFirst(), p.getSecond()),
+								(s) -> Pair.of(s.list(), s.instance())));
+
+		@Override
+		public EmanationDataType<SequentialInstance> dataType() {
+			return TYPE;
+		}
 
 	}
 
-	private static record SimultaneousInstance(List<Map.Entry<IEmanation, Object>> list) {
+	private static record SimultaneousInstance(List<Map.Entry<IEmanation, IEmanationInstanceData>> list)
+			implements IEmanationInstanceData {
+
+		public static final EmanationDataType<SimultaneousInstance> TYPE = new EmanationDataType<>(
+				ModUtils.path("simultaneous"),
+				Codec.list(Codec.pair(IEmanation.codec().fieldOf("emanation").codec(),
+						EmanationDataType.DISPATCH_CODEC.optionalFieldOf("data").codec()))
+						.xmap((lis) -> new SimultaneousInstance(
+								Lists.transform(lis, (v) -> Map.entry(v.getFirst(), v.getSecond().orElse(null)))),
+								(lis) -> Lists.transform(lis.list,
+										(v) -> Pair.of(v.getKey(), Optional.ofNullable(v.getValue())))));
+
 		public SimultaneousInstance(List<IEmanation> emanations, boolean f) {
 			this(new ArrayList<>(Lists.transform(emanations, (m) -> Map.entry(m, null))));
 		}
 
-		public List<IEmanation> onlyEmanations() {
-			return Lists.transform(list, (x) -> x.getKey());
+		@Override
+		public EmanationDataType<SimultaneousInstance> dataType() {
+			return TYPE;
 		}
 	}
 

@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 
 /**
- * An instance of something happening that the deity remembers which impacted
+ * An emanation of something happening that the deity remembers which impacted
  * their relationship with a Party
  * 
  * @author borah
@@ -32,8 +32,8 @@ import net.minecraft.world.level.storage.TagValueInput;
  */
 public interface IPartyMemory {
 
-	public static final Codec<IPartyMemory> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
-	instance.group( // Define the fields within the instance
+	public static final Codec<IPartyMemory> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
+	instance.group( // Define the fields within the emanation
 			Codec.STRING.fieldOf("type").forGetter((x) -> x.memoryType().toString()),
 			Codec.STRING.optionalFieldOf("actor").forGetter((x) -> x.opActorParty()),
 			Codec.STRING.optionalFieldOf("targetPartyID").forGetter((x) -> x.opTargetParty()),

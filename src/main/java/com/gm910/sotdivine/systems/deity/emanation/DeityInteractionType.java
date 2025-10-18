@@ -1,5 +1,8 @@
 package com.gm910.sotdivine.systems.deity.emanation;
 
+import com.gm910.sotdivine.util.CodecUtils;
+import com.mojang.serialization.Codec;
+
 /**
  * A way a deity interacts with the world
  */
@@ -8,39 +11,41 @@ public enum DeityInteractionType {
 	 * An emanation that occurs when a deity accepts an offering. By nature, this
 	 * targets the block where the offering was made
 	 */
-	accept_offering,
+	ACCEPT_OFFERING,
 	/**
 	 * An emanation that occurs when a deity finds one of its symbols during an
 	 * offering or something similar. Targets the entity with the symbol or the
 	 * position of the block it is at
 	 */
-	symbol_recognition,
-	/** A singular spell, which may be targeted at a block or entity */
-	spell,
-	/** The effects of an attack from one deity to another on the world */
-	attack,
+	SYMBOL_RECOGNITION,
+	/** A singular SPELL, which may be targeted at a block or entity */
+	SPELL,
+	/** The effects of an ATTACK from one deity to another on the world */
+	ATTACK,
 	/** The effects of a deity taking damage on the world */
-	take_damage,
-	/** The effects of a deity absorbing energy from a dimension to attack */
-	absorb,
+	TAKE_DAMAGE,
+	/** The effects of a deity absorbing energy from a dimension to ATTACK */
+	ABSORB,
 	/** The effects of a deity being killed on its dimensions of ownership */
-	neutralize,
+	NEUTRALIZE,
 	/**
 	 * The effects of a deity being born/resurrected on the dimension it resurrects
 	 * in
 	 */
-	revitalize,
+	REVITALIZE,
 	/**
-	 * A massive spell cast by a deity that usually affects the whole world rather
+	 * A massive SPELL cast by a deity that usually affects the whole world rather
 	 * than just a block or entity
 	 */
-	legislate,
+	LEGISLATE,
 	/** The manifestation of a deity at a location */
-	theophany,
-	/** The effects of a deity putting a palyer in a vision */
-	vision,
+	THEOPHANY,
+	/** The effects of a deity putting a palyer in a VISION */
+	VISION,
 	/** A manifestation of a sign that a deity is about to do something big */
-	omen,
+	OMEN,
 	/** The effects of a deity angrily trying to destroy the world */
-	apocalypse
+	APOCALYPSE;
+
+	public static final Codec<DeityInteractionType> CODEC = CodecUtils.caselessEnumCodec(DeityInteractionType.class);
 }

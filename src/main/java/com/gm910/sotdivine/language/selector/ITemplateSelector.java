@@ -15,7 +15,7 @@ import com.google.common.collect.Multimaps;
 import com.google.gson.JsonElement;
 
 /**
- * A selector for a language element
+ * A selector for a language provider
  * 
  * @author borah
  *

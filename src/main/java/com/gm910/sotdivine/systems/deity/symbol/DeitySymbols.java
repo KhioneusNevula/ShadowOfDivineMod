@@ -3,11 +3,17 @@ package com.gm910.sotdivine.systems.deity.symbol;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
+import com.gm910.sotdivine.items.ModBannerPatternTags;
+import com.gm910.sotdivine.registries.ModRegistries;
+import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.util.StreamUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -19,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -30,13 +37,14 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.registries.RegistryManager;
 
 public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol> {
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private BiMap<ResourceLocation, IDeitySymbol> SYMBOLS = ImmutableBiMap.of();
 	private Map<BannerPattern, IDeitySymbol> SYMBOL_BY_PATTERN = null;
 	private static Optional<DeitySymbols> INSTANCE = Optional.empty();
-
+	public static final ResourceLocation DIVINE_TAG_PATH = ModUtils.path("divine_patterns");
 	private static Codec<IDeitySymbol> CODEC;
 
 	public static final Codec<IDeitySymbol> symbolCodec() {
@@ -46,13 +54,19 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	}
 
 	private DeitySymbols(Provider prov) {
-		super(prov, symbolCodec(), IDeitySymbol.REGISTRY_KEY);
+		super(prov, symbolCodec(), ModRegistries.DEITY_SYMBOLS);
+	}
+
+	@Override
+	protected Map<ResourceLocation, IDeitySymbol> prepare(ResourceManager mana, ProfilerFiller p_10772_) {
+
+		return super.prepare(mana, p_10772_);
 	}
 
 	@Override
 	protected void apply(Map<ResourceLocation, IDeitySymbol> map, ResourceManager rm, ProfilerFiller filler) {
 		this.SYMBOLS = HashBiMap.create(map);
-		LOGGER.info("Loaded SYMBOLS: {}", SYMBOLS.values());
+		LOGGER.info("Loaded symbols: {}", SYMBOLS.values());
 	}
 
 	public static DeitySymbols instance() {
@@ -69,9 +83,20 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	}
 
 	/**
-	 * Get a deity symbol using a banner pattern
+	 * Get a deity symbol using a banner patterns
 	 * 
-	 * @param pattern
+	 * @param patterns
+	 * @return
+	 */
+	public Optional<IDeitySymbol> getFromPattern(Holder<BannerPattern> pattern) {
+		return pattern.isBound() ? this.getFromPattern(pattern.value())
+				: Optional.ofNullable(this.SYMBOLS.get(pattern.unwrapKey().get().location()));
+	}
+
+	/**
+	 * Get a deity symbol using a banner patterns
+	 * 
+	 * @param patterns
 	 * @return
 	 */
 	public Optional<IDeitySymbol> getFromPattern(BannerPattern pattern) {
@@ -103,7 +128,7 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	 * @return
 	 */
 	public Stream<IDeitySymbol> getFromBlock(ServerLevel level, BlockPos pos) {
-		if (level.getExistingBlockEntity(pos) instanceof BlockEntity blockEn) {
+		if (level.getBlockEntity(pos) instanceof BlockEntity blockEn) {
 			if (blockEn instanceof BannerBlockEntity banner) {
 				return banner.getPatterns().layers().stream().map((x) -> x.pattern().get()).map(this::getFromPattern)
 						.flatMap(Optional::stream);

@@ -2,38 +2,33 @@ package com.gm910.sotdivine.systems.deity.symbol;
 
 import java.util.Optional;
 
+import com.gm910.sotdivine.registries.ModRegistries;
 import com.gm910.sotdivine.systems.deity.sphere.ISphere;
-import com.gm910.sotdivine.systems.deity.sphere.Sphere;
-import com.gm910.sotdivine.util.ModUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryFixedCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.entity.BannerPattern;
 
 /**
  * A symbol -- generally, a texture -- which can be used to represent a deity
  */
 public interface IDeitySymbol {
-	public static final ResourceKey<Registry<IDeitySymbol>> REGISTRY_KEY = ResourceKey
-			.createRegistryKey(ModUtils.path("deity_symbol"));
 
 	public static Codec<IDeitySymbol> createCodec() {
-		return RecordCodecBuilder.create(instance -> // Given an instance
+		return RecordCodecBuilder.create(instance -> // Given an emanation
 		instance.group(
 				RegistryFixedCodec.create(Registries.BANNER_PATTERN).fieldOf("banner_pattern")
 						.forGetter(IDeitySymbol::bannerPattern),
-				RegistryCodecs.homogeneousList(Sphere.REGISTRY_KEY).optionalFieldOf("preferred_spheres")
+				RegistryCodecs.homogeneousList(ModRegistries.SPHERES).optionalFieldOf("preferred_spheres")
 						.forGetter(IDeitySymbol::preferredSpheres),
-				RegistryCodecs.homogeneousList(Sphere.REGISTRY_KEY).optionalFieldOf("allowed_spheres")
+				RegistryCodecs.homogeneousList(ModRegistries.SPHERES).optionalFieldOf("allowed_spheres")
 						.forGetter(IDeitySymbol::allowedSpheres),
-				RegistryCodecs.homogeneousList(Sphere.REGISTRY_KEY).optionalFieldOf("forbidden_spheres")
+				RegistryCodecs.homogeneousList(ModRegistries.SPHERES).optionalFieldOf("forbidden_spheres")
 						.forGetter(IDeitySymbol::forbiddenSpheres)
 
 		).apply(instance, DeitySymbol::new));
@@ -64,6 +59,7 @@ public interface IDeitySymbol {
 	 * @return
 	 */
 	public default int permittedOrPreferred(ISphere sphere) {
+
 		if (this.preferredSpheres().isPresent()
 				&& this.preferredSpheres().get().stream().map(Holder::get).anyMatch(sphere::equals)) {
 			return 2;

@@ -19,8 +19,8 @@ import net.minecraft.server.level.ServerLevel;
  */
 public interface IRelationship {
 
-	public static final Codec<IRelationship> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
-	instance.group( // Define the fields within the instance
+	public static final Codec<IRelationship> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
+	instance.group( // Define the fields within the emanation
 			Codec.STRING.fieldOf("target").forGetter((x) -> x.target()),
 			Codec.simpleMap(Codec.STRING, Codec.FLOAT,
 					Keyable.forStrings(() -> Arrays.stream(RelationStat.values()).map(Object::toString)))

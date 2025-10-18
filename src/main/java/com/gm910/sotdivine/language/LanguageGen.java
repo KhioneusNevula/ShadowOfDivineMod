@@ -36,6 +36,7 @@ import com.gm910.sotdivine.language.phono.IPhonotacticDisallow;
 import com.gm910.sotdivine.language.selector.ILSelector;
 import com.gm910.sotdivine.language.selector.ITemplateSelector;
 import com.gm910.sotdivine.language.selector.LProtocol;
+import com.gm910.sotdivine.registries.ModRegistries;
 import com.gm910.sotdivine.util.ModUtils;
 import com.gm910.sotdivine.util.WeightedSet;
 import com.google.common.collect.HashMultiset;
@@ -102,7 +103,7 @@ import net.minecraftforge.registries.RegistryObject;
 		"creature", // a creature,
 		"monster", // a monstrous being
 	
-	"element"
+	"provider"
 		"fire", // something fire-elemental,
 		"water", // something water-elemental
 		"earth", // earth elemental
@@ -129,8 +130,8 @@ import net.minecraftforge.registries.RegistryObject;
  */
 public class LanguageGen {
 
-	private static final RegistryHolder<LanguageGen> REGISTRY_HOLDER = SOTDMod.LANGUAGE_GENS
-			.makeRegistry(() -> RegistryBuilder.of());
+	public static final RegistryHolder<LanguageGen> REGISTRY = SOTDMod.LANGUAGE_GENS.makeRegistry(
+			() -> RegistryBuilder.<LanguageGen>of(ModRegistries.LANGUAGE_GEN.location()).allowModification());
 
 	private static final String FOLDER = "assets/<modid>/lang/deity/";
 
@@ -157,9 +158,11 @@ public class LanguageGen {
 	}
 
 	public static void init() {
-		System.out.println("language gen");
-		registerGenerator(SOTDMod.MODID, SOTDMod.LANGUAGE_GENS, "en_us");
+		LogUtils.getLogger().debug("Initializing language");
+	}
 
+	public static void registerInit() {
+		registerGenerator(SOTDMod.MODID, SOTDMod.LANGUAGE_GENS, "en_us");
 	}
 
 	public Map<String, IPhoneme> getPhonemes() {
@@ -276,7 +279,7 @@ public class LanguageGen {
 	 * @param environ    variables set before we begin generating, e.g. semantic
 	 *                   variables
 	 * @param tries      the number of tries to do for each search for an argument
-	 *                   or element
+	 *                   or provider
 	 * @return
 	 */
 	public GenerationResult generate(int minWords, int maxLevels, String protocolId,
@@ -380,7 +383,7 @@ public class LanguageGen {
 
 			Optional<IConstituentTemplate> selectedTemplate = randomElementByProperties(templateSelector,
 					elementTypePred, prefix);
-			if (selectedTemplate.isPresent()) { // if we got an element
+			if (selectedTemplate.isPresent()) { // if we got an provider
 				previouslyRepeateds.add(selectedTemplate.get());
 				if (selectedTemplate.get() instanceof IPhraseTemplate phraseTemplate) { // if we got a phrase
 					GeneratedConstituent phrase = new GeneratedConstituent(phraseTemplate);
@@ -521,7 +524,7 @@ public class LanguageGen {
 	}
 
 	/**
-	 * Return a random element that matches the given selector, given the variables
+	 * Return a random provider that matches the given selector, given the variables
 	 * as environment
 	 * 
 	 * @param selector
@@ -592,7 +595,7 @@ public class LanguageGen {
 	 * @return
 	 */
 	public static LanguageGen getGenWithoutReset(ResourceLocation key) {
-		return REGISTRY_HOLDER.get().getValue(key);
+		return REGISTRY.get().getValue(key);
 	}
 
 	/**
@@ -603,7 +606,7 @@ public class LanguageGen {
 	 * @return
 	 */
 	public static LanguageGen getGenAfterReset(ResourceLocation key) {
-		LanguageGen gen = REGISTRY_HOLDER.get().getValue(key);
+		LanguageGen gen = REGISTRY.get().getValue(key);
 		if (gen != null)
 			gen.resetPreviousRepetitions();
 		return gen;
@@ -706,13 +709,13 @@ public class LanguageGen {
 
 	/**
 	 * 
-	 * @param element
+	 * @param provider
 	 * @param secondCycle whether to copy elements or not
 	 * @return
 	 */
 	private void loadElement(JsonElement element, ElementType type, boolean secondCycle) {
 		try {
-			// System.out.println("[ModLanguage] Loading element from tag " + element);
+			// System.out.println("[ModLanguage] Loading provider from tag " + provider);
 			Optional<String> copySourceKey = IConstituentTemplate.getCopySource(element);
 			if (!secondCycle && copySourceKey.isPresent() || secondCycle && copySourceKey.isEmpty()) {
 				return;
@@ -720,10 +723,10 @@ public class LanguageGen {
 			IConstituentTemplate newObj = IConstituentTemplate.create(type);
 			copySourceKey.map((x) -> this.getElement(x, type)).ifPresent((cons) -> {
 				// System.out.println("[ModLanguage] Copying " + cons.id() + " to new language
-				// element");
+				// provider");
 				newObj.copy(cons);
 			});
-			// System.out.println("[ModLanguage] Parsing json for new language element");
+			// System.out.println("[ModLanguage] Parsing json for new language provider");
 			newObj.parse(element);
 			switch (type) {
 			case PHRASE:
@@ -734,13 +737,13 @@ public class LanguageGen {
 				break;
 			}
 
-			// System.out.println("[ModLanguage] Successfully made new element " + newObj);
+			// System.out.println("[ModLanguage] Successfully made new provider " + newObj);
 			try {
-				// System.out.println("[ModLanguage] Generating derivations for element " +
+				// System.out.println("[ModLanguage] Generating derivations for provider " +
 				// newObj.id());
 				newObj.genDerivations(element, type).forEach((x) -> {
 					// System.out.println("[ModLanguage] Generated a new derivation called for
-					// element " + newObj.id()
+					// provider " + newObj.id()
 					// + " with structure: " + x);
 					switch (type) {
 					case PHRASE:

@@ -109,12 +109,12 @@ class TS implements ITemplateSelector {
 		}
 
 		/*
-		 * System.out.println(">><<Startselector>> Testing " + element +
+		 * System.out.println(">><<Startselector>> Testing " + provider +
 		 * " with selector " + this + " and environment " + environment);
 		 */
 		/*
-		 * System.out.println("  <<selector>> Info of element " +
-		 * element.detailedString());
+		 * System.out.println("  <<selector>> Info of provider " +
+		 * provider.detailedString());
 		 */
 		for (String feature : this.features().keySet()) {
 			/* System.out.println("  <<selector>> Testing feature " + feature); */
@@ -131,7 +131,7 @@ class TS implements ITemplateSelector {
 				 * System.out.println("  <<selector>> Element has unbound variable " +
 				 * comparingSpecification.getVariable().orElse(null) + "; ignoring");
 				 */
-				continue; // ignore if the element's feature is an unbound variable
+				continue; // ignore if the provider's feature is an unbound variable
 			}
 			boolean match = false;
 			for (ISpecificationValue selectorSpecificationVariant : this.features().get(feature)) {
@@ -154,17 +154,17 @@ class TS implements ITemplateSelector {
 						/*
 						 * System.out.println("  <<selector>> Mismatch between selector value " +
 						 * selectorValue + "(" + !selectorSpecificationVariant.opposite() + ")" +
-						 * " and element value " + comparingSpecification.getLiteral().get() + " (" +
-						 * !comparingSpecification.opposite() + ")" + " for element " +
-						 * element.detailedString() + " (selector:" + this + ")");
+						 * " and provider value " + comparingSpecification.getLiteral().get() + " (" +
+						 * !comparingSpecification.opposite() + ")" + " for provider " +
+						 * provider.detailedString() + " (selector:" + this + ")");
 						 */
 
 						return false;
 					} else {
 						/*
 						 * System.out.println("  <<selector>> Match found for feature " + feature +
-						 * " between selector value " + selectorValue + " and element value " +
-						 * comparingSpecification.getLiteral().get() + " for element " + element);
+						 * " between selector value " + selectorValue + " and provider value " +
+						 * comparingSpecification.getLiteral().get() + " for provider " + provider);
 						 */
 						match = true;
 						break;
@@ -179,7 +179,7 @@ class TS implements ITemplateSelector {
 			if (!match) {
 				/*
 				 * System.out.println( ">><<Endselector>> No match for " +
-				 * element.detailedString() + " with selector " + this);
+				 * provider.detailedString() + " with selector " + this);
 				 */
 				return false;
 			}
@@ -195,7 +195,7 @@ class TS implements ITemplateSelector {
 				if (testeeSpec == null || testeeSpec.isSelective()) {
 					if (selectorSpec.mustBeSpecified()) {
 						/*
-						 * System.out.println(">><<Endselector>> Category in element " + element.id() +
+						 * System.out.println(">><<Endselector>> Category in provider " + provider.id() +
 						 * " not specified (" + categoire + "), but is expected to be: " +
 						 * selectorSpec.toString() + " (for selector: " + this + ")");
 						 */
@@ -206,7 +206,7 @@ class TS implements ITemplateSelector {
 				if (testeeSpec.isVariable()) {
 					/*
 					 * System.out.println(">><<Endselector>> Ignoring variable for category " +
-					 * categoire + " (" + testeeSpec.getVariable().get() + ") of element " + element
+					 * categoire + " (" + testeeSpec.getVariable().get() + ") of provider " + provider
 					 * + "; selector: " + selectorSpec.toString());
 					 */
 					continue;
@@ -215,7 +215,7 @@ class TS implements ITemplateSelector {
 				for (String item : selectorSpec.getConstraint(SemanticConstraint.REQUIRED).get()) {
 					if (!testeeValues.contains(item)) {
 						/*
-						 * System.out.println(">><<Endselector>> Failed since element " + element.id() +
+						 * System.out.println(">><<Endselector>> Failed since provider " + provider.id() +
 						 * " does not contain required item " + item + " for category " + categoire +
 						 * " out of specified items " + testeeValues + ": " + this);
 						 */
@@ -225,7 +225,7 @@ class TS implements ITemplateSelector {
 				for (String item : selectorSpec.getConstraint(SemanticConstraint.DISALLOWED).get()) {
 					if (testeeValues.contains(item)) {
 						/*
-						 * System.out.println(">><<Endselector>> Failed since element " + element.id() +
+						 * System.out.println(">><<Endselector>> Failed since provider " + provider.id() +
 						 * " contains forbidden item " + item + " for category " + categoire +
 						 * " in specified items " + testeeValues + ": " + this);
 						 */
@@ -242,10 +242,10 @@ class TS implements ITemplateSelector {
 					}
 					if (!match) {
 						/*
-						 * System.out.println(">><<Endselector>> Failed since element " + element.id() +
+						 * System.out.println(">><<Endselector>> Failed since provider " + provider.id() +
 						 * " lacks at least one of " +
 						 * selectorSpec.getConstraint(SemanticConstraint.ALLOWED).get() +
-						 * " for category " + categoire + " in element items " + testeeValues + ": " +
+						 * " for category " + categoire + " in provider items " + testeeValues + ": " +
 						 * this);
 						 */
 						return false;
@@ -255,9 +255,9 @@ class TS implements ITemplateSelector {
 		}
 
 		/*
-		 * System.out.println(">><<Endselector>> Match success for " + element +
+		 * System.out.println(">><<Endselector>> Match success for " + provider +
 		 * " with environment " + environment + " for selector " + this +
-		 * "    ,,,element:" + element.detailedString());
+		 * "    ,,,provider:" + provider.detailedString());
 		 */
 		return true;
 	}

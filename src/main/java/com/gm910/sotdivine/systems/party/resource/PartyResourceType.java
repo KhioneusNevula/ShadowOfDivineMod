@@ -3,6 +3,7 @@ package com.gm910.sotdivine.systems.party.resource;
 import java.util.Optional;
 
 import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.registries.ModRegistries;
 import com.gm910.sotdivine.systems.party.resource.type.DimensionResource;
 import com.gm910.sotdivine.systems.party.resource.type.EntityResource;
 import com.gm910.sotdivine.systems.party.resource.type.IDResource;
@@ -36,8 +37,9 @@ import net.minecraftforge.registries.RegistryObject;
  */
 public class PartyResourceType<T extends IPartyResource> {
 
-	private static final RegistryHolder<PartyResourceType<?>> REGISTRY_HOLDER = SOTDMod.PARTY_RESOURCE_TYPES
-			.makeRegistry(() -> RegistryBuilder.of());
+	public final static RegistryHolder<PartyResourceType<?>> REGISTRY = SOTDMod.PARTY_RESOURCE_TYPES
+			.makeRegistry(() -> RegistryBuilder.<PartyResourceType<?>>of(ModRegistries.PARTY_RESOURCE_TYPES.location())
+					.allowModification());
 
 	private static Optional<Codec<IPartyResource>> O_CODEC = Optional.empty();
 
@@ -78,7 +80,7 @@ public class PartyResourceType<T extends IPartyResource> {
 	}
 
 	public static Codec<PartyResourceType<?>> typeCodec() {
-		return REGISTRY_HOLDER.get().getCodec();
+		return REGISTRY.get().getCodec();
 	}
 
 	/**
@@ -88,7 +90,7 @@ public class PartyResourceType<T extends IPartyResource> {
 	 */
 	public static Optional<Codec<IPartyResource>> resourceCodec() {
 		if (O_CODEC.isEmpty()) {
-			O_CODEC = Optional.ofNullable(REGISTRY_HOLDER.get()).map((f) -> f.getCodec())
+			O_CODEC = Optional.ofNullable(REGISTRY.get()).map((f) -> f.getCodec())
 					.map((f) -> f.dispatch("resourceType", IPartyResource::resourceType, PartyResourceType::codec));
 		}
 		return O_CODEC;

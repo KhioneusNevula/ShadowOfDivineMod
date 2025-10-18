@@ -1,4 +1,4 @@
-package com.gm910.sotdivine.util;
+package com.gm910.sotdivine.particle;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ public record ParticleSpecification(ParticleOptions particle, Vec3 offset, Vec3 
 	/**
 	 * Codec makes all fields except particle type optional
 	 */
-	public static final Codec<ParticleSpecification> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
+	public static final Codec<ParticleSpecification> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(
 			Codec.either(BuiltInRegistries.PARTICLE_TYPE.byNameCodec(), ParticleTypes.CODEC).fieldOf("particle")
 					.forGetter((p) -> Either.right(p.particle())),

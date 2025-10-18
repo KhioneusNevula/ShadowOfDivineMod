@@ -20,7 +20,10 @@ import com.gm910.sotdivine.systems.party.resource.type.RegionResource;
 import com.gm910.sotdivine.systems.party_system.IPartySystem;
 import com.gm910.sotdivine.systems.villagers.ModBrainElements.MemoryModuleTypes;
 import com.gm910.sotdivine.systems.villagers.ModBrainElements.SensorTypes;
-import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.util.FieldUtils;
+import com.gm910.sotdivine.util.TextUtils;
+import com.gm910.sotdivine.util.WorldUtils;
+import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -58,14 +61,15 @@ public class VillagerTweaks {
 	@SuppressWarnings("deprecation")
 	public static void modifyMind(Villager villager, ServerLevel level, @Nullable BrainBuilder<Villager> brainBuilder) {
 
-		System.out.println("Modifying mind of villager " + villager.getDisplayName().getString() + " ("
+		LogUtils.getLogger().debug("Modifying mind of villager " + villager.getDisplayName().getString() + " ("
 				+ villager.getUUID() + ")");
 		if (brainBuilder != null) {
-			System.out.println("Modifying builder");
+			LogUtils.getLogger().debug("Modifying builder");
 
-			Collection<SensorType<? extends Sensor<? super Villager>>> sensors = ModUtils.getField("sensorTypes",
-					"sensorTypes", brainBuilder);
-			Collection<MemoryModuleType<?>> memories = ModUtils.getField("memoryTypes", "memoryTypes", brainBuilder);
+			Collection<SensorType<? extends Sensor<? super Villager>>> sensors = FieldUtils
+					.getInstanceField("sensorTypes", "sensorTypes", brainBuilder);
+			Collection<MemoryModuleType<?>> memories = FieldUtils.getInstanceField("memoryTypes", "memoryTypes",
+					brainBuilder);
 
 			// add new sensors
 			sensors.add(SensorTypes.PARTY_TERRITORY.get());
@@ -75,11 +79,11 @@ public class VillagerTweaks {
 			memories.add(MemoryModuleTypes.PARTY_ID.get());
 			memories.add(MemoryModuleTypes.VILLAGE_LEADER.get());
 
-			System.out.println("Mind of villager " + memories + " (" + sensors + ")");
+			LogUtils.getLogger().debug("Mind of villager " + memories + " (" + sensors + ")");
 		} else {
 
-			Map<SensorType<? extends Sensor<? super Villager>>, Sensor<? super Villager>> sensors = ModUtils
-					.getField("sensors", "e", villager.getBrain());
+			Map<SensorType<? extends Sensor<? super Villager>>, Sensor<? super Villager>> sensors = FieldUtils
+					.getInstanceField("sensors", "e", villager.getBrain());
 			Map<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> memories = villager.getBrain()
 					.getMemories();
 
@@ -91,7 +95,7 @@ public class VillagerTweaks {
 			memories.put(MemoryModuleTypes.PARTY_ID.get(), Optional.empty());
 			memories.put(MemoryModuleTypes.VILLAGE_LEADER.get(), Optional.empty());
 
-			System.out.println("Mind of villager " + memories + " (" + sensors + ")");
+			LogUtils.getLogger().debug("Mind of villager " + memories + " (" + sensors + ")");
 		}
 	}
 
@@ -168,10 +172,10 @@ public class VillagerTweaks {
 		}
 		Set<ChunkPos> villageChunks = villPois.stream().map((poi) -> new ChunkPos(poi.getPos()))
 				.collect(Collectors.toSet());
-		BlockPos centra = ModUtils.centerC(villageChunks);
+		BlockPos centra = WorldUtils.centerCP(villageChunks);
 		IParty party = IParty.createGroup(
 				"village[" + centra.getX() + "," + centra.getZ() + "," + level.dimension().location() + "]",
-				ModUtils.literal("Village at " + "[" + centra.getX() + "," + centra.getZ() + ","
+				TextUtils.literal("Village at " + "[" + centra.getX() + "," + centra.getZ() + ","
 						+ level.dimension().location() + "]"),
 				villageChunks.stream().map((r) -> new RegionResource(r, level.dimension())).toList());
 		party.setResourceAmount(new IDResource(villager.getUUID()), 1);

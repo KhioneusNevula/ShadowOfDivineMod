@@ -1,4 +1,4 @@
-package com.gm910.sotdivine.systems.deity.sphere;
+package com.gm910.sotdivine.systems.deity.sphere.genres;
 
 import java.util.Collection;
 
@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * A genre for a sphere
  */
-public sealed interface IGenre<T> permits Genres.Genre {
+public sealed interface IGenreType<T> permits GenreTypes.GenreType {
 
 	public ResourceLocation resourceLocation();
 
@@ -27,6 +27,20 @@ public sealed interface IGenre<T> permits Genres.Genre {
 	 * @return
 	 */
 	public Range<Integer> amountPermitted();
+
+	/**
+	 * Whether an emanation of this genre can be given to something with inventory
+	 * 
+	 * @return
+	 */
+	public boolean isGiveable();
+
+	/**
+	 * Whether an emanation of this genre can be created in the world
+	 * 
+	 * @return
+	 */
+	public boolean isPlaceable();
 
 	public static void init() {
 

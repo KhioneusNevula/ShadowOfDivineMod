@@ -15,7 +15,7 @@ import com.gm910.sotdivine.systems.party.relation.IRelationship;
 import com.gm910.sotdivine.systems.party.relation.MemoryType;
 import com.gm910.sotdivine.systems.party.resource.IPartyResource;
 import com.gm910.sotdivine.systems.party.resource.PartyResourceType;
-import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -167,7 +167,7 @@ public class Party implements IParty {
 
 	@Override
 	public Component descriptiveInfo(ServerLevel level) {
-		return ModUtils.trans("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "entity" : "other"))
+		return TextUtils.transPrefix("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "entity" : "other"))
 				+ (canWorship ? ".worshiper" : ""), relations.size());
 	}
 

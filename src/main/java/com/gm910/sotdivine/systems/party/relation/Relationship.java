@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.gm910.sotdivine.systems.party_system.IPartySystem;
-import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.util.TextUtils;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -67,8 +67,8 @@ public class Relationship implements IRelationship {
 	public Component report(ServerLevel access) {
 		IPartySystem system = IPartySystem.get(access);
 		return system.getPartyByName(target)
-				.map((party) -> ModUtils.trans("cmd.relationship",
-						party.descriptiveName().orElse(ModUtils.trans("cmd.noname")), party.uniqueName(),
+				.map((party) -> TextUtils.transPrefix("cmd.relationship",
+						party.descriptiveName().orElse(TextUtils.transPrefix("cmd.noname")), party.uniqueName(),
 						stats.toString()))
 				.orElse(Component.literal(this.toString()));
 

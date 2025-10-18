@@ -1,9 +1,10 @@
 package com.gm910.sotdivine.systems.deity.sphere;
 
-import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.registries.ModRegistries;
 import com.gm910.sotdivine.util.ModUtils;
 
 import net.minecraft.tags.TagKey;
+import net.minecraftforge.registries.RegistryManager;
 
 public class SphereTags {
 
@@ -16,7 +17,7 @@ public class SphereTags {
 	}
 
 	private static TagKey<ISphere> tag(String p_203855_) {
-		return SOTDMod.SPHERES.createTagKey(ModUtils.path(p_203855_));
+		return RegistryManager.FROZEN.getRegistry(ModRegistries.SPHERES).tags().createTagKey(ModUtils.path(p_203855_));
 	}
 
 }

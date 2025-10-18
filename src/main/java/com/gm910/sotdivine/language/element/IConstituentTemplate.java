@@ -40,7 +40,7 @@ public interface IConstituentTemplate extends IConstituent {
 	}
 
 	/**
-	 * Create a language element by type
+	 * Create a language provider by type
 	 * 
 	 * @param type
 	 * @return
@@ -72,18 +72,18 @@ public interface IConstituentTemplate extends IConstituent {
 		return this instanceof IWordTemplate ? ElementType.WORD : ElementType.PHRASE;
 	}
 
-	/** the unique id of this element */
+	/** the unique id of this provider */
 	public String id();
 
 	/**
-	 * Return the form of this element
+	 * Return the form of this provider
 	 * 
 	 * @return
 	 */
 	public String form();
 
 	/**
-	 * The syntactic category of this element
+	 * The syntactic category of this provider
 	 * 
 	 * @return
 	 */
@@ -97,14 +97,14 @@ public interface IConstituentTemplate extends IConstituent {
 	public String detailedString();
 
 	/**
-	 * The (specified) features of this element, if available
+	 * The (specified) features of this provider, if available
 	 * 
 	 * @return
 	 */
 	public Map<String, ISpecificationValue> features();
 
 	/**
-	 * Return the (optional) id of the element to be copied from the given element
+	 * Return the (optional) id of the provider to be copied from the given provider
 	 * definition
 	 * 
 	 * @return
@@ -115,7 +115,7 @@ public interface IConstituentTemplate extends IConstituent {
 	}
 
 	/**
-	 * Try to return an array of the derivations of this element, or an empty one if
+	 * Try to return an array of the derivations of this provider, or an empty one if
 	 * not possible
 	 * 
 	 * @param item
@@ -124,16 +124,16 @@ public interface IConstituentTemplate extends IConstituent {
 	public Collection<IConstituentTemplate> genDerivations(JsonElement element, ElementType type);
 
 	/**
-	 * copy another language element
+	 * copy another language provider
 	 * 
 	 * @param other
 	 */
 	public IConstituentTemplate copy(IConstituentTemplate other);
 
 	/**
-	 * Parse data into this language element
+	 * Parse data into this language provider
 	 * 
-	 * @param element
+	 * @param provider
 	 */
 	public IConstituentTemplate parse(JsonElement element);
 

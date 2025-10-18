@@ -5,13 +5,11 @@ import java.util.function.Function;
 
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.blocks.ModBlocks;
-import com.gm910.sotdivine.misc.ModCreativeTabs;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -32,7 +30,7 @@ public class ModItems {
 		System.out.println("Initializing mod items");
 	}
 
-	private static final Multimap<ResourceKey<CreativeModeTab>, ResourceKey<Item>> TABS = MultimapBuilder.hashKeys()
+	private static final Multimap<ResourceKey<CreativeModeTab>, RegistryObject<Item>> TABS = MultimapBuilder.hashKeys()
 			.hashSetValues().build();
 
 	/**
@@ -45,7 +43,7 @@ public class ModItems {
 	public static final RegistryObject<Item> DIVINE_BANNER_PATTERN = register("divine_banner_pattern",
 			(key) -> new Item(new Item.Properties().setId(key).stacksTo(1)
 					.component(DataComponents.PROVIDES_BANNER_PATTERNS, ModBannerPatternTags.ALL_DIVINE)),
-			CreativeModeTabs.TOOLS_AND_UTILITIES);
+			CreativeModeTabs.INGREDIENTS);
 
 	/**
 	 * Creates a new food item with the id "examplemod:example_id", nutrition 1 and
@@ -56,7 +54,7 @@ public class ModItems {
 	 * register("example_item", (key) -> new Item(new Item.Properties().setId(key)
 	 * .food(new
 	 * FoodProperties.Builder().alwaysEdible().nutrition(1).saturationModifier(2f).build())),
-	 * ModCreativeTabs.EXAMPLE_TAB);
+	 * ModCreativeTabs.SOTD_TAB);
 	 */
 
 	/**
@@ -84,9 +82,10 @@ public class ModItems {
 	public static RegistryObject<Item> register(String blockID, Function<ResourceKey<Item>, Item> supplier,
 			RegistryObject<CreativeModeTab>... tabs) {
 		ResourceKey<Item> key = SOTDMod.ITEMS.key(blockID);
+		var obj = SOTDMod.ITEMS.register(blockID, () -> supplier.apply(key));
 		for (RegistryObject<CreativeModeTab> tab : tabs)
-			TABS.put(tab.getKey(), key);
-		return SOTDMod.ITEMS.register(blockID, () -> supplier.apply(key));
+			TABS.put(tab.getKey(), obj);
+		return obj;
 	}
 
 	/**
@@ -101,12 +100,13 @@ public class ModItems {
 	public static RegistryObject<Item> register(String blockID, Function<ResourceKey<Item>, Item> supplier,
 			ResourceKey<CreativeModeTab>... tabs) {
 		ResourceKey<Item> key = SOTDMod.ITEMS.key(blockID);
+		var obj = SOTDMod.ITEMS.register(blockID, () -> supplier.apply(key));
 		for (ResourceKey<CreativeModeTab> tab : tabs)
-			TABS.put(tab, key);
-		return SOTDMod.ITEMS.register(blockID, () -> supplier.apply(key));
+			TABS.put(tab, obj);
+		return obj;
 	}
 
-	public static Collection<ResourceKey<Item>> itemsOfTab(ResourceKey<CreativeModeTab> tab) {
+	public static Collection<RegistryObject<Item>> itemsOfTab(ResourceKey<CreativeModeTab> tab) {
 		return TABS.get(tab);
 	}
 }

@@ -1,19 +1,24 @@
 package com.gm910.sotdivine.systems.deity.emanation.spell;
 
+import com.gm910.sotdivine.util.CodecUtils;
+import com.mojang.serialization.Codec;
+
 public enum SpellAlignment {
 
-	/** A harmful spell */
-	curse,
-	/** A helpful spell */
-	blessing,
-	/** A neutral spell that isn't helpful or harmful */
-	pragma,
-	/** A helpful spell that can have a dangerous cost */
-	cursed_blessing;
+	/** A harmful SPELL */
+	CURSE,
+	/** A helpful SPELL */
+	BLESSING,
+	/** A neutral SPELL that isn't helpful or harmful */
+	PRAGMA,
+	/** A helpful SPELL that can have a dangerous cost */
+	CURSED_BLESSING;
+
+	public static final Codec<SpellAlignment> CODEC = CodecUtils.caselessEnumCodec(SpellAlignment.class);
 
 	/**
-	 * Returns the spell alignment fitting the given booleans, left being whether it
-	 * is blessing and right being whether it's a curse
+	 * Returns the SPELL alignment fitting the given booleans, left being whether it
+	 * is BLESSING and right being whether it's a CURSE
 	 * 
 	 * @param benefit
 	 * @param malefit
@@ -21,39 +26,39 @@ public enum SpellAlignment {
 	 */
 	public static SpellAlignment from(boolean bless, boolean cursea) {
 		if (bless && cursea) {
-			return cursed_blessing;
+			return CURSED_BLESSING;
 		} else if (bless) {
-			return blessing;
+			return BLESSING;
 		} else if (cursea) {
-			return curse;
+			return CURSE;
 		}
-		return pragma;
+		return PRAGMA;
 	}
 
 	/**
-	 * Whether this spell is a blessing
+	 * Whether this SPELL is a BLESSING
 	 * 
 	 * @return
 	 */
 	public boolean isBlessing() {
-		return this == blessing || this == cursed_blessing;
+		return this == BLESSING || this == CURSED_BLESSING;
 	}
 
 	/**
-	 * Return true if this spell is a curse
+	 * Return true if this SPELL is a CURSE
 	 * 
 	 * @return
 	 */
 	public boolean isCurse() {
-		return this == curse || this == cursed_blessing;
+		return this == CURSE || this == CURSED_BLESSING;
 	}
 
 	/**
-	 * Return true if this spell is a pragma
+	 * Return true if this SPELL is a PRAGMA
 	 * 
 	 * @return
 	 */
 	public boolean isPragma() {
-		return this == pragma;
+		return this == PRAGMA;
 	}
 }

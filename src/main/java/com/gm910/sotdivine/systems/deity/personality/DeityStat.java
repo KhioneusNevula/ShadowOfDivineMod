@@ -15,7 +15,7 @@ public enum DeityStat implements IDeityStat {
 	 * Higher chance of going after a deity or even individual that has wronged it
 	 */
 	VINDICTIVENESS,
-	/** Higher chance of communicating and manifesting a theophany */
+	/** Higher chance of communicating and manifesting a THEOPHANY */
 	PERSONABILITY,
 	/**
 	 * Higher chance of taking independent actions; if 0, the deity will only act in

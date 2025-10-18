@@ -24,10 +24,10 @@ import com.google.common.collect.Maps;
 public class GeneratedConstituent implements IConstituent {
 
 	/*
-	 * public static final Codec<GeneratedConstituent> CODEC =
-	 * RecordCodecBuilder.create(instance -> instance.group(
+	 * public static final Codec<GeneratedConstituent> DEFICIENT_CODEC =
+	 * RecordCodecBuilder.create(emanation -> emanation.group(
 	 * 
-	 * ).apply(instance, (x, y, z) -> ...));
+	 * ).apply(emanation, (x, y, z) -> ...));
 	 */
 
 	private IConstituentTemplate element;
@@ -63,7 +63,7 @@ public class GeneratedConstituent implements IConstituent {
 	}
 
 	/**
-	 * Return the element this holder represents
+	 * Return the provider this holder represents
 	 * 
 	 * @return
 	 */

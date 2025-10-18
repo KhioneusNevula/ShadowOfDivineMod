@@ -10,7 +10,7 @@ record GR(Optional<GeneratedConstituent> constituent, boolean complete, int word
 	@Override
 	public String getAsString(boolean showBrackets) {
 		return constituent.isEmpty() ? "FAIL"
-				: ((complete ? "SUCCESS" : "INCOMPLETE") + "(\"" + constituent.get().constructString(showBrackets)
+				: ((complete ? "SIGNIFIER" : "INCOMPLETE") + "(\"" + constituent.get().constructString(showBrackets)
 						+ "\")");
 	}
 }

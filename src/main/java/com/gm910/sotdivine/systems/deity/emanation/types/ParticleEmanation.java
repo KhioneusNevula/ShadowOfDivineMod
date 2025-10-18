@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.gm910.sotdivine.particle.ParticleSpecification;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationInstance;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
 import com.gm910.sotdivine.systems.deity.emanation.spell.ISpellProperties;
-import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.ParticleSpecification;
+import com.gm910.sotdivine.util.StreamUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -19,7 +19,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public class ParticleEmanation extends AbstractEmanation {
-	public static final Codec<ParticleEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
+	public static final Codec<ParticleEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(
 			Codec.list(ParticleSpecification.CODEC).fieldOf("particles")
 					.forGetter((p) -> new ArrayList<>(p.particles())),
@@ -76,7 +76,7 @@ public class ParticleEmanation extends AbstractEmanation {
 
 		return "Particles["
 				+ this.particles.stream().map((p) -> BuiltInRegistries.PARTICLE_TYPE.getKey(p.particle().getType()))
-						.collect(ModUtils.setStringCollector(","))
+						.collect(StreamUtils.setStringCollector(","))
 				+ "]";
 	}
 

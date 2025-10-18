@@ -9,6 +9,7 @@ import com.google.common.collect.Streams;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
@@ -21,7 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
  *
  */
 public class GiveEffectEmanation extends AbstractEmanation {
-	public static final Codec<GiveEffectEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
+	public static final Codec<GiveEffectEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(MobEffectInstance.CODEC.fieldOf("effect").forGetter(GiveEffectEmanation::getEffectInstance),
 			ISpellProperties.CODEC.fieldOf("spell_properties").forGetter((p) -> p.optionalSpellProperties().get()))
 			.apply(instance, GiveEffectEmanation::new));
@@ -35,7 +36,8 @@ public class GiveEffectEmanation extends AbstractEmanation {
 
 	@Override
 	protected String emanationName() {
-		return "give_effect_" + effectInstance.getEffect().getRegisteredName();
+		return "give_effect_" + effectInstance.getEffect().unwrap()
+				.map((x) -> x.location().toString().replace(":", "_"), (x) -> BuiltInRegistries.MOB_EFFECT.getKey(x));
 	}
 
 	@Override

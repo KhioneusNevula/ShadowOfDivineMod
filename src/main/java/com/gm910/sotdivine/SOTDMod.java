@@ -8,9 +8,16 @@ import com.gm910.sotdivine.items.ModItems;
 import com.gm910.sotdivine.language.LanguageGen;
 import com.gm910.sotdivine.misc.ModCreativeTabs;
 import com.gm910.sotdivine.networking.ModNetwork;
+import com.gm910.sotdivine.registries.ModRegistries;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
+import com.gm910.sotdivine.systems.deity.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.systems.deity.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.systems.deity.sphere.ISphere;
 import com.gm910.sotdivine.systems.deity.sphere.Spheres;
+import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
+import com.gm910.sotdivine.systems.deity.sphere.genres.provider.data.ComponentMatchers;
+import com.gm910.sotdivine.systems.deity.sphere.genres.provider.entity_preds.TypeSpecificProviders;
 import com.gm910.sotdivine.systems.deity.symbol.DeitySymbols;
 import com.gm910.sotdivine.systems.party.resource.PartyResourceType;
 import com.gm910.sotdivine.systems.villagers.ModBrainElements;
@@ -20,8 +27,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -58,20 +63,19 @@ public final class SOTDMod {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
 	// defered register for banner patterns
-	public static final DeferredRegister<BannerPattern> PATTERNS = DeferredRegister.create(Registries.BANNER_PATTERN,
-			MODID);
+	public static final DeferredRegister<BannerPattern> BANNER_PATTERNS = DeferredRegister
+			.create(Registries.BANNER_PATTERN, MODID);
 
 	// Create a Deferred Register to hold pois which will all be registered under
 	// the "examplemod" namespace
-	public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(ForgeRegistries.POI_TYPES, MODID);
-	// deferred register for spheree
-	public static final DeferredRegister<ISphere> SPHERES = DeferredRegister.create(ISphere.REGISTRY_KEY, MODID);
+	public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE,
+			MODID);
 
 	public static final DeferredRegister<MemoryModuleType<?>> MEMORY_MODULE_TYPES = DeferredRegister
-			.create(ForgeRegistries.MEMORY_MODULE_TYPES, MODID);
+			.create(Registries.MEMORY_MODULE_TYPE, MODID);
 
-	public static final DeferredRegister<SensorType<?>> SENSOR_TYPES = DeferredRegister
-			.create(ForgeRegistries.SENSOR_TYPES, MODID);
+	public static final DeferredRegister<SensorType<?>> SENSOR_TYPES = DeferredRegister.create(Registries.SENSOR_TYPE,
+			MODID);
 
 	// Create a Deferred Register to hold CreativeModeTabs which will all be
 	// registered under the "examplemod" namespace
@@ -80,25 +84,28 @@ public final class SOTDMod {
 
 	public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister
 			.create(Registries.COMMAND_ARGUMENT_TYPE, MODID);
-	/**
-	 * Party resource types register
-	 */
-	public static final DeferredRegister<PartyResourceType<?>> PARTY_RESOURCE_TYPES = DeferredRegister.create(
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "resource_type")),
-			SOTDMod.MODID);
+
+	// deferred register for genres
+	public static final DeferredRegister<IGenreType<?>> GENRE_TYPES = DeferredRegister.create(ModRegistries.GENRE_TYPES,
+			MODID);
 
 	/**
 	 * Emanation Type register
 	 */
-	public static final DeferredRegister<EmanationType<?>> EMANATION_TYPES = DeferredRegister.create(
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "emanation_type")),
-			SOTDMod.MODID);
+	public static final DeferredRegister<EmanationType<?>> EMANATION_TYPES = DeferredRegister
+			.create(ModRegistries.EMANATION_TYPES, SOTDMod.MODID);
+
+	/**
+	 * Party resource types register
+	 */
+	public static final DeferredRegister<PartyResourceType<?>> PARTY_RESOURCE_TYPES = DeferredRegister
+			.create(ModRegistries.PARTY_RESOURCE_TYPES, SOTDMod.MODID);
+
 	/**
 	 * Deity language generators
 	 */
-	public static final DeferredRegister<LanguageGen> LANGUAGE_GENS = DeferredRegister.create(
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "language_gen")),
-			SOTDMod.MODID);
+	public static final DeferredRegister<LanguageGen> LANGUAGE_GENS = DeferredRegister
+			.create(ModRegistries.LANGUAGE_GEN, SOTDMod.MODID);
 
 	public SOTDMod(FMLJavaModLoadingContext context) {
 		var modBusGroup = context.getModBusGroup();
@@ -106,16 +113,11 @@ public final class SOTDMod {
 		// Register the commonSetup method for modloading
 		FMLCommonSetupEvent.getBus(modBusGroup).addListener(this::commonSetup);
 
-		// Register the Deferred Register to the mod event bus so blocks get registered
 		BLOCKS.register(modBusGroup);
 		ModBlocks.init();
-		// Register the Deferred Register to the mod event bus so items get registered
 		ITEMS.register(modBusGroup);
 		ModItems.init();
-		// Register the Deferred Register to the mod event bus so banner patterns get
-		// registered
-		PATTERNS.register(modBusGroup);
-		// Register the Deferred Register to the mod event bus so tabs get registered
+		BANNER_PATTERNS.register(modBusGroup);
 		CREATIVE_MODE_TABS.register(modBusGroup);
 		ModCreativeTabs.init();
 
@@ -126,23 +128,22 @@ public final class SOTDMod {
 		SENSOR_TYPES.register(modBusGroup);
 		ModBrainElements.init();
 
-		COMMAND_ARGUMENT_TYPES.register(modBusGroup);
-		ModCommandArgumentTypes.init();
-
-		PARTY_RESOURCE_TYPES.register(modBusGroup);
-		PartyResourceType.init();
-
-		SPHERES.register(modBusGroup);
-		Spheres.init();
-
-		AddReloadListenerEvent.BUS.addListener(Spheres::eventAddListener);
-		AddReloadListenerEvent.BUS.addListener(DeitySymbols::eventAddListener);
-
-		EMANATION_TYPES.register(modBusGroup);
+		GenreTypes.init();
+		GENRE_TYPES.register(modBusGroup);
 		EmanationType.init();
-
-		LANGUAGE_GENS.register(modBusGroup);
+		EMANATION_TYPES.register(modBusGroup);
+		PartyResourceType.init();
+		PARTY_RESOURCE_TYPES.register(modBusGroup);
 		LanguageGen.init();
+		LANGUAGE_GENS.register(modBusGroup);
+		LanguageGen.registerInit();
+
+		ModCommandArgumentTypes.init();
+		COMMAND_ARGUMENT_TYPES.register(modBusGroup);
+
+		AddReloadListenerEvent.BUS.addListener(RitualPatterns::eventAddListener);
+		AddReloadListenerEvent.BUS.addListener(DeitySymbols::eventAddListener);
+		AddReloadListenerEvent.BUS.addListener(Spheres::eventAddListener);
 
 		// Register the item to a creative tab
 		BuildCreativeModeTabContentsEvent.getBus(modBusGroup).addListener(SOTDMod::addCreative);
@@ -152,6 +153,9 @@ public final class SOTDMod {
 		context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
 		ModNetwork.init();
+
+		ComponentMatchers.registerInit();
+		TypeSpecificProviders.registerInit();
 
 	}
 

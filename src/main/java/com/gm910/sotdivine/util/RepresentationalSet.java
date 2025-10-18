@@ -105,7 +105,7 @@ public class RepresentationalSet<E> implements Set<E> {
 	public boolean removeAll(Collection<?> c) {
 		boolean mod = false;
 		for (Object x : c) {
-			if (this.remove(c))
+			if (this.remove(x))
 				mod = true;
 		}
 		return mod;

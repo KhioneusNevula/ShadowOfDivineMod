@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.networking.ModNetwork;
-import com.gm910.sotdivine.systems.deity.type.IDeity;
+import com.gm910.sotdivine.systems.deity.IDeity;
 import com.gm910.sotdivine.systems.party.IParty;
 import com.gm910.sotdivine.systems.party.resource.PartyResourceType;
 import com.google.common.collect.Iterators;

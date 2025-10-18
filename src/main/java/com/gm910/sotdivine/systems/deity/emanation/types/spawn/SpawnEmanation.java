@@ -6,7 +6,7 @@ import com.gm910.sotdivine.systems.deity.emanation.EmanationInstance;
 import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
 import com.gm910.sotdivine.systems.deity.emanation.spell.ISpellProperties;
 import com.gm910.sotdivine.systems.deity.emanation.types.AbstractEmanation;
-import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.util.StreamUtils;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,14 +23,14 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 /**
- * A spawning spell, to spawn an entity
+ * A spawning SPELL, to spawn an entity
  * 
  * @author borah
  *
  */
 public class SpawnEmanation extends AbstractEmanation {
 
-	public static final Codec<SpawnEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
+	public static final Codec<SpawnEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(Codec.STRING.optionalFieldOf("name").forGetter((m) -> Optional.ofNullable(m.emanationName())), Codec
 			.mapEither(WeightedList.codec(EntityType.CODEC).fieldOf("entities"), EntityType.CODEC.fieldOf("entity"))
 			.forGetter((sp) -> {
@@ -55,7 +55,7 @@ public class SpawnEmanation extends AbstractEmanation {
 		if (name.isEmpty()) {
 			this.name = "spawn_" + mobs.unwrap().stream().sorted((w, w2) -> -Integer.compare(w.weight(), w2.weight()))
 					.map(Weighted<EntityType<?>>::value).map(EntityType::getKey).map(ResourceLocation::getPath)
-					.collect(ModUtils.setStringCollector("_or_"));
+					.collect(StreamUtils.setStringCollector("_or_"));
 		} else {
 			this.name = name.get();
 		}
@@ -137,8 +137,8 @@ public class SpawnEmanation extends AbstractEmanation {
 		}
 		info.targetInfo().level().addFreshEntityWithPassengers(entity);
 		entityPostprocessing(entity, info);
-		info.targetInfo().level().gameEvent(GameEvent.ENTITY_PLACE, gpos.pos(),
-				GameEvent.Context.of(info.targetInfo().opCaster().orElse(null).getEntity(level, Entity.class)));
+		info.targetInfo().level().gameEvent(GameEvent.ENTITY_PLACE, gpos.pos(), GameEvent.Context
+				.of(info.targetInfo().opCaster().map((u) -> info.targetInfo().level().getEntity(u)).orElse(null)));
 		return false;
 	}
 

@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.gm910.sotdivine.language.selector.ITemplateSelector;
 
 /**
- * A language element which can be a template for other elements
+ * A language provider which can be a template for other elements
  * 
  * @author borah
  *

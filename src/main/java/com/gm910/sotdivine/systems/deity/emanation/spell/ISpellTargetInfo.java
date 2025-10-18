@@ -5,11 +5,14 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.gm910.sotdivine.systems.deity.type.IDeity;
+import com.gm910.sotdivine.systems.deity.IDeity;
 import com.gm910.sotdivine.systems.party_system.IPartySystem;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
@@ -25,7 +28,7 @@ public interface ISpellTargetInfo {
 	public static class Builder {
 		private IDeity deity;
 		private ServerLevel level;
-		private Optional<EntityReference<Entity>> opCaster = Optional.empty();
+		private Optional<UUID> opCaster = Optional.empty();
 		private Optional<EntityReference<Entity>> opTargetEntity = Optional.empty();
 		private Optional<GlobalPos> opTargetPos = Optional.empty();
 
@@ -50,6 +53,8 @@ public interface ISpellTargetInfo {
 		}
 
 		public Builder targetPos(BlockPos pos) {
+			if (this.level == null)
+				throw new IllegalArgumentException();
 			return targetPos(GlobalPos.of(level.dimension(), pos));
 		}
 
@@ -59,12 +64,12 @@ public interface ISpellTargetInfo {
 		}
 
 		public Builder caster(UUID caster) {
-			this.opCaster = Optional.of(new EntityReference<>(caster));
+			this.opCaster = Optional.of(caster);
 			return this;
 		}
 
 		public Builder caster(Entity caster) {
-			this.opCaster = Optional.of(new EntityReference<>(caster));
+			this.opCaster = Optional.of(caster.getUUID());
 			return this;
 		}
 
@@ -78,7 +83,18 @@ public interface ISpellTargetInfo {
 	}
 
 	/**
-	 * creates the most basic kind of spell target info
+	 * Encodes a {@link ISpellTargetInfo} emanation, though it only decodes deficient
+	 * instances
+	 */
+	public static final Codec<ISpellTargetInfo> DEFICIENT_CODEC = RecordCodecBuilder.create(instance -> // Given an
+																										// emanation
+	instance.group(GlobalPos.CODEC.optionalFieldOf("targetPos").forGetter(ISpellTargetInfo::opTargetPos),
+			EntityReference.<Entity>codec().optionalFieldOf("targetEntity").forGetter(ISpellTargetInfo::opTargetEntity),
+			UUIDUtil.CODEC.optionalFieldOf("caster").forGetter(ISpellTargetInfo::opCaster))
+			.apply(instance, (tp, te, c) -> new SPTI(null, null, c, te, tp)));
+
+	/**
+	 * creates the most basic kind of SPELL target info
 	 * 
 	 * @param deity
 	 * @param level
@@ -147,14 +163,14 @@ public interface ISpellTargetInfo {
 	}
 
 	/**
-	 * The entity that casts this spell, if it was not directly the deity
+	 * The entity or party that casts this SPELL, if it was not directly the deity
 	 * 
 	 * @return
 	 */
-	public Optional<EntityReference<Entity>> opCaster();
+	public Optional<UUID> opCaster();
 
 	/**
-	 * The divine source of this spell
+	 * The divine source of this SPELL
 	 * 
 	 * @return
 	 */

@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 /**
- * A language element
+ * A language provider
  */
 abstract class LEAbstract<T extends IConstituentTemplate> implements IConstituentTemplate {
 
@@ -39,7 +39,7 @@ abstract class LEAbstract<T extends IConstituentTemplate> implements IConstituen
 				copyAdditional(clazz.cast(other));
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("While copying element from " + other + ": " + e.getMessage(), e);
+			throw new RuntimeException("While copying provider from " + other + ": " + e.getMessage(), e);
 		}
 		return this;
 	}
@@ -131,14 +131,14 @@ abstract class LEAbstract<T extends IConstituentTemplate> implements IConstituen
 	/**
 	 * For child classes to parse specific removals
 	 * 
-	 * @param element
+	 * @param provider
 	 */
 	protected abstract void parseRemovals(JsonObject object);
 
 	/**
 	 * For child classes to parse additional things
 	 * 
-	 * @param element
+	 * @param provider
 	 */
 	protected abstract void parseAdditional(JsonObject object);
 

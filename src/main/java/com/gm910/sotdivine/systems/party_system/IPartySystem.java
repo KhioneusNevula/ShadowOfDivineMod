@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.networking.PartySystemClient;
+import com.gm910.sotdivine.systems.deity.IDeity;
 import com.gm910.sotdivine.systems.deity.sphere.ISphere;
 import com.gm910.sotdivine.systems.deity.symbol.DeitySymbols;
 import com.gm910.sotdivine.systems.deity.symbol.IDeitySymbol;
-import com.gm910.sotdivine.systems.deity.type.IDeity;
 import com.gm910.sotdivine.systems.party.IParty;
 import com.gm910.sotdivine.systems.villagers.poi.ModPoiTypes;
 import com.google.common.base.Functions;
@@ -25,6 +25,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -55,8 +56,8 @@ public interface IPartySystem {
 
 	public static final String SAVED_DATA_ID = "sotdivine_parties";
 
-	public static final Codec<IPartySystem> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
-	instance.group( // Define the fields within the instance
+	public static final Codec<IPartySystem> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
+	instance.group( // Define the fields within the emanation
 			Codec.list(IParty.CODEC).fieldOf("parties").forGetter((ds) -> {
 				return new ArrayList<>(ds.nonDeityParties());
 			}), Codec.list(IDeity.CODEC).fieldOf("deities").forGetter((ds) -> new ArrayList<>(ds.allDeities())))
@@ -86,7 +87,7 @@ public interface IPartySystem {
 	}
 
 	/**
-	 * Return the singular instance (which might not yet be loaded) of the party
+	 * Return the singular emanation (which might not yet be loaded) of the party
 	 * system that exists on the client side
 	 * 
 	 * @return
@@ -100,6 +101,17 @@ public interface IPartySystem {
 	 * Return the party associated with this ID
 	 */
 	public Optional<IParty> getPartyByName(String id);
+
+	/**
+	 * Returns party by its display name
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public default Optional<IParty> getPartyByDisplayName(String name) {
+		return this.allParties().stream()
+				.filter((x) -> x.descriptiveName().filter((m) -> m.getString().equals(name)).isPresent()).findAny();
+	}
 
 	/**
 	 * If a certain party exists
@@ -133,7 +145,7 @@ public interface IPartySystem {
 	}
 
 	/**
-	 * Returns stream of deities based on a given banner pattern (calls
+	 * Returns stream of deities based on a given banner patterns (calls
 	 * {@link #deitiesBySymbol(IDeitySymbol)})
 	 * 
 	 * @param sphere
@@ -150,7 +162,15 @@ public interface IPartySystem {
 	 * @return
 	 */
 	public default Stream<IDeity> deitiesBySymbol(IDeitySymbol symbol) {
-		return allDeities().stream().filter((a) -> a.symbol().equals(symbol));
+		return allDeities().stream().filter((a) -> {
+			ResourceLocation aRL = DeitySymbols.instance().getDeitySymbolMap().inverse().get(a.symbol());
+			ResourceLocation arg = DeitySymbols.instance().getDeitySymbolMap().inverse().get(symbol);
+			boolean eq = arg.equals(aRL);
+			// System.out.println("Deity " + a.uniqueName() + ": " + arg + " vs " +
+			// a.symbol());
+
+			return eq;
+		});
 	}
 
 	/**

@@ -3,8 +3,8 @@ package com.gm910.sotdivine.events;
 import java.util.Random;
 
 import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.systems.deity.IDeity;
 import com.gm910.sotdivine.systems.deity.sphere.Spheres;
-import com.gm910.sotdivine.systems.deity.type.IDeity;
 import com.gm910.sotdivine.systems.party.IParty;
 import com.gm910.sotdivine.systems.party.resource.type.DimensionResource;
 import com.gm910.sotdivine.systems.party_system.IPartySystem;
@@ -24,10 +24,13 @@ public class PlayerEvents {
 			IPartySystem system = IPartySystem.get(player.level());
 			if (system.getPartyByName(player.getUUID().toString()).isEmpty()) {
 				system.addParty(IParty.createEntity(player.getUUID(), player.getDisplayName()), player.level());
+
 				Random random = new Random(new Random(player.level().getSeed()).longs()
 						.skip(system.allDeities().size() + 1).findAny().orElse(player.level().getSeed()));
-				int deities = random.nextInt(Spheres.instance().getSphereMap().size(),
-						Spheres.instance().getSphereMap().size() * 2);
+				int deities = 1;
+				if (system.allDeities().isEmpty())
+					deities = random.nextInt(Spheres.instance().getSphereMap().size(),
+							Spheres.instance().getSphereMap().size() * 2);
 				for (int mama = 0; mama < deities; mama++) {
 					IDeity dimde = IDeity.generateDeity(player.level(), random, system);
 					if (system.dimensionOwners(Level.NETHER).count() == 0) {

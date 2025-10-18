@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.gm910.sotdivine.systems.deity.type.IDeity;
+import com.gm910.sotdivine.systems.deity.IDeity;
 import com.gm910.sotdivine.systems.party.relation.IPartyMemory;
 import com.gm910.sotdivine.systems.party.relation.IRelationship;
 import com.gm910.sotdivine.systems.party.relation.MemoryType;
@@ -34,7 +34,7 @@ public interface IParty {
 
 	public static final Codec<IParty> CODEC = RecordCodecBuilder.create(instance -> instance.group( // Define the fields
 																									// within the
-																									// instance
+																									// emanation
 			Codec.BOOL.fieldOf("canWorship").forGetter(IParty::canWorship),
 			Codec.STRING.fieldOf("uniqueName").forGetter(IParty::uniqueName),
 			Codec.BOOL.fieldOf("isEntity").forGetter(IParty::isEntity),
@@ -268,7 +268,7 @@ public interface IParty {
 
 	/**
 	 * Repotr stuff about this party with some additional info by having access to a
-	 * world instance
+	 * world emanation
 	 * 
 	 * @param level
 	 * @return

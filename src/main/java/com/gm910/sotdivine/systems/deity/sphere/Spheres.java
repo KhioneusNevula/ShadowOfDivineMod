@@ -1,10 +1,17 @@
 package com.gm910.sotdivine.systems.deity.sphere;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
+import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.registries.ModRegistries;
+import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.util.ModUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -14,17 +21,26 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.registries.DeferredRegister.RegistryHolder;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryManager;
 
 public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
+
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private BiMap<ResourceLocation, ISphere> spheres = ImmutableBiMap.of();
 	private static Optional<Spheres> INSTANCE = Optional.empty();
-
+	private Map<ISphere, PoiType> ritualPoiTypes = new HashMap<>();
 	private static Codec<ISphere> CODEC;
 
 	public static final Codec<ISphere> sphereCodec() {
@@ -34,13 +50,13 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 	}
 
 	private Spheres(Provider prov) {
-		super(prov, sphereCodec(), Sphere.REGISTRY_KEY);
+		super(prov, sphereCodec(), ModRegistries.SPHERES);
 
 	}
 
 	@Override
 	protected Map<ResourceLocation, ISphere> prepare(ResourceManager man, ProfilerFiller p_10772_) {
-		LOGGER.info("InfoTag {}", SphereTags.CONCEPTUAL);
+		// LOGGER.info("InfoTag {}", SphereTags.CONCEPTUAL);
 		return super.prepare(man, p_10772_);
 	}
 
@@ -50,8 +66,51 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 			((Sphere) v).name = k;
 			return v;
 		}));
-		LOGGER.info("RM " + rm.getNamespaces());
+
+		map.values().forEach((sphere) -> {
+
+			ResourceLocation path = ResourceLocation.fromNamespaceAndPath(sphere.name().getNamespace(),
+					sphere.name().getPath() + "_sotdivine_focus");
+
+			if (!sphere.getGenres(GenreTypes.FOCUS_BLOCK).isEmpty()) {
+				if (!ForgeRegistries.POI_TYPES.containsKey(path)) {
+
+					Set<BlockState> states = new HashSet<>();
+
+					sphere.getGenres(GenreTypes.FOCUS_BLOCK).stream().forEach((pred) -> {
+						if (pred.kind().left().orElse(null) instanceof HolderSet<Block> blocks) {
+							blocks.forEach((hol) -> {
+								hol.get().getStateDefinition().getPossibleStates().stream()
+										.filter((state) -> pred.properties().isPresent()
+												? pred.properties().get().matches(state)
+												: true)
+										.forEach((state) -> {
+											states.add(state);
+										});
+							});
+						}
+					});
+
+					PoiType poi = new PoiType(states, 0, 1);
+
+					ModUtils.forceRegister(ForgeRegistries.POI_TYPES, path, poi);
+					this.ritualPoiTypes.put(sphere, poi);
+				} else {
+					this.ritualPoiTypes.put(sphere, ForgeRegistries.POI_TYPES.getValue(path));
+				}
+			}
+		});
+
 		LOGGER.info("Loaded spheres: {}", spheres.values());
+	}
+
+	/**
+	 * Return the poi type for focus blocks for the given sphere
+	 * 
+	 * @return
+	 */
+	public PoiType focusType(ISphere sphere) {
+		return this.ritualPoiTypes.get(sphere);
 	}
 
 	public static Spheres instance() {
@@ -59,7 +118,7 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 	}
 
 	public static void init() {
-
+		LogUtils.getLogger().debug("Initializing spheres");
 	}
 
 	/**
@@ -90,12 +149,12 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 	}
 
 	public static void initTest(HolderLookup.Provider provider) {
-		// provider.lookup(ISphere.REGISTRY_KEY).get().listTagIds().collect(ModUtils.setStringCollector(","));
+		// provider.lookup(ISphere.SPHERES).get().listTagIds().collect(ModUtils.setStringCollector(","));
 		/*
 		 * LOGGER.debug("TEST SPHERE json: " +
 		 * sphereCodec().encodeStart(JsonOps.INSTANCE, new Sphere(
-		 * Map.of(Genres.DIMENSION, Set.of(BuiltinDimensionTypes.NETHER),
-		 * Genres.OFFERING, Set.of(ItemPredicate.Builder.item().of(null,
+		 * Map.of(GenreTypes.DIMENSION, Set.of(BuiltinDimensionTypes.NETHER),
+		 * GenreTypes.OFFERING, Set.of(ItemPredicate.Builder.item().of(null,
 		 * Items.GOLDEN_SWORD)
 		 * 
 		 * .withComponents(DataComponentMatchers.Builder.components()
@@ -105,12 +164,12 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 		 * .getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))))
 		 * .build())
 		 * 
-		 * .build())), Map.of(DeityInteractionType.spell, Set.of( new SpawnEmanation(
+		 * .build())), Map.of(DeityInteractionType.SPELL, Set.of( new SpawnEmanation(
 		 * WeightedList.of(new Weighted<>(EntityType.AXOLOTL, 1), new
 		 * Weighted<>(EntityType.CAT, 1)),
-		 * ISpellProperties.create(SpellAlignment.blessing, false)), new
+		 * ISpellProperties.create(SpellAlignment.BLESSING, false)), new
 		 * GiveEffectEmanation(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60),
-		 * ISpellProperties.create(SpellAlignment.blessing, false)))))));
+		 * ISpellProperties.create(SpellAlignment.BLESSING, false)))))));
 		 */
 	}
 }

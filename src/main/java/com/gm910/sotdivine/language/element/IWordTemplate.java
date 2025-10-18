@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.gm910.sotdivine.language.feature.ISemanticSpecificationValue;
 
 /**
- * An atomic element of a language
+ * An atomic provider of a language
  * 
  * @author borah
  *

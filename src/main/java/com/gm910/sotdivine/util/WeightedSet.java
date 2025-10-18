@@ -4,9 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.stream.Streams;
 
@@ -20,23 +23,55 @@ public class WeightedSet<K> implements Set<K> {
 	private float totalWeight = 0f;
 	private WeightMap wMap = new WeightMap();
 
+	private void recalculateTotalWeight() {
+		totalWeight = (float) this.weightMap.values().stream().mapToDouble((x) -> x).sum();
+	}
+
+	public static <K> WeightedSet<K> fromEntries(Iterable<? extends Map.Entry<? extends K, ? extends Number>> entries) {
+		return new WeightedSet<>(Streams.of(entries).collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+	}
+
+	public static <K> WeightedSet<K> fromEntries(Iterator<? extends Map.Entry<? extends K, ? extends Number>> entries) {
+		return new WeightedSet<>(Streams.of(entries).collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+	}
+
+	public static <K> WeightedSet<K> fromEntries(Stream<? extends Map.Entry<? extends K, ? extends Number>> entries) {
+		return new WeightedSet<>(entries.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+	}
+
 	public WeightedSet() {
+	}
+
+	public WeightedSet(Stream<? extends K> source) {
+		source.forEach(this::add);
+	}
+
+	public WeightedSet(Iterator<? extends K> source) {
+		Streams.of(source).forEach(this::add);
 	}
 
 	public WeightedSet(Iterable<? extends K> source) {
 		Streams.of(source).forEach(this::add);
 	}
 
-	public WeightedSet(Map<? extends K, Float> source) {
-		source.entrySet().stream().forEach((x) -> this.setWeight(x.getKey(), x.getValue()));
+	public WeightedSet(Stream<? extends K> source, Function<K, ? extends Number> genWeight) {
+		source.forEach((x) -> setWeight(x, genWeight.apply(x).floatValue()));
 	}
 
-	public WeightedSet(Iterable<? extends K> source, Function<K, Float> genWeight) {
-		Streams.of(source).forEach((x) -> setWeight(x, genWeight.apply(x)));
+	public WeightedSet(Iterator<? extends K> source, Function<K, ? extends Number> genWeight) {
+		Streams.of(source).forEach((x) -> setWeight(x, genWeight.apply(x).floatValue()));
+	}
+
+	public WeightedSet(Iterable<? extends K> source, Function<K, ? extends Number> genWeight) {
+		Streams.of(source).forEach((x) -> setWeight(x, genWeight.apply(x).floatValue()));
+	}
+
+	public WeightedSet(Map<? extends K, ? extends Number> source) {
+		source.entrySet().stream().forEach((x) -> this.setWeight(x.getKey(), x.getValue().floatValue()));
 	}
 
 	private K get(float weightFactor) {
-		totalWeight = (float) this.weightMap.values().stream().mapToDouble((x) -> x).sum();
+		this.recalculateTotalWeight();
 		if (this.isEmpty())
 			return null;
 		float weight = weightFactor * totalWeight;
@@ -101,7 +136,7 @@ public class WeightedSet<K> implements Set<K> {
 
 	@Override
 	public Iterator<K> iterator() {
-		return weightMap.keySet().iterator();
+		return new WeightIterator();
 	}
 
 	@Override
@@ -127,15 +162,14 @@ public class WeightedSet<K> implements Set<K> {
 		if (weight < 0)
 			throw new IllegalArgumentException("Invalid weight " + weight + " for " + e);
 		float oldWeight = weightMap.getOrDefault(e, 0f);
-		totalWeight -= oldWeight;
 		if (weight == 0) {
 			if (oldWeight != 0f) {
 				this.remove(e);
 			}
 		} else {
-			totalWeight += weight;
 			this.weightMap.put(e, weight);
 		}
+		this.recalculateTotalWeight();
 		return oldWeight;
 	}
 
@@ -152,9 +186,7 @@ public class WeightedSet<K> implements Set<K> {
 	@Override
 	public boolean remove(Object o) {
 		Float oldWeight = weightMap.remove(o);
-		if (oldWeight != null) {
-			totalWeight -= oldWeight;
-		}
+		this.recalculateTotalWeight();
 		return oldWeight != null;
 	}
 
@@ -230,6 +262,28 @@ public class WeightedSet<K> implements Set<K> {
 	@Override
 	public int hashCode() {
 		return weightMap.hashCode();
+	}
+
+	private class WeightIterator implements Iterator<K> {
+
+		private Iterator<K> inner = weightMap.keySet().iterator();
+
+		@Override
+		public boolean hasNext() {
+			return inner.hasNext();
+		}
+
+		@Override
+		public K next() {
+			return inner.next();
+		}
+
+		@Override
+		public void remove() {
+			inner.remove();
+			recalculateTotalWeight();
+		}
+
 	}
 
 	private class WeightMap implements Map<K, Float> {

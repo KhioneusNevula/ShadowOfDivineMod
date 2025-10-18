@@ -15,11 +15,12 @@ import com.mojang.serialization.Codec;
 public interface IEmanation {
 
 	public static Codec<IEmanation> codec() {
+
 		return EmanationType.resourceCodec();
 	}
 
 	/**
-	 * If this emanation is a kind of spell, return the spell properties
+	 * If this emanation is a kind of SPELL, return the SPELL properties
 	 * 
 	 * @return
 	 */
@@ -48,7 +49,7 @@ public interface IEmanation {
 	public boolean trigger(EmanationInstance instance);
 
 	/**
-	 * Return true if this spell can continue ticking; update variables that are
+	 * Return true if this SPELL can continue ticking; update variables that are
 	 * relevant, too
 	 * 
 	 * @param info
@@ -62,7 +63,7 @@ public interface IEmanation {
 	/**
 	 * Whether this emanation can trigger; update variables relevant, too
 	 * 
-	 * @param instance
+	 * @param emanation
 	 * @return
 	 */
 	public default boolean checkIfCanTrigger(EmanationInstance instance) {
@@ -70,7 +71,7 @@ public interface IEmanation {
 	}
 
 	/**
-	 * Return true if this spell failed while ticking
+	 * Return true if this SPELL failed while ticking
 	 * 
 	 * @param info
 	 * @param tick
@@ -84,7 +85,7 @@ public interface IEmanation {
 	/**
 	 * Call this when an emanation is interrupted to clean up loose end
 	 * 
-	 * @param instance
+	 * @param emanation
 	 */
 	public default void interrupt(EmanationInstance instance) {
 

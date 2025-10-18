@@ -4,12 +4,12 @@ import java.util.Collection;
 
 import com.gm910.sotdivine.systems.deity.emanation.DeityInteractionType;
 import com.gm910.sotdivine.systems.deity.emanation.IEmanation;
-import com.gm910.sotdivine.util.ModUtils;
+import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
 
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -19,9 +19,6 @@ import net.minecraft.world.item.ItemStack;
  *
  */
 public sealed interface ISphere permits Sphere {
-	public static final ResourceKey<Registry<ISphere>> REGISTRY_KEY = ResourceKey
-			.createRegistryKey(ModUtils.path("deity_sphere"));
-
 	/**
 	 * The name of this sphere
 	 * 
@@ -50,8 +47,8 @@ public sealed interface ISphere permits Sphere {
 	 * @param stack
 	 * @return
 	 */
-	public default boolean canOffer(ItemStack stack) {
-		return this.getGenres(Genres.OFFERING).stream().anyMatch((x) -> x.test(stack));
+	public default boolean canOffer(ServerLevel level, ItemStack stack) {
+		return this.getGenres(GenreTypes.OFFERING).stream().anyMatch((x) -> x.matches(level, stack));
 	}
 
 	/**
@@ -62,9 +59,13 @@ public sealed interface ISphere permits Sphere {
 	 * @param genre
 	 * @return
 	 */
-	public <T> Collection<T> getGenres(IGenre<T> genre);
+	public <T> Collection<T> getGenres(IGenreType<T> genre);
 
-	public Collection<IGenre<?>> representedGenres();
+	public Collection<IGenreType<?>> representedGenres();
+
+	String report();
+
+	public Collection<IEmanation> allEmanations();
 
 	// Map<String, ISemanticSpecificationValue> semantics();
 

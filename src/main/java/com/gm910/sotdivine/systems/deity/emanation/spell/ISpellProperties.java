@@ -9,17 +9,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
- * Properties of a spell
+ * Properties of a SPELL
  * 
  * @author borah
  *
  */
 public interface ISpellProperties {
 
-	public static final Codec<ISpellProperties> CODEC = RecordCodecBuilder.create(instance -> // Given an instance
-	instance.group(
-			Codec.STRING.xmap(SpellAlignment::valueOf, SpellAlignment::name).fieldOf("alignment")
-					.forGetter(ISpellProperties::alignment),
+	public static final Codec<ISpellProperties> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
+	instance.group(SpellAlignment.CODEC.fieldOf("alignment").forGetter(ISpellProperties::alignment),
 
 			Codec.list(Codec.STRING.xmap(SpellTrait::valueOf, SpellTrait::name)).optionalFieldOf("traits")
 					.forGetter((a) -> Optional.of(new ArrayList<>(a.traits())))
@@ -31,14 +29,14 @@ public interface ISpellProperties {
 	}
 
 	/**
-	 * If this spell is helpful, harmful, both, or neither
+	 * If this SPELL is helpful, harmful, both, or neither
 	 * 
 	 * @return
 	 */
 	public SpellAlignment alignment();
 
 	/**
-	 * This spell's general traits
+	 * This SPELL's general traits
 	 * 
 	 * @return
 	 */

@@ -18,7 +18,7 @@ public interface ILSelector {
 	/**
 	 * Returns a map of variables that this selector has specified
 	 * 
-	 * @param element
+	 * @param provider
 	 * @return
 	 */
 	public Map<String, ISpecificationValue> obtainSetVariables(GeneratedConstituent element);
@@ -26,20 +26,20 @@ public interface ILSelector {
 	/**
 	 * Return true if this matches and has matching specifications for all the
 	 * features and semantics that this selector selectors for. In the given
-	 * element, variables will not be evaluated, and features with no specification
+	 * provider, variables will not be evaluated, and features with no specification
 	 * will be ignored. Variables in this selector will also not be evaluated if
 	 * nothing is provided for them in the environment.
 	 * 
 	 * If any literal features/semantics could not get matched, or the category
 	 * failed to match, return false
 	 * 
-	 * @param element
+	 * @param provider
 	 * @return
 	 */
 	public boolean test(IConstituentTemplate element);
 
 	/**
-	 * The semantic expectations of this element's adjuncts; copied over from
+	 * The semantic expectations of this provider's adjuncts; copied over from
 	 * prvious selector
 	 * 
 	 * @return
@@ -47,14 +47,14 @@ public interface ILSelector {
 	Map<String, ISemanticSpecificationValue> adjunctSemantics();
 
 	/**
-	 * The possible syntactic categories of this element
+	 * The possible syntactic categories of this provider
 	 * 
 	 * @return
 	 */
 	Collection<String> category();
 
 	/**
-	 * The semantic expectations of this element's head
+	 * The semantic expectations of this provider's head
 	 * 
 	 * @return
 	 */
@@ -79,7 +79,7 @@ public interface ILSelector {
 	ILSelector withUpdatedSemanticVariables(Map<String, ISemanticSpecificationValue> variables);
 
 	/**
-	 * The (specified) features of this element
+	 * The (specified) features of this provider
 	 * 
 	 * @return
 	 */
