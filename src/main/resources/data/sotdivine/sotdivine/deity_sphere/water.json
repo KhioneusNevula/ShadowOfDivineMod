@@ -5,6 +5,21 @@
 			{
 				"items":["minecraft:kelp", "minecraft:dried_kelp"]
 			}
+		],
+		"sotdivine:focus_block":[
+			{
+				"fluids":"minecraft:water"
+			}
+		],
+		"sotdivine:decor_block":[
+			{
+				"blocks":"minecraft:stone"
+			}
+		],
+		"sotdivine:building_block":[
+			{
+				"blocks":"minecraft:stone"
+			}
 		]
 	},
 	"emanations":{
@@ -17,7 +32,8 @@
 						{"data":"minecraft:lightning_bolt","weight":1}
 					],
 					"spell_properties": {
-						"alignment":"curse"
+						"alignment":"curse",
+						"difficulty":"normal"
 					}
 				}
 			},
@@ -30,7 +46,8 @@
 						"duration":200
 					},
 					"spell_properties": {
-						"alignment":"blessing"
+						"alignment":"blessing",
+						"difficulty":"normal"
 					}
 				}
 			}

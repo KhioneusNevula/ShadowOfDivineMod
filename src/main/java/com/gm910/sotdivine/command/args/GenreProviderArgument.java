@@ -3,8 +3,8 @@ package com.gm910.sotdivine.command.args;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
-import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.IGenreType;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;

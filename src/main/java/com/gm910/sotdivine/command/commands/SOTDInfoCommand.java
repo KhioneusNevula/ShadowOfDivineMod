@@ -10,19 +10,24 @@ import com.gm910.sotdivine.command.args.GenreProviderArgument;
 import com.gm910.sotdivine.command.args.PartyIdentifierArgument;
 import com.gm910.sotdivine.command.args.RitualPatternArgument;
 import com.gm910.sotdivine.command.args.SphereArgument;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.IRitualPattern;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.RitualPattern;
-import com.gm910.sotdivine.systems.deity.sphere.ISphere;
-import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
-import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
-import com.gm910.sotdivine.systems.deity.sphere.genres.creator.IGenreItemGiver;
-import com.gm910.sotdivine.systems.deity.sphere.genres.creator.IGenrePlacer;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.IGenreProvider;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.independent.IGiveableGenreProvider;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.independent.IPlaceableGenreProvider;
-import com.gm910.sotdivine.systems.party.IParty;
-import com.gm910.sotdivine.systems.party_system.IPartySystem;
-import com.gm910.sotdivine.systems.villagers.ModBrainElements.MemoryModuleTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.IRitual;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPattern;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPatterns;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.properties.RitualQuality;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.properties.RitualType;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.ISphere;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.IGenreType;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.creator.IGenreItemGiver;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.creator.IGenrePlacer;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.IGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.independent.IGiveableGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.independent.IPlaceableGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.party.IParty;
+import com.gm910.sotdivine.deities_and_parties.system_storage.IPartySystem;
+import com.gm910.sotdivine.deities_and_parties.villagers.ModBrainElements.MemoryModuleTypes;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -53,6 +58,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.server.command.EnumArgument;
 
 public class SOTDInfoCommand {
 
@@ -108,7 +114,7 @@ public class SOTDInfoCommand {
 						.then(Commands.argument("patterns", RitualPatternArgument.argument())
 								.then(Commands.argument("pos", BlockPosArgument.blockPos())
 										.executes(stack -> placePattern(stack,
-												RitualPatternArgument.getArgument(stack, "pattern"),
+												RitualPatternArgument.getArgument(stack, "patterns"),
 												BlockPosArgument.getBlockPos(stack, "pos"), Map.of()))
 										.then(Commands.argument("placeables", new GenrePlacementMapArgument(context))
 												.executes(stack -> placePattern(stack,
@@ -131,8 +137,64 @@ public class SOTDInfoCommand {
 								.then(Commands.argument("genre_type", ResourceLocationArgument.id())
 										.executes(stack -> listGenres(stack, SphereArgument.getSphere(stack, "sphere"),
 												ResourceLocationArgument.getId(stack, "genre_type")))))))
-				.then(Commands.literal("memory")).then(Commands.literal("relationship"))
-				.then(Commands.literal("ritual")));
+				.then(Commands.literal("memory")
+						.then(Commands.literal("list")
+								.then(Commands.argument("deity", PartyIdentifierArgument.deityArgument()))))
+
+				.then(Commands.literal("relationship"))
+				.then(Commands.literal("ritual")
+						.then(Commands.literal("list")
+								.then(Commands.argument("deity", PartyIdentifierArgument.deityArgument())
+										.executes(stack -> listRituals(stack,
+												PartyIdentifierArgument.getDeity(stack, "deity",
+														PartyIdentifierArgument.ERROR_PARTY_INVALID)))))
+						.then(Commands
+								.literal("start"))
+						.then(Commands
+								.literal(
+										"place")
+								.then(Commands.argument("deity", PartyIdentifierArgument.deityArgument())
+										.then(Commands.argument("type", EnumArgument.enumArgument(RitualType.class))
+												.then(Commands
+														.argument("quality",
+																EnumArgument.enumArgument(RitualQuality.class))
+														.then(Commands.argument("pos", BlockPosArgument.blockPos())
+																.executes(stack -> {
+																	IDeity deity = PartyIdentifierArgument.getDeity(
+																			stack, "deity",
+																			PartyIdentifierArgument.ERROR_PARTY_INVALID);
+																	IRitual ritual = deity.getRituals().stream()
+																			.filter((r) -> r.ritualQuality() == stack
+																					.getArgument("quality",
+																							RitualQuality.class)
+																					&& r.ritualType() == stack
+																							.getArgument("type",
+																									RitualType.class))
+																			.findAny().orElse(null);
+																	if (ritual == null) {
+																		throw ERROR_ENTITY_INVALID.create(context);
+																	}
+																	return placePattern(stack,
+																			ritual.patterns().getAllPatterns()
+																					.iterator().next(),
+																			BlockPosArgument.getBlockPos(stack, "pos"),
+																			ritual.symbols());
+																}))))))));
+	}
+
+	private static int listRituals(CommandContext<CommandSourceStack> context, IDeity deity) {
+
+		for (IRitual ritual : deity.getRituals()) {
+			context.getSource().sendSystemMessage(TextUtils.transPrefix("cmd.list.item", TextUtils
+					.transPrefix("cmd.ritual.info", ritual.ritualType(), ritual.ritualQuality(), ritual.symbols())));
+			context.getSource().sendSystemMessage(
+					TextUtils.transPrefix("cmd.ritual.info.2", ritual.trigger(), ritual.emanations()));
+			context.getSource().sendSystemMessage(TextUtils.transPrefix("cmd.ritual.info.3", ritual.offerings(),
+					Optional.ofNullable(
+							RitualPatterns.instance().getPatternMap().inverse().get(ritual.patterns().getBasePattern()))
+							.map((s) -> s.toString()).orElse("" + ritual.patterns().getBasePattern().blockCount())));
+		}
+		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int listGenres(CommandContext<CommandSourceStack> context, ISphere sphere,
@@ -199,16 +261,15 @@ public class SOTDInfoCommand {
 
 	private static int placePattern(CommandContext<CommandSourceStack> context, IRitualPattern pattern,
 			BlockPos blockPos, Map<String, IPlaceableGenreProvider<?, ?>> map) throws CommandSyntaxException {
-
 		try {
 			pattern.generatePossible(context.getSource().getLevel(), blockPos, map);
+			LogUtils.getLogger().debug("Placed patterns: ");
+			for (int i = pattern.maxPos().getY(); i >= pattern.minPos().getY(); i--) {
+				System.out.println(((RitualPattern) pattern).drawLayer(i));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		LogUtils.getLogger().debug("Placed patterns: ");
-		for (int i = pattern.maxPos().getY(); i >= pattern.minPos().getY(); i--) {
-			System.out.println(((RitualPattern) pattern).drawLayer(i));
 		}
 		return Command.SINGLE_SUCCESS;
 

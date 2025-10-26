@@ -8,6 +8,21 @@
 			{
 				"items":"#minecraft:stone_tool_materials"
 			}
+		],
+		"sotdivine:building_block":[
+			{
+				"blocks":"minecraft:stone"
+			}
+		],
+		"sotdivine:focus_block":[
+			{
+				"blocks":"minecraft:gravel"
+			}
+		],
+		"sotdivine:decor_block":[
+			{
+				"blocks":"minecraft:torch"
+			}
 		]
 	},
 	"emanations":{
@@ -20,7 +35,8 @@
 						{"data":"minecraft:lightning_bolt","weight":1}
 					],
 					"spell_properties": {
-						"alignment":"curse"
+						"alignment":"curse",
+						"difficulty":"normal"
 					}
 				}
 			},
@@ -33,7 +49,8 @@
 						"duration":200
 					},
 					"spell_properties": {
-						"alignment":"blessing"
+						"alignment":"blessing",
+						"difficulty":"normal"
 					}
 				}
 			}

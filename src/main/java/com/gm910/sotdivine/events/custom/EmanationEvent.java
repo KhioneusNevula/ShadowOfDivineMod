@@ -2,10 +2,10 @@ package com.gm910.sotdivine.events.custom;
 
 import javax.annotation.Nullable;
 
-import com.gm910.sotdivine.systems.deity.IDeity;
-import com.gm910.sotdivine.systems.deity.emanation.EmanationDataType.IEmanationInstanceData;
-import com.gm910.sotdivine.systems.deity.emanation.IEmanation;
-import com.gm910.sotdivine.systems.deity.emanation.spell.ISpellTargetInfo;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.IEmanation;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationDataType.IEmanationInstanceData;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.spell.ISpellTargetInfo;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
@@ -80,7 +80,7 @@ public sealed class EmanationEvent extends MutableEvent implements InheritableEv
 	/**
 	 * Update is fired before an emanation ticks. <br>
 	 * This event is {@link Cancellable}, which will call
-	 * {@link IEmanation#interrupt(com.gm910.sotdivine.systems.deity.emanation.EmanationInstance)}.
+	 * {@link IEmanation#interrupt(com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationInstance)}.
 	 * The interruption itself will be triggered after all emanations have updated
 	 * for the specific deity, and produce its own {@link EmanationEvent.End}
 	 * event<br>
@@ -132,7 +132,7 @@ public sealed class EmanationEvent extends MutableEvent implements InheritableEv
 
 	/**
 	 * End is fired after an emanation stops updating, whether this is after
-	 * {@link IEmanation#trigger(com.gm910.sotdivine.systems.deity.emanation.EmanationInstance)}
+	 * {@link IEmanation#trigger(com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationInstance)}
 	 * is called, or after the final tick it does. If it ended at an interruption,
 	 * boolean "interrupted" will be true; if it ended with failure, "failed" will
 	 * be true. <br>

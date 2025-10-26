@@ -196,7 +196,7 @@ public class LanguageGen {
 		// logger.debug("Starting generation of phoneme sequence of length between " +
 		// minLength + " and " + maxLength
 		// + " (inclusive)");
-		for (int i = 0; phonemes.size() < maxLength; i++) {
+		while (phonemes.size() < maxLength) {
 			if (tries < 0) {
 				logger.debug("Too many tries...");
 				return null;

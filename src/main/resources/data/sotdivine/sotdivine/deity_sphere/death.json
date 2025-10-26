@@ -8,6 +8,25 @@
 			{
 				"items":["minecraft:bone"]
 			}
+		],
+		"sotdivine:building_block":[
+			{
+				"blocks":"minecraft:bone_block"
+			}
+		],
+		"sotdivine:focus_block":[
+			{
+				"blocks":"minecraft:cauldron"
+			}
+		],
+		"sotdivine:decor_block":[
+			{
+				"blocks":"minecraft:skeleton_skull",
+				"rarity":"uncommon"
+			},
+			{
+				"blocks":"minecraft:torch"
+			}
 		]
 	},
 	"emanations":{
@@ -21,12 +40,13 @@
 						{"data":"minecraft:zombie","weight":10}
 					],
 					"spell_properties": {
-						"alignment":"curse"
+						"alignment":"curse",
+						"difficulty":2
 					}
 				}
 			}
 		],
-		"symbol_recognition":[
+		"accept_offering":[
 			{
 				"type":"sotdivine:particle",
 				"data": {

@@ -118,7 +118,7 @@ public class PT implements IPhonotacticDisallow {
 		// + this);
 		if (prefixLength > sequenceLength) // if the sequence is too short, assume failure
 			return false;
-		if (atBegin && sequenceLength != prefixLength) { // check we are at beginning
+		if (atBegin && sequenceLength > prefixLength) { // check we are at beginning
 			// logger.debug(phoneme + " failed due to beginning mismatch: " + this);
 			return false;
 		}

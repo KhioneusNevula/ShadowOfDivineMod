@@ -1,5 +1,6 @@
 {
 	"focus":"X",
-	"template":[["X"],
+	"template":[["*"],
+				["X"],
 				["B"]]
 }

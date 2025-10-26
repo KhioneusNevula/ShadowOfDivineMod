@@ -1,11 +1,11 @@
 package com.gm910.sotdivine.events;
 
 import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPatterns;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.Spheres;
+import com.gm910.sotdivine.deities_and_parties.deity.symbol.DeitySymbols;
 import com.gm910.sotdivine.items.ModItems;
 import com.gm910.sotdivine.registries.ModRegistries;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.RitualPatterns;
-import com.gm910.sotdivine.systems.deity.sphere.Spheres;
-import com.gm910.sotdivine.systems.deity.symbol.DeitySymbols;
 
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;

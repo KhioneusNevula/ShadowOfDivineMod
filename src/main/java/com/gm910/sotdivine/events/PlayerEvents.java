@@ -3,11 +3,11 @@ package com.gm910.sotdivine.events;
 import java.util.Random;
 
 import com.gm910.sotdivine.SOTDMod;
-import com.gm910.sotdivine.systems.deity.IDeity;
-import com.gm910.sotdivine.systems.deity.sphere.Spheres;
-import com.gm910.sotdivine.systems.party.IParty;
-import com.gm910.sotdivine.systems.party.resource.type.DimensionResource;
-import com.gm910.sotdivine.systems.party_system.IPartySystem;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.Spheres;
+import com.gm910.sotdivine.deities_and_parties.party.IParty;
+import com.gm910.sotdivine.deities_and_parties.party.resource.type.DimensionResource;
+import com.gm910.sotdivine.deities_and_parties.system_storage.IPartySystem;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;

@@ -2,8 +2,8 @@ package com.gm910.sotdivine.events.custom;
 
 import java.util.UUID;
 
-import com.gm910.sotdivine.systems.deity.IDeity;
-import com.gm910.sotdivine.systems.deity.ritual.IRitual;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.IRitual;
 
 import net.minecraft.core.GlobalPos;
 import net.minecraftforge.common.MinecraftForge;

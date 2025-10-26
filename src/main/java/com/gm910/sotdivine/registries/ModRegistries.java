@@ -1,13 +1,13 @@
 package com.gm910.sotdivine.registries;
 
 import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationType;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.ISphere;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.IGenreType;
+import com.gm910.sotdivine.deities_and_parties.deity.symbol.IDeitySymbol;
+import com.gm910.sotdivine.deities_and_parties.party.resource.PartyResourceType;
 import com.gm910.sotdivine.language.LanguageGen;
-import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.IRitualPattern;
-import com.gm910.sotdivine.systems.deity.sphere.ISphere;
-import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
-import com.gm910.sotdivine.systems.deity.symbol.IDeitySymbol;
-import com.gm910.sotdivine.systems.party.resource.PartyResourceType;
 import com.gm910.sotdivine.util.ModUtils;
 
 import net.minecraft.core.Registry;

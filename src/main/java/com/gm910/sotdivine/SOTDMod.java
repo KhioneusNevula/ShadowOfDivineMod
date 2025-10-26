@@ -3,25 +3,25 @@ package com.gm910.sotdivine;
 import org.slf4j.Logger;
 
 import com.gm910.sotdivine.blocks.ModBlocks;
+import com.gm910.sotdivine.client.ModNetwork;
 import com.gm910.sotdivine.command.ModCommandArgumentTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationType;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPatterns;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.ISphere;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.Spheres;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.IGenreType;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.data.ComponentMatcherCodecs;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.entity_preds.TypeSpecificProviders;
+import com.gm910.sotdivine.deities_and_parties.deity.symbol.DeitySymbols;
+import com.gm910.sotdivine.deities_and_parties.party.resource.PartyResourceType;
+import com.gm910.sotdivine.deities_and_parties.villagers.ModBrainElements;
+import com.gm910.sotdivine.deities_and_parties.villagers.poi.ModPoiTypes;
 import com.gm910.sotdivine.items.ModItems;
 import com.gm910.sotdivine.language.LanguageGen;
 import com.gm910.sotdivine.misc.ModCreativeTabs;
-import com.gm910.sotdivine.networking.ModNetwork;
 import com.gm910.sotdivine.registries.ModRegistries;
-import com.gm910.sotdivine.systems.deity.emanation.EmanationType;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.IRitualPattern;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.RitualPatterns;
-import com.gm910.sotdivine.systems.deity.sphere.ISphere;
-import com.gm910.sotdivine.systems.deity.sphere.Spheres;
-import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
-import com.gm910.sotdivine.systems.deity.sphere.genres.IGenreType;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.data.ComponentMatchers;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.entity_preds.TypeSpecificProviders;
-import com.gm910.sotdivine.systems.deity.symbol.DeitySymbols;
-import com.gm910.sotdivine.systems.party.resource.PartyResourceType;
-import com.gm910.sotdivine.systems.villagers.ModBrainElements;
-import com.gm910.sotdivine.systems.villagers.poi.ModPoiTypes;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.Minecraft;
@@ -154,7 +154,7 @@ public final class SOTDMod {
 
 		ModNetwork.init();
 
-		ComponentMatchers.registerInit();
+		ComponentMatcherCodecs.registerInit();
 		TypeSpecificProviders.registerInit();
 
 	}

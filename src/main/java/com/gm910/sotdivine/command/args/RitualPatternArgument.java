@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import com.gm910.sotdivine.systems.deity.ritual.pattern.IRitualPattern;
-import com.gm910.sotdivine.systems.deity.ritual.pattern.RitualPatterns;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

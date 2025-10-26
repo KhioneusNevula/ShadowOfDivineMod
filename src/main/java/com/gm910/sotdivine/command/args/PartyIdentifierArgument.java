@@ -5,11 +5,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import com.gm910.sotdivine.networking.PartySystemClient;
-import com.gm910.sotdivine.systems.deity.IDeity;
-import com.gm910.sotdivine.systems.party.IParty;
-import com.gm910.sotdivine.systems.party_system.IPartySystem;
+import com.gm910.sotdivine.client.IPartyLister;
+import com.gm910.sotdivine.client.IPartyLister.IPartyInfo;
+import com.gm910.sotdivine.client.ClientPartyLister;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.party.IParty;
+import com.gm910.sotdivine.deities_and_parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.util.TextUtils;
+import com.google.common.collect.Streams;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -68,9 +71,10 @@ public class PartyIdentifierArgument implements ArgumentType<String> {
 	public String parse(StringReader reader) throws CommandSyntaxException {
 
 		String name = reader.readQuotedString();
-		if (PartySystemClient.instance().isPresent()) {
-			if ((deity ? PartySystemClient.instance().get().allDeities()
-					: PartySystemClient.instance().get().allParties()).stream()
+		if (ClientPartyLister.instance().isPresent()) {
+			if (Streams
+					.<IPartyInfo>stream(deity ? (Iterable<IPartyInfo>) ClientPartyLister.instance().get().allDeities()
+							: (Iterable<IPartyInfo>) ClientPartyLister.instance().get().allParties())
 					.noneMatch((s) -> s.uniqueName().equals(name)
 							|| s.descriptiveName().map((x) -> x.getString()).equals(Optional.of(name)))) {
 				throw ERROR_PARTY_INVALID.create(name);
@@ -83,9 +87,9 @@ public class PartyIdentifierArgument implements ArgumentType<String> {
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
-			// System.out.println(PartySystemClient.instance());
-			if (PartySystemClient.instance().isPresent()) {
-				IPartySystem system = PartySystemClient.instance().get();
+			// System.out.println(ClientPartyLister.instance());
+			if (ClientPartyLister.instance().isPresent()) {
+				IPartyLister system = ClientPartyLister.instance().get();
 				system.allDeities().forEach((deity) -> builder.suggest("\"" + deity.uniqueName() + "\"",
 						deity.descriptiveName().orElse(TextUtils.literal("deity"))));
 				if (!deity)

@@ -64,7 +64,8 @@
 		{"disallowed":["c-hard",{"low":false,"round":false}]},
 		// disallow c-soft before a low vowel or a round vowel
 		{"disallowed":["c-soft",{"low":true}]},
-		{"disallowed":["c-soft",{"round":true}]}
+		{"disallowed":["c-soft",{"round":true}]},
+		{"disallowed":["#","glottal-stop"]}
 		
 		
 	]

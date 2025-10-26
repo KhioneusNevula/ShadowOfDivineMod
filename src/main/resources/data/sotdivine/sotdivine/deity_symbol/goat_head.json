@@ -1,0 +1,5 @@
+{
+  "banner_pattern": "sotdivine:goat_head",
+  "preferred_spheres":["sotdivine:life", "sotdivine:death"],
+  "allowed_spheres":"#sotdivine:conceptual"
+}

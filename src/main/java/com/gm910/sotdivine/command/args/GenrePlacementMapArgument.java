@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.IGenreProvider;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.independent.IPlaceableGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.IGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.independent.IPlaceableGenreProvider;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;

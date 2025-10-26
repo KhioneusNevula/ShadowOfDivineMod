@@ -8,15 +8,15 @@ import java.util.UUID;
 import org.slf4j.Logger;
 
 import com.gm910.sotdivine.SOTDMod;
+import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.DeityInteractionType;
+import com.gm910.sotdivine.deities_and_parties.deity.emanation.spell.ISpellTargetInfo;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.ISphere;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.GenreTypes;
+import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.independent.ItemGenreProvider;
+import com.gm910.sotdivine.deities_and_parties.deity.symbol.DeitySymbols;
+import com.gm910.sotdivine.deities_and_parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.events.custom.EmanationEvent;
-import com.gm910.sotdivine.systems.deity.IDeity;
-import com.gm910.sotdivine.systems.deity.emanation.DeityInteractionType;
-import com.gm910.sotdivine.systems.deity.emanation.spell.ISpellTargetInfo;
-import com.gm910.sotdivine.systems.deity.sphere.ISphere;
-import com.gm910.sotdivine.systems.deity.sphere.genres.GenreTypes;
-import com.gm910.sotdivine.systems.deity.sphere.genres.provider.independent.ItemGenreProvider;
-import com.gm910.sotdivine.systems.deity.symbol.DeitySymbols;
-import com.gm910.sotdivine.systems.party_system.IPartySystem;
 import com.gm910.sotdivine.util.FieldUtils;
 import com.gm910.sotdivine.util.ModUtils;
 import com.google.common.collect.Iterators;
@@ -69,6 +69,7 @@ public class WorldEvents {
 			for (IDeity deity : system.allDeities()) {
 				deity.tick(level, level.getGameTime());
 			}
+			system.markDirty(level);
 		}
 	}
 
@@ -142,9 +143,9 @@ public class WorldEvents {
 						item.remove(RemovalReason.KILLED);
 						accepted.get(deity).forEach((e) -> e
 								.ifLeft((en) -> deity.triggerAnEmanation(DeityInteractionType.SYMBOL_RECOGNITION,
-										ISpellTargetInfo.builder().targetEntity(en).build()))
+										ISpellTargetInfo.builder().targetEntity(en).build(), 1))
 								.ifRight((ps) -> deity.triggerAnEmanation(DeityInteractionType.SYMBOL_RECOGNITION,
-										ISpellTargetInfo.builder(deity, level1).targetPos(ps).build())));
+										ISpellTargetInfo.builder(deity, level1).targetPos(ps).build(), 1)));
 					}
 				}
 			}
