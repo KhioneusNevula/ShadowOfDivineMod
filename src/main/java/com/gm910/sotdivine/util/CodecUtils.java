@@ -1,16 +1,28 @@
 package com.gm910.sotdivine.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.compress.utils.Lists;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Streams;
+import com.google.common.collect.Table;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -20,24 +32,63 @@ public class CodecUtils {
 	}
 
 	/**
-	 * A decoder which tries multiple things and returns the result.
+	 * See {@link #multiCodecEither(Iterator)}
 	 * 
 	 * @param <T>
 	 * @param codecs
 	 * @return
 	 */
-	public static <T> Codec<T> multiCodecEither(Iterator<? extends Decoder<T>> codecs) {
-		return new Codec<T>() {
+	@SafeVarargs
+	public static <T> Codec<T> multiCodecEither(Codec<? extends T>... codecs) {
+		return multiCodecEither(Iterators.forArray(codecs));
+	}
 
-			public <U extends Object> com.mojang.serialization.DataResult<U> encode(T input, DynamicOps<U> ops,
-					U prefix) {
-				return DataResult.error(() -> "Cannot decode with this special codec");
+	/**
+	 * See {@link #multiCodecEither(Iterator)}
+	 * 
+	 * @param <T>
+	 * @param codecs
+	 * @return
+	 */
+	public static <T> Codec<T> multiCodecEither(Collection<? extends Codec<? extends T>> codecs) {
+		return multiCodecEither(codecs.iterator());
+	}
+
+	/**
+	 * A codec which tries multiple codecs and returns the result.
+	 * 
+	 * @param <T>
+	 * @param codecs
+	 * @return
+	 */
+	public static <T> Codec<T> multiCodecEither(Iterator<? extends Codec<? extends T>> codecIter) {
+		var codecs = Lists.newArrayList(Streams.stream(codecIter).map((s) -> (Codec<T>) s).iterator());
+		return new Codec<T>() {
+			public <U extends Object> DataResult<U> encode(T input, DynamicOps<U> ops, U prefix) {
+				List<DataResult<U>> errors = new ArrayList<>();
+				U partial = prefix;
+				for (Codec<T> attempt : codecs) {
+					DataResult<U> result;
+					try {
+						result = attempt.encode(input, ops, prefix);
+					} catch (Exception e) {
+						result = DataResult.error(() -> "Other error: " + e.getMessage());
+					}
+					if (result.isSuccess()) {
+						return result;
+					} else {
+						partial = result.resultOrPartial().orElse(partial);
+						errors.add(result);
+					}
+				}
+				return DataResult.<U>error(() -> errors.stream().collect(StreamUtils.setStringCollector("; ")),
+						partial);
 			};
 
 			@Override
 			public <X> DataResult<Pair<T, X>> decode(DynamicOps<X> ops, X input) {
 				List<DataResult<? extends Pair<? extends T, X>>> errors = new ArrayList<>();
-				for (Decoder<T> attempt : (Iterable<Decoder<T>>) () -> (Iterator<Decoder<T>>) codecs) {
+				for (Codec<T> attempt : codecs) {
 					var result = attempt.decode(ops, input);
 					if (result.isSuccess()) {
 						return result;
@@ -52,17 +103,6 @@ public class CodecUtils {
 	}
 
 	/**
-	 * A decoder which tries multiple codecs and returns the result
-	 * 
-	 * @param <T>
-	 * @param codecs
-	 * @return
-	 */
-	public static <T> Codec<T> multiCodecEitherDecoder(Iterable<? extends Decoder<T>> codecs) {
-		return multiCodecEither(codecs.iterator());
-	}
-
-	/**
 	 * A codec that creates a list which also passes if a singular item is passed in
 	 * 
 	 * @param <T>
@@ -72,6 +112,52 @@ public class CodecUtils {
 	public static <T> Codec<List<T>> listOrSingleCodec(Codec<T> codec) {
 		return Codec.either(codec, Codec.list(codec)).xmap((s) -> s.map((x) -> List.of(x), (y) -> y),
 				(s) -> s.size() == 1 ? Either.left(s.getFirst()) : Either.right(s));
+	}
+
+	/**
+	 * Codec which interprets structures of the form "X":["Y", "Z",...] or "X":"Y"
+	 * as Multimaps
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param keys
+	 * @param vals
+	 * @return
+	 */
+	public static <K, V> Codec<Multimap<K, V>> multimapCodec(Codec<K> keys, Codec<V> vals) {
+		return Codec.unboundedMap(keys, CodecUtils.listOrSingleCodec(vals)).xmap((m) -> m.entrySet().stream()
+				.collect(Multimaps.flatteningToMultimap((k) -> k.getKey(), (v) -> v.getValue().stream(), () -> {
+					Multimap<K, V> mapa = MultimapBuilder.hashKeys().arrayListValues().build();
+					return mapa;
+				})),
+				(m) -> m.asMap().entrySet().stream()
+						.map((e) -> Map.entry(e.getKey(),
+								e.getValue() instanceof List<V> ls ? ls : new ArrayList<>(e.getValue())))
+						.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+	}
+
+	/**
+	 * Makes a codec for the table which is a map where the two kinds of keys much
+	 * each be mappable to Strings, and point to the value
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param rows
+	 * @param cols
+	 * @param values
+	 * @return
+	 */
+	public static <R, C, V> Codec<Table<R, C, V>> tableCodec(Codec<R> rows, Codec<C> cols, Codec<V> values) {
+		return Codec.unboundedMap(rows, Codec.unboundedMap(cols, values)).xmap((mm) -> {
+			Table<R, C, V> table = HashBasedTable.create();
+			for (R key1 : mm.keySet()) {
+				for (C key2 : mm.get(key1).keySet()) {
+					table.put(key1, key2, mm.get(key1).get(key2));
+				}
+			}
+			return table;
+		}, (tb) -> tb.rowMap());
 	}
 
 	/**
@@ -147,39 +233,39 @@ public class CodecUtils {
 	 * @return
 	 */
 	public static <T extends Enum<T>> Codec<Float> enumFloatScaleCodec(Class<T> enumClass) {
-		return Codec.either(Codec.floatRange(0, enumClass.getEnumConstants().length - 1),
-				Codec.STRING.comapFlatMap((str) -> {
-					if (str.contains("+") || str.contains("-")) {
-						boolean minus = str.contains("-");
-						var split = str.split("[+-]");
-						if (split.length != 2) {
-							return DataResult.error(() -> "Invalid formatting: " + str);
-						}
-						String enuma = split[0];
-						String floata = split[1];
-						float out = 0;
-						try {
-							out = Enum.valueOf(enumClass, enuma.toUpperCase().replace("[- ]", "_")).ordinal();
-						} catch (Exception e) {
-							return DataResult.error(() -> "Invalid enum in string: " + str);
-						}
-						try {
-							out += (minus ? -1 : 1) * Float.parseFloat(floata);
-						} catch (Exception e) {
-							return DataResult.error(() -> "Invalid float in string: " + str);
-						}
-						return DataResult.success(out);
-					} else {
-						float out = 0;
-						try {
-							out = Enum.valueOf(enumClass, str.toUpperCase().replace("[- ]", "_")).ordinal();
-						} catch (Exception e) {
-							return DataResult.error(() -> "Invalid enum");
-						}
+		return Codec.either(Codec.floatRange(0, enumClass.getEnumConstants().length), Codec.STRING.flatXmap((str) -> {
+			if (str.contains("+") || str.contains("-")) {
+				boolean minus = str.contains("-");
+				var split = str.split("[+-]");
+				if (split.length != 2) {
+					return DataResult.error(() -> "Invalid formatting: " + str);
+				}
+				String enuma = split[0];
+				String floata = split[1];
+				float out = 0;
+				try {
+					out = Enum.valueOf(enumClass, enuma.toUpperCase().replace("[- ]", "_")).ordinal();
+				} catch (Exception e) {
+					return DataResult.error(() -> "Invalid enum in string: " + str);
+				}
+				try {
+					out += (minus ? -1 : 1) * Float.parseFloat(floata);
+				} catch (Exception e) {
+					return DataResult.error(() -> "Invalid float in string: " + str);
+				}
+				return DataResult.success(out);
+			} else {
+				float out = 0;
+				try {
+					out = Enum.valueOf(enumClass, str.toUpperCase().replace("[- ]", "_")).ordinal();
+				} catch (Exception e) {
+					return DataResult.error(() -> "Invalid enum");
+				}
 
-						return DataResult.success(out);
-					}
-				}, (s) -> "" + s)).xmap((s) -> Either.unwrap(s), Either::left);
+				return DataResult.success(out);
+			}
+		}, (s) -> DataResult.error(() -> "Do not turn float into string", s + ""))).xmap((s) -> Either.unwrap(s),
+				Either::left);
 	}
 
 	/**

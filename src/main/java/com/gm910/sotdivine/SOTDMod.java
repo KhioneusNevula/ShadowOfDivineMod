@@ -2,30 +2,31 @@ package com.gm910.sotdivine;
 
 import org.slf4j.Logger;
 
-import com.gm910.sotdivine.blocks.ModBlocks;
-import com.gm910.sotdivine.client.ModNetwork;
-import com.gm910.sotdivine.command.ModCommandArgumentTypes;
-import com.gm910.sotdivine.deities_and_parties.deity.emanation.EmanationType;
-import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.IRitualPattern;
-import com.gm910.sotdivine.deities_and_parties.deity.ritual.pattern.RitualPatterns;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.ISphere;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.Spheres;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.GenreTypes;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.IGenreType;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.data.ComponentMatcherCodecs;
-import com.gm910.sotdivine.deities_and_parties.deity.sphere.genres.provider.entity_preds.TypeSpecificProviders;
-import com.gm910.sotdivine.deities_and_parties.deity.symbol.DeitySymbols;
-import com.gm910.sotdivine.deities_and_parties.party.resource.PartyResourceType;
-import com.gm910.sotdivine.deities_and_parties.villagers.ModBrainElements;
-import com.gm910.sotdivine.deities_and_parties.villagers.poi.ModPoiTypes;
-import com.gm910.sotdivine.items.ModItems;
-import com.gm910.sotdivine.language.LanguageGen;
-import com.gm910.sotdivine.misc.ModCreativeTabs;
-import com.gm910.sotdivine.registries.ModRegistries;
+import com.gm910.sotdivine.common.blocks.ModBlocks;
+import com.gm910.sotdivine.common.command.ModCommandArgumentTypes;
+import com.gm910.sotdivine.common.items.ModItems;
+import com.gm910.sotdivine.common.misc.ModCreativeTabs;
+import com.gm910.sotdivine.common.misc.ModDataComponents;
+import com.gm910.sotdivine.concepts.genres.GenreTypes;
+import com.gm910.sotdivine.concepts.genres.IGenreType;
+import com.gm910.sotdivine.concepts.genres.provider.data.CodecsComponentMatchers;
+import com.gm910.sotdivine.concepts.genres.provider.entity_preds.CodecsTypeSpecificProviders;
+import com.gm910.sotdivine.concepts.language.LanguageGen;
+import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
+import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements;
+import com.gm910.sotdivine.concepts.parties.villagers.poi.ModPoiTypes;
+import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
+import com.gm910.sotdivine.magic.emanation.EmanationType;
+import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
+import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
+import com.gm910.sotdivine.magic.sphere.ISphere;
+import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.network.ModNetwork;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
@@ -48,7 +49,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-// The value here should match an entry in the META-INF/mods.toml file
+// The value here should instrument an entry in the META-INF/mods.toml file
 @Mod(SOTDMod.MODID)
 public final class SOTDMod {
 	// Define mod id in a common place for everything to reference
@@ -70,6 +71,9 @@ public final class SOTDMod {
 	// the "examplemod" namespace
 	public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE,
 			MODID);
+
+	public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister
+			.create(Registries.DATA_COMPONENT_TYPE, MODID);
 
 	public static final DeferredRegister<MemoryModuleType<?>> MEMORY_MODULE_TYPES = DeferredRegister
 			.create(Registries.MEMORY_MODULE_TYPE, MODID);
@@ -123,6 +127,8 @@ public final class SOTDMod {
 
 		POI_TYPES.register(modBusGroup);
 		ModPoiTypes.init();
+		DATA_COMPONENT_TYPES.register(modBusGroup);
+		ModDataComponents.init();
 
 		MEMORY_MODULE_TYPES.register(modBusGroup);
 		SENSOR_TYPES.register(modBusGroup);
@@ -154,19 +160,14 @@ public final class SOTDMod {
 
 		ModNetwork.init();
 
-		ComponentMatcherCodecs.registerInit();
-		TypeSpecificProviders.registerInit();
+		CodecsComponentMatchers.registerInit();
+		CodecsTypeSpecificProviders.registerInit();
 
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event) {
 		// Some common setup code
 		LOGGER.info("HELLO FROM COMMON SETUP");
-
-		if (Config.logDirtBlock)
-			LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
-
-		LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
 		Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
 	}

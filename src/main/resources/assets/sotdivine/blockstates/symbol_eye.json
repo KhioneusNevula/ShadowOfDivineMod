@@ -1,0 +1,110 @@
+{
+  "variants": {
+    "face=ceiling,facing=east,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=east,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=north,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=north,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 180
+    },
+    "face=ceiling,facing=south,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 180
+    },
+    "face=ceiling,facing=west,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=west,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 180,
+      "y": 90
+    },
+    "face=floor,facing=east,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "y": 90
+    },
+    "face=floor,facing=east,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "y": 90
+    },
+    "face=floor,facing=north,active=false": {
+      "model": "sotdivine:block/symbol_eye"
+    },
+    "face=floor,facing=north,active=true": {
+      "model": "sotdivine:block/symbol_eye_active"
+    },
+    "face=floor,facing=south,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "y": 180
+    },
+    "face=floor,facing=south,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "y": 180
+    },
+    "face=floor,facing=west,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "y": 270
+    },
+    "face=floor,facing=west,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "y": 270
+    },
+    "face=wall,facing=east,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 90,
+      "y": 90
+    },
+    "face=wall,facing=east,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 90,
+      "y": 90
+    },
+    "face=wall,facing=north,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 90
+    },
+    "face=wall,facing=north,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 90
+    },
+    "face=wall,facing=south,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=south,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=west,active=false": {
+      "model": "sotdivine:block/symbol_eye",
+      "x": 90,
+      "y": 270
+    },
+    "face=wall,facing=west,active=true": {
+      "model": "sotdivine:block/symbol_eye_active",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

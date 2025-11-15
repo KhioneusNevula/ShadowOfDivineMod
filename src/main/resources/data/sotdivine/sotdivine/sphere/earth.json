@@ -1,0 +1,91 @@
+{
+	"translation_key": "sotd.sphere.earth",
+	"genres":{
+		"sotdivine:offering":[
+			{
+				"items":"#minecraft:stone_tool_materials"
+			},
+			{
+				"items":"#minecraft:iron_tool_materials",
+				"rarity":"common"
+			},
+			{
+				"items":"#minecraft:gold_tool_materials",
+				"rarity":"uncommon"
+			},
+			{
+				"items":"#minecraft:diamond_tool_materials",
+				"rarity":"rare"
+			},
+			{
+				"items":"#minecraft:netherite_tool_materials",
+				"rarity":"epic"
+			}
+		],
+		"sotdivine:building_block":[
+			{
+				"blocks":"#minecraft:base_stone_overworld"
+			},
+			{
+				"blocks":"#minecraft:stone_bricks"
+			},
+			{
+				"blocks":"#minecraft:stone_bricks"
+			}
+		],
+		"sotdivine:focus_block":[
+			{
+				"blocks":"#minecraft:anvil"
+			},
+			{
+				"blocks":"minecraft:cauldron"
+			}
+		],
+		"sotdivine:decor":[
+			{
+				"blocks":"minecraft:torch"
+			}
+		],
+		"sotdivine:ritual_instrument":[
+			{
+				"items":["minecraft:flint"]
+			}
+		],
+		"sotdivine:magic_word":[
+			{"translate":"sotd.magic_word.gaia"},
+			{"translate":"sotd.magic_word.yggdrasil"},
+			{"translate":"sotd.magic_word.cybele"}
+		]
+	},
+	"emanations":{
+		"spell":[ 
+			{
+				"type":"sotdivine:spawn",
+				"data": {
+					"name":"smite_lightning",
+					"entities": [
+						{"data":"minecraft:lightning_bolt","weight":1}
+					],
+					"spell_properties": {
+						"alignment":"curse",
+						"difficulty":"normal"
+					}
+				}
+			},
+			{
+				"type":"sotdivine:give_effect",
+				"data": {
+					"effect": {
+						"id":"minecraft:resistance",
+						"show_icon":true,
+						"duration":200
+					},
+					"spell_properties": {
+						"alignment":"blessing",
+						"difficulty":"normal"
+					}
+				}
+			}
+		]
+	}
+}

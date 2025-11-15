@@ -1,8 +1,8 @@
 package com.gm910.sotdivine.events;
 
 import com.gm910.sotdivine.SOTDMod;
-import com.gm910.sotdivine.deities_and_parties.villagers.VillagerTweaks;
-import com.gm910.sotdivine.deities_and_parties.villagers.ModBrainElements.MemoryModuleTypes;
+import com.gm910.sotdivine.concepts.parties.villagers.VillagerTweaks;
+import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements.MemoryModuleTypes;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;

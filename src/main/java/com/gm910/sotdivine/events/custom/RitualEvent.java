@@ -2,8 +2,8 @@ package com.gm910.sotdivine.events.custom;
 
 import java.util.UUID;
 
-import com.gm910.sotdivine.deities_and_parties.deity.IDeity;
-import com.gm910.sotdivine.deities_and_parties.deity.ritual.IRitual;
+import com.gm910.sotdivine.concepts.deity.IDeity;
+import com.gm910.sotdivine.magic.ritual.IRitual;
 
 import net.minecraft.core.GlobalPos;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,7 +55,7 @@ public sealed class RitualEvent extends MutableEvent implements InheritableEvent
 	 * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
 	 **/
 	public static final class Start extends RitualEvent implements Cancellable {
-		public static final EventBus<Start> BUS = CancellableEventBus.create(Start.class);
+		public static final CancellableEventBus<Start> BUS = CancellableEventBus.create(Start.class);
 
 		public Start(IRitual ritual, GlobalPos startPos, IDeity patron, UUID caster) {
 			super(ritual, startPos, patron, caster);

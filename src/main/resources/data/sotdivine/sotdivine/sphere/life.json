@@ -1,0 +1,68 @@
+{
+	"translation_key": "sotd.sphere.life",
+	"genres":{
+		"sotdivine:offering":[
+			{
+				"items":"#sotdivine:vegetation"
+			},
+			{
+				"items":"#minecraft:meat"
+			},
+			{
+				"predicates": {
+					"minecraft:enchantments": {
+						"provider": "any"
+					}
+				}
+			}
+		],
+		"sotdivine:focus_block":[
+			{
+				"blocks":"#minecraft:flowers"
+			}
+		],
+		"sotdivine:decor":[
+			{
+				"blocks":"#minecraft:flowers"
+			}
+		],
+		"sotdivine:building_block":[
+			{
+				"blocks":"#minecraft:logs"
+			}
+		],
+		"sotdivine:ritual_instrument":[
+			{
+				"items":["minecraft:stick"]
+			}
+		],
+		"sotdivine:forbidden_mob":[
+			{
+				"entities":{"categories":"monster"}
+			}
+		],
+		"sotdivine:magic_word":[
+			{"translate":"sotd.magic_word.elohim"},
+			{"translate":"sotd.magic_word.cybele"},
+			{"translate":"sotd.magic_word.gaia"}
+		]
+	},
+	"emanations":{
+		"spell":[ 
+			{
+				"type":"sotdivine:spawn",
+				"data": {
+					"name":"undead",
+					"entities": [
+						{"data":"minecraft:skeleton","weight":2},
+						{"data":"minecraft:zombie","weight":10}
+					],
+					"spell_properties": {
+						"alignment":"curse",
+						"difficulty":"normal"
+					}
+				}
+			}
+		]
+	}
+}

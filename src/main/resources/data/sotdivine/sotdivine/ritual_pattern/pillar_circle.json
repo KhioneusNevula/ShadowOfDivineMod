@@ -1,5 +1,11 @@
 {
 	"focus":"X",
+	"genres":{
+		"F":"sotdivine:decor",
+		"b":"sotdivine:building_block",
+		"C":"sotdivine:building_block",
+		"B":"sotdivine:building_block"
+	},
 	"template":
 	      [["  ***  ",
 			" ***** ",
@@ -33,11 +39,11 @@
 			" ***** ",
 			"  *B*  "],
 	      
-	       ["  *B*  ",
+	       ["  *b*  ",
 			" ***** ",
 			"*******",
-			"B**B**B",
+			"b**C**b",
 			"*******",
 			" ***** ",
-			"  *B*  "]]
+			"  *b*  "]]
 }

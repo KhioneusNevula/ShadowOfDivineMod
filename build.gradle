@@ -3,6 +3,12 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0.36,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+mixin {
+	add sourceSets.main, "sotdivine.refmap.json"
+	config "sotdivine.mixins.json"
 }
 
 version = '1.21.1-1.0.0.0'
@@ -148,6 +154,8 @@ dependencies {
     // to improve performance in production environments. This line is required to enable said compile-time validation
     // in your development environment, helping you catch issues early.
     annotationProcessor 'net.minecraftforge:eventbus-validator:7.0-beta.10'
+    
+	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Example mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.gm910.sotdivine.mixins",
+  "refmap": "sotdivine.refmap.json",
+  "mixins": [
+  	"pathfinding.PathfindingContextMixin",
+  	"pathfinding.PathTypeCacheMixin",
+  	"entity.ItemFrameMixin",
+  	"block.BlockStateMixin"
+  ]
+}
