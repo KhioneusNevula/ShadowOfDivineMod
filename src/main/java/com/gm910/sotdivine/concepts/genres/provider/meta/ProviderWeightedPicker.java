@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import com.gm910.sotdivine.concepts.genres.provider.IGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.util.CodecUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WeightedSet;
 import com.google.common.collect.HashBiMap;
@@ -162,7 +162,7 @@ public record ProviderWeightedPicker<T, G, E extends IGenreProvider>(WeightedSet
 	@Override
 	public Component translate() {
 		return this.set.stream().map((e) -> TextUtils.transPrefix("sotd.cmd.quote", e.translate()))
-				.collect(StreamUtils.componentCollectorCommasPretty());
+				.collect(CollectionUtils.componentCollectorCommasPretty());
 	}
 
 }

@@ -85,7 +85,7 @@ public non-sealed class Sanctuary implements ISanctuary {
 	@Override
 	public int timeUntilForbidden(Entity entity) {
 		// TODO make this specific to the deity
-		// if you hurt something, the protection goes away
+		// if you hurt something, the PROTECTION goes away
 		if (entity.getCapability(ISanctuaryInfo.CAPABILITY).orElse(null) instanceof ISanctuaryInfo info) {
 			if (info.recentlyBanned(deityName)) {
 				return 0;

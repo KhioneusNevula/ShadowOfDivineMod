@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
@@ -81,7 +82,7 @@ public class CodecUtils {
 						errors.add(result);
 					}
 				}
-				return DataResult.<U>error(() -> errors.stream().collect(StreamUtils.setStringCollector("; ")),
+				return DataResult.<U>error(() -> errors.stream().collect(CollectionUtils.setStringCollector("; ")),
 						partial);
 			};
 
@@ -97,7 +98,7 @@ public class CodecUtils {
 					}
 				}
 				return DataResult
-						.<Pair<T, X>>error(() -> errors.stream().collect(StreamUtils.setStringCollector("; ")));
+						.<Pair<T, X>>error(() -> errors.stream().collect(CollectionUtils.setStringCollector("; ")));
 			}
 		};
 	}
@@ -110,8 +111,28 @@ public class CodecUtils {
 	 * @return
 	 */
 	public static <T> Codec<List<T>> listOrSingleCodec(Codec<T> codec) {
-		return Codec.either(codec, Codec.list(codec)).xmap((s) -> s.map((x) -> List.of(x), (y) -> y),
-				(s) -> s.size() == 1 ? Either.left(s.getFirst()) : Either.right(s));
+		return Codec.either(Codec.list(codec), codec).xmap((s) -> s.map((x) -> x, (y) -> List.of(y)),
+				(s) -> s.size() == 1 ? Either.right(s.getFirst()) : Either.left(s));
+	}
+
+	/**
+	 * Codec which interprets structures of the form "X":["Y", "Z",...] as Multimaps
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param keys
+	 * @param vals
+	 * @return
+	 */
+	public static <K, V, M extends Multimap<K, V>> Codec<M> multimapCodec(Codec<K> keys, Codec<V> vals,
+			Supplier<M> mmap) {
+		return Codec.unboundedMap(keys, Codec.list(vals))
+				.xmap((m) -> m.entrySet().stream()
+						.collect(Multimaps.flatteningToMultimap((k) -> k.getKey(), (v) -> v.getValue().stream(), mmap)),
+						(m) -> m.asMap().entrySet().stream()
+								.map((e) -> Map.entry(e.getKey(),
+										e.getValue() instanceof List<V> ls ? ls : new ArrayList<>(e.getValue())))
+								.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 	}
 
 	/**
@@ -124,16 +145,42 @@ public class CodecUtils {
 	 * @param vals
 	 * @return
 	 */
+	public static <K, V, M extends Multimap<K, V>> Codec<M> multimapCodecOrSingle(Codec<K> keys, Codec<V> vals,
+			Supplier<M> mmap) {
+		return Codec.unboundedMap(keys, CodecUtils.listOrSingleCodec(vals))
+				.xmap((m) -> m.entrySet().stream()
+						.collect(Multimaps.flatteningToMultimap((k) -> k.getKey(), (v) -> v.getValue().stream(), mmap)),
+						(m) -> m.asMap().entrySet().stream()
+								.map((e) -> Map.entry(e.getKey(),
+										e.getValue() instanceof List<V> ls ? ls : new ArrayList<>(e.getValue())))
+								.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+	}
+
+	/**
+	 * Codec which interprets structures of the form "X":["Y", "Z",...] or "X":"Z"
+	 * as Multimaps
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param keys
+	 * @param vals
+	 * @return
+	 */
+	public static <K, V> Codec<Multimap<K, V>> multimapCodecOrSingle(Codec<K> keys, Codec<V> vals) {
+		return multimapCodecOrSingle(keys, vals, () -> MultimapBuilder.hashKeys().arrayListValues().build());
+	}
+
+	/**
+	 * Codec which interprets structures of the form "X":["Y", "Z",...] as Multimaps
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param keys
+	 * @param vals
+	 * @return
+	 */
 	public static <K, V> Codec<Multimap<K, V>> multimapCodec(Codec<K> keys, Codec<V> vals) {
-		return Codec.unboundedMap(keys, CodecUtils.listOrSingleCodec(vals)).xmap((m) -> m.entrySet().stream()
-				.collect(Multimaps.flatteningToMultimap((k) -> k.getKey(), (v) -> v.getValue().stream(), () -> {
-					Multimap<K, V> mapa = MultimapBuilder.hashKeys().arrayListValues().build();
-					return mapa;
-				})),
-				(m) -> m.asMap().entrySet().stream()
-						.map((e) -> Map.entry(e.getKey(),
-								e.getValue() instanceof List<V> ls ? ls : new ArrayList<>(e.getValue())))
-						.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+		return multimapCodec(keys, vals, () -> MultimapBuilder.hashKeys().arrayListValues().build());
 	}
 
 	/**

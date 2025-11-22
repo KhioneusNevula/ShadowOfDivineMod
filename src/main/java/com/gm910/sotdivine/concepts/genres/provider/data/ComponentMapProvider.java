@@ -9,7 +9,7 @@ import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.concepts.genres.provider.data.components.IComponentMatcherProvider;
 import com.gm910.sotdivine.concepts.genres.provider.meta.ProviderWeightedPicker;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -108,7 +108,7 @@ public record ComponentMapProvider(DataComponentExactPredicate exact,
 				+ (this.partial.isEmpty() ? ""
 						: "partial={" + this.partial.entrySet().stream()
 								.map((e) -> Map.entry(ModUtils.toShortString(e.getKey()), e.getValue()))
-								.collect(StreamUtils.setStringCollector(",")) + "}")
+								.collect(CollectionUtils.setStringCollector(",")) + "}")
 				+ "}";
 	}
 
@@ -117,7 +117,7 @@ public record ComponentMapProvider(DataComponentExactPredicate exact,
 		Component partialS = partial
 				.entrySet().stream().map((a) -> TextUtils.transPrefix("sotd.cmd.map",
 						ModUtils.toShortString(a.getKey()), a.getValue().translate()))
-				.collect(StreamUtils.componentCollectorCommas());
+				.collect(CollectionUtils.componentCollectorCommas());
 		if (!exact.isEmpty() && !partial.isEmpty()) {
 			return TextUtils.transPrefix("genre.provider.cmap.exact_and_partial", exact.toString(), partialS);
 		} else if (!exact.isEmpty()) {

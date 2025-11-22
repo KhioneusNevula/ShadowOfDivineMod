@@ -2,7 +2,7 @@ package com.gm910.sotdivine.events;
 
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.network.party_system.ClientParties;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.datafixers.util.Either;
 
@@ -38,7 +38,7 @@ public class ClientEvents {
 								Either.left(TextUtils.transPrefix("sotd.tooltip.deity.symbol_of", text,
 										deities.stream().map(
 												(s) -> s.descriptiveName().orElse(Component.literal(s.uniqueName())))
-												.collect(StreamUtils.componentCollectorCommasPretty()))));
+												.collect(CollectionUtils.componentCollectorCommasPretty()))));
 					}
 				}
 			}

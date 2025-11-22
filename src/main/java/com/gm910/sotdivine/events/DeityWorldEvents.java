@@ -84,7 +84,7 @@ public class DeityWorldEvents {
 					deities = random.nextInt(Spheres.instance().getSphereMap().size(),
 							Spheres.instance().getSphereMap().size() * 2);
 				for (int mama = 0; mama < deities; mama++) {
-					IDeity dimde = IDeity.generateDeity(player.level(), random, system);
+					IDeity dimde = IDeity.generateDeity(player.level(), player.getLanguage(), random, system);
 					if (dimde != null) {
 
 						if (system.dimensionOwners(Level.NETHER).count() == 0) {

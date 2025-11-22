@@ -213,7 +213,7 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	}
 
 	/**
-	 * Convert all symbols at the position to the given symbol
+	 * Convert all symbols at the rawPosition to the given symbol
 	 * 
 	 * @param level
 	 * @param pos

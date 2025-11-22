@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Specification for generating particles, assuming that this specification will
- * be used at a specific position
+ * be used at a specific rawPosition
  */
 public record ParticleSpecification(ParticleOptions particle, Vec3 offset, Vec3 delta, double speed, int count,
 		boolean force, boolean alwaysVisible) {
@@ -47,7 +47,7 @@ public record ParticleSpecification(ParticleOptions particle, Vec3 offset, Vec3 
 	}
 
 	/**
-	 * Display the particle specified here at the given position
+	 * Display the particle specified here at the given rawPosition
 	 * 
 	 * @param level
 	 * @param pos

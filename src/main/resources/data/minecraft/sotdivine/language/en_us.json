@@ -1,0 +1,34 @@
+{
+	"phonology": "minecraft:en_us",
+	
+	"orthography": {
+		"writers":[
+			{"sequence":["ə"], "form":{"translate":"sotd.phon.schwa"}, "replace":0},
+			{"sequence":["ŋ"], "form":{"translate":"sotd.phon.eng"}, "replace":0},
+			{"sequence":["ɪ"], "form":{"translate":"sotd.phon.short_i"}, "replace":0},
+			{"sequence":["ɛ"], "form":{"translate":"sotd.phon.short_e"}, "replace":0},
+			{"sequence":["ʌ"], "form":{"translate":"sotd.phon.unround_short_o"}, "replace":0},
+			{"sequence":["ɔ"], "form":{"translate":"sotd.phon.short_o"}, "replace":0},
+			{"sequence":["m̩"], "form":{"translate":"sotd.phon.sylm"}, "replace":0},
+			{"sequence":["l̩"], "form":{"translate":"sotd.phon.syll"}, "replace":0},
+			{"sequence":["n̩"], "form":{"translate":"sotd.phon.syln"}, "replace":0},
+			{"sequence":["r̩"], "form":{"translate":"sotd.phon.sylr"}, "replace":0},
+			{"sequence":["ʊ"], "form":{"translate":"sotd.phon.upside_omega"}, "replace":0}
+		]
+	},
+	
+	"syntax": {
+		
+	},
+	
+	"morphology": {
+		"N,number=pl": {"form":"z", "at":"suffix"},
+		"V,person=3,number=s,tense=pres": {"form":"z", "at":"suffix"},
+		"tense=pst": {"form":["eh", "d"], "at":"suffix"},
+		"voice=pass": "past",
+		"asp=prog": {"form": ["ih", "ng"], "at":"suffix"}
+	},
+	
+	"lexicon": "minecraft:en_us"
+
+}

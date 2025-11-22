@@ -21,7 +21,7 @@ public interface ISpellProperties {
 	instance.group(SpellAlignment.CODEC.fieldOf("alignment").forGetter(ISpellProperties::alignment),
 			CodecUtils.caselessEnumOrOrdinal(SpellPower.class).optionalFieldOf("difficulty", SpellPower.IMPOSSIBLE)
 					.forGetter(ISpellProperties::difficulty),
-			Codec.list(Codec.STRING.xmap(SpellTrait::valueOf, SpellTrait::name)).optionalFieldOf("traits")
+			Codec.list(CodecUtils.caselessEnumCodec(SpellTrait.class)).optionalFieldOf("traits")
 					.forGetter((a) -> Optional.of(new ArrayList<>(a.traits())))
 
 	).apply(instance, SpellProperties::new));

@@ -9,7 +9,7 @@ import org.apache.commons.lang3.stream.Streams;
 import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.util.ModUtils;
 import com.gm910.sotdivine.util.RandomUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WeightedSet;
 import com.google.common.collect.Lists;
@@ -117,21 +117,21 @@ public record EnchantmentsComponentMatcher(List<EnchantmentPredicate> enchantmen
 										.map((wa) -> TextUtils.transPrefix("sotd.genre.provider.ench.tag",
 												ModUtils.toShortString(wa.location())),
 												(x) -> x.stream().map(Holder::get).map((e) -> e.description())
-														.collect(StreamUtils.componentCollectorSetStyle()))),
+														.collect(CollectionUtils.componentCollectorSetStyle()))),
 						TextUtils.printMinMaxBounds(pred.level()));
 	}
 
 	@Override
 	public String toString() {
 		return "(Enchants){" + (this.enchantments.isEmpty() ? "(any)"
-				: this.enchantments.stream().map((x) -> prettyPrint(x)).collect(StreamUtils.setStringCollector(",")))
+				: this.enchantments.stream().map((x) -> prettyPrint(x)).collect(CollectionUtils.setStringCollector(",")))
 				+ "}";
 	}
 
 	@Override
 	public Component translate() {
 		return TextUtils.transPrefix("sotd.genre.provider.ench.list" + (enchantments.isEmpty() ? "_any" : ""),
-				enchantments.stream().map((s) -> translate(s)).collect(StreamUtils.componentCollectorCommasPretty()));
+				enchantments.stream().map((s) -> translate(s)).collect(CollectionUtils.componentCollectorCommasPretty()));
 	}
 
 }

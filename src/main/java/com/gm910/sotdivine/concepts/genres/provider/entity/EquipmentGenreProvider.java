@@ -7,7 +7,7 @@ import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.concepts.genres.provider.independent.IEntityGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.independent.ItemGenreProvider;
 import com.gm910.sotdivine.util.CodecUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.serialization.Codec;
 
@@ -91,7 +91,7 @@ public record EquipmentGenreProvider(Map<EquipmentSlot, ItemGenreProvider> map)
 		return this.map.entrySet().stream()
 				.map((s) -> Map.entry(TextUtils.transPrefix("sotd.cmd.slot." + s.getKey().getName()),
 						TextUtils.transPrefix("sotd.cmd.parenthesis", s.getValue().translate())))
-				.collect(StreamUtils.componentCollector(TextUtils.PRETTY_LIST_TRANSLATION_PREFIX, null,
+				.collect(CollectionUtils.componentCollector(TextUtils.PRETTY_LIST_TRANSLATION_PREFIX, null,
 						(x) -> TextUtils.transPrefix("sotd.cmd.map.colon", x.getKey(), x.getValue())));
 	}
 

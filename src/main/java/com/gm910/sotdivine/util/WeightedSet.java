@@ -536,7 +536,7 @@ public class WeightedSet<K> implements Set<K> {
 		public String toString() {
 			if (source != null)
 				return "{" + source.stream().map((x) -> x + "=" + sourceMapper.apply(x))
-						.collect(StreamUtils.setStringCollector(",")) + "}";
+						.collect(CollectionUtils.setStringCollector(",")) + "}";
 			return weightMap.entrySet().toString();
 		}
 

@@ -29,7 +29,7 @@ import com.gm910.sotdivine.magic.ritual.RitualInstance;
 import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
 import com.gm910.sotdivine.magic.ritual.properties.RitualQuality;
 import com.gm910.sotdivine.magic.ritual.properties.RitualType;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -48,7 +48,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.entity.EntityTypeTest;
 
 /**
- * A ritual emanation targeter which can optionally target the position(s) of
+ * A ritual emanation targeter which can optionally target the rawPosition(s) of
  * instances of the given (placeable) genre and optionally target instances of a
  * given (entity) genre in the ritual
  * 
@@ -103,7 +103,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 	}
 
 	/**
-	 * Matches this emanation to every entity or position relevant and run it.
+	 * Matches this emanation to every entity or rawPosition relevant and run it.
 	 * Return false if all emanations failed
 	 * 
 	 * @param level
@@ -296,7 +296,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 				entityTargeter.map((s) -> s.translate()).orElse(Component.empty()),
 				elementTargeter.stream()
 						.map((s) -> TextUtils.transPrefix("sotd.cmd.ritual.element." + s.name().toLowerCase()))
-						.collect(StreamUtils.componentCollectorCommasPretty()));
+						.collect(CollectionUtils.componentCollectorCommasPretty()));
 	}
 
 }

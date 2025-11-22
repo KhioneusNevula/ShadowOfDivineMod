@@ -288,7 +288,7 @@ public sealed interface IRitual permits Ritual {
 	}
 
 	/**
-	 * Scans for all deity symbols around this position and identify one "winning
+	 * Scans for all deity symbols around this rawPosition and identify one "winning
 	 * deity", and return a stream all other deities matched
 	 * 
 	 * @param world

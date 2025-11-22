@@ -126,7 +126,7 @@ public class PartyMemory implements IPartyMemory {
 	public String toString() {
 		return "Memory_" + this.type + "{" + actor.map((x) -> "actorParty=" + x).orElse("")
 				+ otherParty.map((x) -> "targetParty=" + x).orElse("") + item.map((x) -> "item=" + x).orElse("")
-				+ pos.map((x) -> "position=" + x).orElse("") + block.map((x) -> "block=" + x).orElse("")
+				+ pos.map((x) -> "rawPosition=" + x).orElse("") + block.map((x) -> "block=" + x).orElse("")
 				+ entityType.map((x) -> "entityType=" + x).orElse("")
 				+ entityTag.map((x) -> "entityTag=" + x).orElse("") + resource.map((x) -> "resource=" + x).orElse("")
 				+ resAmt.map((x) -> "resourceAmount=" + x).orElse("") + "}";

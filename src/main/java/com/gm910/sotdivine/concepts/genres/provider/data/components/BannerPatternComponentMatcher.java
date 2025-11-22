@@ -11,7 +11,7 @@ import com.gm910.sotdivine.concepts.genres.provider.IGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.concepts.genres.provider.data.other.BannerPatternLayerMatcher;
 import com.gm910.sotdivine.util.CodecUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
@@ -41,7 +41,7 @@ public class BannerPatternComponentMatcher implements IComponentMatcherProvider<
 							Ordering.CODEC.optionalFieldOf("ordering", Ordering.UNORDERED)
 									.forGetter((x) -> x.sequential && x.contiguous ? Ordering.CONTIGUOUS_SEQUENTIAL
 											: x.sequential ? Ordering.SEQUENTIAL : Ordering.UNORDERED),
-							Position.CODEC.optionalFieldOf("position", Position.ANYWHERE).forGetter((x) -> x.position))
+							Position.CODEC.optionalFieldOf("rawPosition", Position.ANYWHERE).forGetter((x) -> x.position))
 					.apply(instance,
 							(layer, order, position) -> new BannerPatternComponentMatcher(layer, order, position)));
 		}
@@ -191,14 +191,14 @@ public class BannerPatternComponentMatcher implements IComponentMatcherProvider<
 
 	@Override
 	public String toString() {
-		return "(" + PATH + "){layers=" + this.layers() + ",position=" + this.position + ",sequential="
+		return "(" + PATH + "){layers=" + this.layers() + ",rawPosition=" + this.position + ",sequential="
 				+ this.sequential + ",contiguous=" + this.contiguous + "}";
 	}
 
 	@Override
 	public Component translate() {
 		Component layers = predicateLayers.stream().map((s) -> s.translate())
-				.collect(StreamUtils.componentCollectorCommas());
+				.collect(CollectionUtils.componentCollectorCommas());
 		String ordering = "sotd.genre.provider.banner."
 				+ (sequential ? (contiguous ? "contiguous_sequential" : "sequential") : "unordered");
 		return TextUtils.transPrefix(

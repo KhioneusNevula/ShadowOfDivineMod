@@ -15,7 +15,7 @@ import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.HolderUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -103,9 +103,9 @@ public record EntityTypeProvider(Optional<EntityTypePredicate> entityType, Colle
 										.map((s) -> ModUtils.toShortString(s.location())).orElse(""),
 								entityType.flatMap((s) -> s.types().unwrap().right())
 										.map((s) -> s.stream().map(Holder::get).map((et) -> et.getDescription())
-												.collect(StreamUtils.componentCollectorCommasPretty()))),
+												.collect(CollectionUtils.componentCollectorCommasPretty()))),
 						categories.stream().map((s) -> Component.literal(s.getName()))
-								.collect(StreamUtils.componentCollectorCommasPretty()));
+								.collect(CollectionUtils.componentCollectorCommasPretty()));
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public record EntityTypeProvider(Optional<EntityTypePredicate> entityType, Colle
 		return "Types(" + entityType
 				.map(et -> et.types().unwrap().map((tg) -> "#" + tg.location(),
 						(ls) -> ls.stream().map((g) -> BuiltInRegistries.ENTITY_TYPE.getKey(g.get()))
-								.collect(StreamUtils.setStringCollector(","))))
+								.collect(CollectionUtils.setStringCollector(","))))
 				.orElse(categories.isEmpty() ? "<any>" : "Categories:" + categories) + ")";
 	}
 
@@ -140,7 +140,7 @@ public record EntityTypeProvider(Optional<EntityTypePredicate> entityType, Colle
 		return "(types={"
 				+ entityType.map(et -> et.types().unwrap().map((tg) -> "#" + tg.location(),
 						(ls) -> ls.stream().map((g) -> BuiltInRegistries.ENTITY_TYPE.getKey(g.get()))
-								.collect(StreamUtils.setStringCollector(","))))
+								.collect(CollectionUtils.setStringCollector(","))))
 						.orElse("")
 				+ "},categories=" + categories + ")";
 	}

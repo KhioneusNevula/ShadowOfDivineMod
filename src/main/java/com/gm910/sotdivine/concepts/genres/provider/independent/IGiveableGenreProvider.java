@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Genre provider for something which can be placed at a block position in the
+ * Genre provider for something which can be placed at a block rawPosition in the
  * world
  * 
  * @param <T>

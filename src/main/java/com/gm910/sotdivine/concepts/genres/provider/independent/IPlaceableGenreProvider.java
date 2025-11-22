@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 
 /**
- * Genre provider for something which can be placed at a block position in the
+ * Genre provider for something which can be placed at a block rawPosition in the
  * world
  * 
  * @param <T>
@@ -18,7 +18,7 @@ import net.minecraft.world.level.LevelReader;
 public interface IPlaceableGenreProvider<T, G extends IGenrePlacer> extends IGenreProvider<T, G> {
 
 	/**
-	 * Whether the specific position matches
+	 * Whether the specific rawPosition matches
 	 * 
 	 * @param emanation
 	 * @return

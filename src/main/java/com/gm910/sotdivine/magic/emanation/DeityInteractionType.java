@@ -8,13 +8,13 @@ import com.mojang.serialization.Codec;
  */
 public enum DeityInteractionType {
 	/**
-	 * An emanation that occurs when a deity starts a ritual at a position
+	 * An emanation that occurs when a deity starts a ritual at a rawPosition
 	 */
 	ACCEPT_OFFERING,
 	/**
 	 * An emanation that occurs when a deity finds one of its symbols during an
 	 * offering or something similar. Targets the entity with the symbol or the
-	 * position of the block it is at
+	 * rawPosition of the block it is at
 	 */
 	SYMBOL_RECOGNITION,
 	/**

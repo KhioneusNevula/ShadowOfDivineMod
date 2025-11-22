@@ -368,7 +368,7 @@ public interface IPartySystem extends IPartyLister {
 	public Stream<IParty> dimensionOwners(ResourceKey<Level> dimension);
 
 	/**
-	 * Return all parties which have direct control at a certain position
+	 * Return all parties which have direct control at a certain rawPosition
 	 */
 	public Stream<IParty> regionOwners(ChunkPos position, ResourceKey<Level> dim);
 

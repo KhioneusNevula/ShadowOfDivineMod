@@ -11,7 +11,7 @@ import com.gm910.sotdivine.magic.emanation.EmanationInstance;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
 import com.gm910.sotdivine.magic.emanation.spell.ISpellProperties;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
@@ -55,7 +55,7 @@ public class ParticleEmanation extends AbstractEmanation {
 				}, () -> {
 					erred[0] = true;
 					LogUtils.getLogger().error(
-							"Could not find entity or position in spell targeting info for ParticleEmanation; cannot run "
+							"Could not find entity or rawPosition in spell targeting info for ParticleEmanation; cannot run "
 									+ this);
 				});
 		return erred[0];
@@ -91,7 +91,7 @@ public class ParticleEmanation extends AbstractEmanation {
 
 		return "Particles{" + this.particles.stream()
 				.map((p) -> ModUtils.toShortString(BuiltInRegistries.PARTICLE_TYPE.getKey(p.particle().getType())))
-				.collect(StreamUtils.setStringCollector(",")) + "}";
+				.collect(CollectionUtils.setStringCollector(",")) + "}";
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class ParticleEmanation extends AbstractEmanation {
 				this.particles.stream()
 						.map((p) -> Component.translatableEscape(
 								BuiltInRegistries.PARTICLE_TYPE.getKey(p.particle().getType()).toLanguageKey()))
-						.collect(StreamUtils.componentCollectorCommasPretty()));
+						.collect(CollectionUtils.componentCollectorCommasPretty()));
 	}
 
 }

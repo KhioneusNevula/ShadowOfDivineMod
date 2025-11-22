@@ -23,7 +23,7 @@ import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.gm910.sotdivine.network.party_system.ClientParties;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
@@ -528,7 +528,7 @@ public interface IPartyLister {
 					+ (this.descriptiveName().isPresent() ? "name=\"" + this.descriptiveName().get().getString() + "\""
 							: "id=" + this.uniqueName())
 					+ ",spheres={" + this.spheres().stream().map(ISphere::name).map(Object::toString)
-							.collect(StreamUtils.setStringCollector(","))
+							.collect(CollectionUtils.setStringCollector(","))
 					+ "}}";
 		}
 
@@ -548,7 +548,7 @@ public interface IPartyLister {
 		public Component descriptiveInfo(Level level) {
 			return TextUtils.transPrefix("sotd.cmd.deityinfo",
 					this.spheres.stream().map(ISphere::displayName)
-							.collect(StreamUtils.componentCollectorCommasPretty()),
+							.collect(CollectionUtils.componentCollectorCommasPretty()),
 					Component.translatableEscape(this.symbol.bannerPattern().get().translationKey()));
 		}
 

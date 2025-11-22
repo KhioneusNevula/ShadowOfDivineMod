@@ -27,7 +27,7 @@ import com.gm910.sotdivine.network.packet_types.ClientboundTellrawNotificationPa
 import com.gm910.sotdivine.network.packet_types.ServerboundIncantationChatPacket;
 import com.gm910.sotdivine.util.FieldUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Either;
@@ -101,7 +101,7 @@ public class MagicWordEvents {
 		LOGGER.debug("Checking incantation by " + player + " with word " + packet.magicWord().getString() + " ("
 				+ packet.magicWord() + ") at positions: {"
 				+ alongVector.stream().map((b) -> "(" + b.toShortString() + ")->(" + level.getBlockState(b) + ")")
-						.collect(StreamUtils.setStringCollector(", "))
+						.collect(CollectionUtils.setStringCollector(", "))
 				+ "}");
 		posloop: for (BlockPos exPos : alongVector) {
 			if (player.gameMode() == GameType.CREATIVE) {

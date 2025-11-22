@@ -24,7 +24,7 @@ import com.gm910.sotdivine.concepts.genres.provider.entity_preds.ITypeSpecificPr
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.HolderUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -292,7 +292,7 @@ public record EntityGenreProvider(EntityTypeProvider entityType, Collection<MobE
 				effects.isEmpty() ? Component.empty()
 						: TextUtils.transPrefix(pref + "effects",
 								effects.stream().map(MobEffectGenreProvider::translate)
-										.collect(StreamUtils.componentCollectorCommasPretty())),
+										.collect(CollectionUtils.componentCollectorCommasPretty())),
 				flags.map((s) -> TextUtils.transPrefix(pref + "flags", s.translate())).orElse(Component.empty()),
 				equipment.map((s) -> TextUtils.transPrefix(pref + "equipment", s.translate()))
 						.orElse(Component.empty()),
@@ -301,7 +301,7 @@ public record EntityGenreProvider(EntityTypeProvider entityType, Collection<MobE
 				typeSpecific.isEmpty() ? Component.empty()
 						: TextUtils.transPrefix(pref + "special",
 								typeSpecific.stream().map(ITypeSpecificProvider::translate)
-										.collect(StreamUtils.componentCollectorCommasPretty())),
+										.collect(CollectionUtils.componentCollectorCommasPretty())),
 				nbt.map((s) -> TextUtils.transPrefix(pref + "nbt", s.translate())).orElse(Component.empty()),
 				components.isEmpty() ? Component.empty()
 						: TextUtils.transPrefix(pref + "components", components.translate()),

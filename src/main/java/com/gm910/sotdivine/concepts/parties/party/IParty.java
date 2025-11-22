@@ -67,7 +67,7 @@ public interface IParty extends IPartyInfo {
 	 * small component to give this entity a name
 	 * 
 	 * @param id
-	 * @param position
+	 * @param rawPosition
 	 * @return
 	 */
 	public static IParty createEntity(Entity en, Component name) {
@@ -77,10 +77,10 @@ public interface IParty extends IPartyInfo {
 
 	/**
 	 * Creates a party as a (worshiper) group centered at a certain (optional)
-	 * position;
+	 * rawPosition;
 	 * 
 	 * @param id
-	 * @param position
+	 * @param rawPosition
 	 * @return
 	 */
 	public static IParty createGroup(String unique, Component displayName,

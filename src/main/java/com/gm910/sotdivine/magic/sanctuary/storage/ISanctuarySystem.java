@@ -66,7 +66,7 @@ public interface ISanctuarySystem {
 	}
 
 	/**
-	 * Remove teh sanctuary at the given position
+	 * Remove teh sanctuary at the given rawPosition
 	 * 
 	 * @param pos
 	 * @return
@@ -127,7 +127,7 @@ public interface ISanctuarySystem {
 	public Stream<ISanctuary> getSanctuaries(IDeity owner);
 
 	/**
-	 * Return the sanctuary that contains the given position, or null if none exists
+	 * Return the sanctuary that contains the given rawPosition, or null if none exists
 	 * 
 	 * @param pos
 	 * @return
@@ -136,7 +136,7 @@ public interface ISanctuarySystem {
 
 	/**
 	 * Return true if this mobID should be allowed to pathfind to the given
-	 * position; false otherwise
+	 * rawPosition; false otherwise
 	 * 
 	 * @param pos
 	 * @param entity
@@ -160,7 +160,7 @@ public interface ISanctuarySystem {
 
 	/**
 	 * If this block is a possible first block in a sanctuary boundary; return the
-	 * position to start counting from. Else, return null
+	 * rawPosition to start counting from. Else, return null
 	 * 
 	 * @param pos
 	 * @param levelReference

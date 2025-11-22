@@ -18,13 +18,12 @@ import javax.annotation.Nullable;
 
 import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.concepts.deity.personality.IDeityStat;
-import com.gm910.sotdivine.concepts.language.LanguageGen;
-import com.gm910.sotdivine.concepts.language.phono.IPhoneme;
 import com.gm910.sotdivine.concepts.parties.IPartyLister.IDeityInfo;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
+import com.gm910.sotdivine.language.Languages;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;
 import com.gm910.sotdivine.magic.emanation.EmanationInstance;
 import com.gm910.sotdivine.magic.emanation.IEmanation;
@@ -33,7 +32,6 @@ import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.RitualInstance;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
-import com.gm910.sotdivine.util.ModUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WeightedSet;
 import com.google.common.collect.Lists;
@@ -175,7 +173,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	/**
 	 * Generates a suitable deity
 	 */
-	public static IDeity generateDeity(ServerLevel level, Random random, IPartySystem system) {
+	public static IDeity generateDeity(ServerLevel level, String language, Random random, IPartySystem system) {
 
 		Set<ISphere> spheres = pickSpheres(level, 3, 1, random, system);
 		IDeitySymbol symbol = pickSymbol(spheres, random, system);
@@ -192,11 +190,9 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 
 		String finalName = null;
 		for (int i = 0; i < 5; i++) {
-			LanguageGen language = LanguageGen
-					.getGenAfterReset(ModUtils.path(level.players().getFirst().getLanguage()));
-			List<IPhoneme> ls = language.generatePhonemeSequence(4, 15);
-			if (ls != null) {
-				finalName = IPhoneme.toString(ls);
+			Optional<String> ls = Languages.instance().get(language).map((l) -> l.generateName(1, 7, level.random));
+			if (ls.isPresent()) {
+				finalName = ls.get();
 				finalName = ("" + finalName.charAt(0)).toUpperCase() + finalName.substring(1);
 				break;
 			}
@@ -296,7 +292,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	}
 
 	/**
-	 * Stops all emanations of the given kind targeting this position
+	 * Stops all emanations of the given kind targeting this rawPosition
 	 * 
 	 * @param pos
 	 */

@@ -87,7 +87,7 @@ public sealed interface IRitualPattern permits RitualPattern {
 
 	/**
 	 * The block (as a string id; could also be an entity such as an armor stand)
-	 * that should be at the given position relative to the center; return null if
+	 * that should be at the given rawPosition relative to the center; return null if
 	 * it does not matter
 	 * 
 	 * @param relativePos
@@ -105,7 +105,7 @@ public sealed interface IRitualPattern permits RitualPattern {
 
 	/**
 	 * Position of the focus block; this just returns {@link Vec3i#ZERO} since all
-	 * focuses are at position 0
+	 * focuses are at rawPosition 0
 	 * 
 	 * @return
 	 */
@@ -157,7 +157,7 @@ public sealed interface IRitualPattern permits RitualPattern {
 	public boolean matches(ServerLevel world, BlockPos focus, Map<String, IPlaceableGenreProvider<?, ?>> blockPreds);
 
 	/**
-	 * Return all entities at any notable or asterisk-ed position within this
+	 * Return all entities at any notable or asterisk-ed rawPosition within this
 	 * pattern
 	 * 
 	 * @param world

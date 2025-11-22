@@ -12,7 +12,7 @@ public enum RitualElement {
 	/** An item being offered, or an entity being sacrificed */
 	OFFERING,
 	/**
-	 * An entity or position which is designated the target of the ritual's effect;
+	 * An entity or rawPosition which is designated the target of the ritual's effect;
 	 * defaults to the caster
 	 */
 	TARGET;

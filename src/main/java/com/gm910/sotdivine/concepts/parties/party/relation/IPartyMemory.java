@@ -41,7 +41,7 @@ public interface IPartyMemory {
 			ItemStack.CODEC.optionalFieldOf("item").forGetter(IPartyMemory::opItem),
 			EntityType.CODEC.optionalFieldOf("entityType").forGetter((e) -> e.opEntityType()),
 			CompoundTag.CODEC.optionalFieldOf("entity").forGetter((e) -> e.opEntityTag()),
-			GlobalPos.CODEC.optionalFieldOf("position").forGetter(IPartyMemory::opPos),
+			GlobalPos.CODEC.optionalFieldOf("rawPosition").forGetter(IPartyMemory::opPos),
 			BlockState.CODEC.optionalFieldOf("block").forGetter(IPartyMemory::opBlockState),
 			IPartyResource.codec().optionalFieldOf("resource").forGetter(IPartyMemory::opResource),
 			Codec.INT.optionalFieldOf("resourceAmount").forGetter(IPartyMemory::opResourceAmount)
@@ -138,7 +138,7 @@ public interface IPartyMemory {
 	public Optional<EntityType<?>> opEntityType();
 
 	/**
-	 * If this memory involved a position, return it
+	 * If this memory involved a rawPosition, return it
 	 * 
 	 * @return
 	 */

@@ -13,7 +13,7 @@ import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.HolderUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
@@ -141,10 +141,10 @@ public record BannerPatternLayerMatcher(Optional<HolderSet<BannerPattern>> patte
 						(w) -> TextUtils.transPrefix("sotd.genre.provider.banner.layer_tag",
 								ModUtils.toShortString(w.location())),
 						(x) -> x.stream().map(Holder::get).map((b) -> Component.translatable(b.translationKey()))
-								.collect(StreamUtils.componentCollectorSetStyle())))
+								.collect(CollectionUtils.componentCollectorSetStyle())))
 						.orElse(Component.empty()),
 				colors.stream().map((s) -> Component.translatable("color.minecraft." + s.getName()))
-						.collect(StreamUtils.componentCollectorSetStyle()),
+						.collect(CollectionUtils.componentCollectorSetStyle()),
 				TextUtils.transPrefix("sotd.genre.provider.banner." + permitSymbols.name().toLowerCase() + "_sym"));
 	}
 

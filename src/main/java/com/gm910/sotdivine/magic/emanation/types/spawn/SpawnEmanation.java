@@ -6,7 +6,7 @@ import com.gm910.sotdivine.magic.emanation.EmanationInstance;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
 import com.gm910.sotdivine.magic.emanation.spell.ISpellProperties;
 import com.gm910.sotdivine.magic.emanation.types.AbstractEmanation;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -59,7 +59,7 @@ public class SpawnEmanation extends AbstractEmanation {
 		if (name.isEmpty()) {
 			this.name = "Spawn(" + mobs.unwrap().stream().sorted((w, w2) -> -Integer.compare(w.weight(), w2.weight()))
 					.map((w) -> EntityType.getKey(w.value()) + "=" + w.weight())
-					.collect(StreamUtils.setStringCollector("|")) + ")";
+					.collect(CollectionUtils.setStringCollector("|")) + ")";
 			dname = true;
 		} else {
 			this.name = name.get();
@@ -87,7 +87,7 @@ public class SpawnEmanation extends AbstractEmanation {
 	public Component translate() {
 		if (dname) {
 			return TextUtils.transPrefix("sotd.emanation.spawn", mobs.unwrap().stream().map(Weighted::value)
-					.map((et) -> et.getDescription()).collect(StreamUtils.componentCollectorCommasPretty()));
+					.map((et) -> et.getDescription()).collect(CollectionUtils.componentCollectorCommasPretty()));
 		}
 		return Component.translatableEscape("sotd.emanation.spawn." + name);
 	}

@@ -133,7 +133,7 @@ public record ServerboundIncantationChatPacket(Component originalMessage, String
 	}
 
 	/**
-	 * Returns the block position or entity being looked at by the sender
+	 * Returns the block rawPosition or entity being looked at by the sender
 	 * 
 	 * @return
 	 */

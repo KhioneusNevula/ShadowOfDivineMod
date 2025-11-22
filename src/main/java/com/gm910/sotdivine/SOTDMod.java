@@ -11,15 +11,15 @@ import com.gm910.sotdivine.concepts.genres.GenreTypes;
 import com.gm910.sotdivine.concepts.genres.IGenreType;
 import com.gm910.sotdivine.concepts.genres.provider.data.CodecsComponentMatchers;
 import com.gm910.sotdivine.concepts.genres.provider.entity_preds.CodecsTypeSpecificProviders;
-import com.gm910.sotdivine.concepts.language.LanguageGen;
 import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
 import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements;
 import com.gm910.sotdivine.concepts.parties.villagers.poi.ModPoiTypes;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
+import com.gm910.sotdivine.language.Languages;
+import com.gm910.sotdivine.language.lexicon.Lexicons;
+import com.gm910.sotdivine.language.phonology.Phonologies;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
-import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
-import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.gm910.sotdivine.network.ModNetwork;
 import com.mojang.logging.LogUtils;
@@ -35,7 +35,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -105,12 +104,6 @@ public final class SOTDMod {
 	public static final DeferredRegister<PartyResourceType<?>> PARTY_RESOURCE_TYPES = DeferredRegister
 			.create(ModRegistries.PARTY_RESOURCE_TYPES, SOTDMod.MODID);
 
-	/**
-	 * Deity language generators
-	 */
-	public static final DeferredRegister<LanguageGen> LANGUAGE_GENS = DeferredRegister
-			.create(ModRegistries.LANGUAGE_GEN, SOTDMod.MODID);
-
 	public SOTDMod(FMLJavaModLoadingContext context) {
 		var modBusGroup = context.getModBusGroup();
 
@@ -140,9 +133,6 @@ public final class SOTDMod {
 		EMANATION_TYPES.register(modBusGroup);
 		PartyResourceType.init();
 		PARTY_RESOURCE_TYPES.register(modBusGroup);
-		LanguageGen.init();
-		LANGUAGE_GENS.register(modBusGroup);
-		LanguageGen.registerInit();
 
 		ModCommandArgumentTypes.init();
 		COMMAND_ARGUMENT_TYPES.register(modBusGroup);
@@ -150,6 +140,9 @@ public final class SOTDMod {
 		AddReloadListenerEvent.BUS.addListener(RitualPatterns::eventAddListener);
 		AddReloadListenerEvent.BUS.addListener(DeitySymbols::eventAddListener);
 		AddReloadListenerEvent.BUS.addListener(Spheres::eventAddListener);
+		AddReloadListenerEvent.BUS.addListener(Lexicons::eventAddListener);
+		AddReloadListenerEvent.BUS.addListener(Phonologies::eventAddListener);
+		AddReloadListenerEvent.BUS.addListener(Languages::eventAddListener);
 
 		// Register the item to a creative tab
 		BuildCreativeModeTabContentsEvent.getBus(modBusGroup).addListener(SOTDMod::addCreative);

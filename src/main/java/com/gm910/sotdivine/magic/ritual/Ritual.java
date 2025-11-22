@@ -29,7 +29,7 @@ import com.gm910.sotdivine.magic.ritual.properties.RitualType;
 import com.gm910.sotdivine.magic.ritual.trigger.type.IRitualTrigger;
 import com.gm910.sotdivine.magic.ritual.trigger.type.IRitualTriggerEvent;
 import com.gm910.sotdivine.util.CodecUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -142,7 +142,7 @@ public non-sealed class Ritual implements IRitual {
 					offerings.entrySet().stream()
 							.map((s) -> TextUtils.transPrefix("sotd.cmd.count", s.getValue(),
 									s.getKey().getItem().getDisplayName()))
-							.collect(StreamUtils.componentCollectorCommasPretty())));
+							.collect(CollectionUtils.componentCollectorCommasPretty())));
 		}
 		boolean success = false;
 		switch (this.type) {

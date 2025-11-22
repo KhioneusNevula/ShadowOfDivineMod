@@ -32,13 +32,13 @@ public class PatternCodec implements Codec<RitualPattern> {
 			(f) -> !f.isBlank() ? DataResult.success(f) : DataResult.error(() -> "Cannot have blank string " + f));
 
 	public static final Codec<Multimap<String, IGenreType<? extends IPlaceableGenreProvider<?, ?>>>> genreMapCodec = CodecUtils
-			.multimapCodec(symbolCodec, GenreTypes.genreCodec());
+			.multimapCodecOrSingle(symbolCodec, GenreTypes.genreCodec());
 
 	@Override
 	public <T> DataResult<T> encode(RitualPattern input, DynamicOps<T> ops, T prefix) {
 
 		if (input.getSymbolAt(Vec3i.ZERO) == null)
-			return DataResult.error(() -> "Focus position is empty");
+			return DataResult.error(() -> "Focus rawPosition is empty");
 
 		RecordBuilder<T> mapBuilder = ops.mapBuilder();
 		mapBuilder.add("focus", symbolCodec.encodeStart(ops, input.blockMap.get(Vec3i.ZERO)));
@@ -146,7 +146,7 @@ public class PatternCodec implements Codec<RitualPattern> {
 
 				if (focusPosition == null || !focusPositionErrors.isEmpty()) {
 					return DataResult.error(
-							() -> focusPositionErrors.isEmpty() ? "No focus position found"
+							() -> focusPositionErrors.isEmpty() ? "No focus rawPosition found"
 									: "Too many focus positions found: " + focusPositionErrors,
 							Pair.of(new RitualPattern(firstBlockMap, genres), pair.getSecond()));
 				}

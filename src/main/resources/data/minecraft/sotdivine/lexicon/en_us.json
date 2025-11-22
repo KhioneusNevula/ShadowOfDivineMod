@@ -1,0 +1,123 @@
+{
+	"nouns":[
+		{
+			"template_name":"common_noun",
+			"features": {
+				"number":"s",
+				"person":"3",
+				"N":true
+			},
+			"heads":"NP",
+			"unspecified":[
+				"case"
+			]
+		},
+		{
+			"template_name":"proper_noun",
+			"features": {
+				"number":"s",
+				"person":"3",
+				"DP":true
+			},
+			"unspecified":[
+				"case"
+			]
+		},
+		{	
+			"template":"proper_noun",
+			"form": "kripr",
+			"orthography":"creeper",
+			"type": {"provider":"entity"},
+			"sense": {"entities":["creeper"]},
+			"features": {
+				"animate":true
+			}
+		}
+	
+	],
+	"eventive":[
+		{
+			"template_name":"adjective",
+			"features":{
+				"A":true
+			},
+			"heads":"AP"
+		},
+		{
+			"template_name":"verb",
+			"features":{
+				"V":true
+			},
+			"heads":"VP"
+		},
+		{
+			"template":"verb",
+			"form":"daɪ",
+			"orthography":"die",
+			"type":"event",
+			"sense":"death",
+			"theta-role":{
+				"theme":{"to":"complement","implicature":{"animate":true}}
+			},
+			"forms":{
+				"asp=prog": "dying"
+			}
+		}
+	],
+	"functionals":[
+		{
+			"template_name":"tense",
+			"features": {
+				"EPP":{"moves":{"DP":true}},
+				"T": true,
+				"case":"nominative"
+			},
+			"unspecified":[
+				"person",
+				"number"
+			],
+			"heads":"TP"
+		},
+		{
+			"template":"tense",
+			"type":"tense",
+			"sense":"present",
+			"features": {
+				"tense":"present",
+				"finite":true
+			}
+		},
+		{
+			"template":"tense",
+			"type":"tense",
+			"sense":"past",
+			"features": {
+				"tense":"pst",
+				"finite":true
+			}
+		},
+		{
+			"template":"tense",
+			"form":"to",
+			"type":"tense",
+			"sense":"infinitive",
+			"features": {
+				"finite":false
+			}
+		},
+		{
+			"template_name":"determiner",
+			"features": {
+				"D": true
+			},
+			"heads":"DP",
+			"phasal":true,
+			"unspecified":[
+				"person",
+				"number",
+				"case"
+			]
+		}
+	
+	]
+}

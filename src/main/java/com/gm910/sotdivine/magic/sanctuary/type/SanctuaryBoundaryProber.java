@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.gm910.sotdivine.magic.sanctuary.storage.ISanctuarySystem;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
@@ -87,7 +87,7 @@ public class SanctuaryBoundaryProber {
 					LogUtils.getLogger()
 							.debug("Probe reached world boundary (" + mover.pos.toShortString() + ") from "
 									+ mover.pivotPos + ": " + mover.pathBlocks.stream().map(BlockPos::toShortString)
-											.map((s) -> "(" + s + ")").collect(StreamUtils.setStringCollector(", ")));
+											.map((s) -> "(" + s + ")").collect(CollectionUtils.setStringCollector(", ")));
 				if (toolong)
 					// LogUtils.getLogger().debug("Probe moved too long a distance (length=" +
 					// mover.length + ") ("
@@ -276,8 +276,8 @@ public class SanctuaryBoundaryProber {
 	 *                        pillar is the block we should add to the boundary,
 	 *                        then add it
 	 * @param blockedBy       what block to not pass through
-	 * @param signifyMovement an optional function to create an effect at a position
-	 *                        to signify movement to it; first position is
+	 * @param signifyMovement an optional function to create an effect at a rawPosition
+	 *                        to signify movement to it; first rawPosition is
 	 *                        currentpos, second is the starting pos
 	 * @param signifyFailure  same as signify movement, but for positiosn the mover
 	 *                        fails to move to
@@ -359,7 +359,7 @@ public class SanctuaryBoundaryProber {
 	}
 
 	/**
-	 * Whether we are at a position we cannot move to
+	 * Whether we are at a rawPosition we cannot move to
 	 * 
 	 * @param pos
 	 * @return
@@ -420,7 +420,7 @@ public class SanctuaryBoundaryProber {
 		}
 
 		/**
-		 * add a certain position to the pathType and also to "visited"
+		 * add a certain rawPosition to the pathType and also to "visited"
 		 * 
 		 * @param pos
 		 */
@@ -442,7 +442,7 @@ public class SanctuaryBoundaryProber {
 		}
 
 		/**
-		 * If this probe has visited a position
+		 * If this probe has visited a rawPosition
 		 * 
 		 * @return
 		 */
@@ -533,13 +533,13 @@ public class SanctuaryBoundaryProber {
 		}
 
 		/**
-		 * The position this mover will move to next, ignoring adjusting
+		 * The rawPosition this mover will move to next, ignoring adjusting
 		 * 
 		 * @return
 		 */
 		public BlockPos nextPos() {
 			if (orient1 == null)
-				throw new IllegalStateException("Cannot project next position mover while it is unoriented");
+				throw new IllegalStateException("Cannot project next rawPosition mover while it is unoriented");
 			BlockPos pos = this.pos.relative(orient1);
 			if (orient2 != null && orient2 != orient1) {
 				pos = pos.relative(orient2);
@@ -552,14 +552,14 @@ public class SanctuaryBoundaryProber {
 		 */
 		public BlockPos nextAdjustmentPos() {
 			if (adjusting == null) {
-				throw new IllegalStateException("Cannot project next position mover while it is not adjusting");
+				throw new IllegalStateException("Cannot project next rawPosition mover while it is not adjusting");
 			}
 			return pos.relative(adjusting);
 		}
 
 		/**
 		 * Marks this probe as completed and remove section of the pathType that is
-		 * before the given position
+		 * before the given rawPosition
 		 */
 		public void completeAt(BlockPos pos) {
 			remove();

@@ -1,4 +1,9 @@
 {
+
+	"sotd.phon.schwa": "ə",
+	"sotd.phon.eng": "ŋ",
+	"sotd.phon.glot": "ʔ",
+	"sotd.phon.sylm": "m̩",
   	"sotd.cmd.list.end": "List complete.",
   	"sotd.cmd.list.start": "Listing %1$s items:",
   	"sotd.cmd.list.item": ">> %s",

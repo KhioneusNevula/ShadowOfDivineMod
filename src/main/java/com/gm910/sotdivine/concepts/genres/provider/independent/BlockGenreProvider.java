@@ -21,7 +21,7 @@ import com.gm910.sotdivine.concepts.genres.provider.data.other.NbtInternalProvid
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.HolderUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
@@ -412,10 +412,10 @@ public record BlockGenreProvider(Either<HolderSet<Block>, HolderSet<Fluid>> kind
 		return "" + (kind.right().isPresent()
 				? "Fluid{" + kind.right().get().unwrap().map((t) -> "#" + t.location(),
 						(t) -> t.stream().map((g) -> BuiltInRegistries.FLUID.getKey(g.get()))
-								.collect(StreamUtils.setStringCollector(",")))
+								.collect(CollectionUtils.setStringCollector(",")))
 				: "Block{" + kind.left().get().unwrap().map((t) -> "#" + t.location(),
 						(t) -> t.stream().map((g) -> BuiltInRegistries.BLOCK.getKey(g.get()))
-								.collect(StreamUtils.setStringCollector(","))))
+								.collect(CollectionUtils.setStringCollector(","))))
 				+ "}";
 	}
 
@@ -428,7 +428,7 @@ public record BlockGenreProvider(Either<HolderSet<Block>, HolderSet<Fluid>> kind
 				.mapRight((s) -> s.unwrap().right().orElse(List.of()).stream().filter(Holder::isBound))
 				.map((s) -> s.map(Holder::get).map((b) -> b.getName()),
 						(s) -> s.map(Holder::get).map((f) -> f.getFluidType().getDescription()))
-				.collect(StreamUtils.componentCollectorCommasPretty());
+				.collect(CollectionUtils.componentCollectorCommasPretty());
 		return TextUtils.transPrefix(
 				"sotd.genre.provider.block."
 						+ (kind.map((x) -> "block", (y) -> "fluid")) + "." + (tagOptional.isPresent() ? "tag" : "list"),

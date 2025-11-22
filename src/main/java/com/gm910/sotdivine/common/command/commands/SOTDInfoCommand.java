@@ -44,7 +44,7 @@ import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.ritual.properties.RitualQuality;
 import com.gm910.sotdivine.magic.ritual.properties.RitualType;
 import com.gm910.sotdivine.magic.sphere.ISphere;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.Command;
@@ -337,15 +337,15 @@ public class SOTDInfoCommand {
 											entry.getValue().bannerPattern().get().translationKey()),
 									entry.getValue().preferredSpheres()
 											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(StreamUtils.componentCollectorSetStyle()))
+													.collect(CollectionUtils.componentCollectorSetStyle()))
 											.orElse(Component.empty()),
 									entry.getValue().forbiddenSpheres()
 											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(StreamUtils.componentCollectorSetStyle()))
+													.collect(CollectionUtils.componentCollectorSetStyle()))
 											.orElse(Component.empty()),
 									entry.getValue().allowedSpheres()
 											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(StreamUtils.componentCollectorSetStyle()))
+													.collect(CollectionUtils.componentCollectorSetStyle()))
 											.orElse(Component.empty()))));
 		}
 		return Command.SINGLE_SUCCESS;
@@ -409,7 +409,7 @@ public class SOTDInfoCommand {
 					TextUtils.transPrefix("sotd.cmd.ritual.quality." + ritual.ritualQuality().name().toLowerCase()),
 					ritual.symbols().entrySet().stream()
 							.map((s) -> Map.entry(Component.literal(s.getKey()), s.getValue().translate()))
-							.collect(StreamUtils.componentCollectorMapStyle()))));
+							.collect(CollectionUtils.componentCollectorMapStyle()))));
 			context.getSource()
 					.sendSystemMessage(TextUtils.transPrefix(
 							"cmd.ritual.info.2" + (ritual.ritualEffect(RitualEffectType.SUCCESS) == null ? "a" : ""),
@@ -417,14 +417,14 @@ public class SOTDInfoCommand {
 							ritual.ritualEffect(RitualEffectType.SUCCESS).map(RitualEmanationTargeter::translate)
 									.orElse(Component.empty()),
 							ritual.emanations().stream().map(IEmanation::translate)
-									.collect(StreamUtils.componentCollectorCommasPretty())));
+									.collect(CollectionUtils.componentCollectorCommasPretty())));
 			context.getSource().sendSystemMessage(
 					TextUtils.transPrefix("cmd.ritual.info.3", ritual.offerings().entrySet().stream().map((s) -> {
 						var mapac = TextUtils.transPrefix("sotd.cmd.map", s.getKey().stream()
-								.map(IGenreProvider::translate).collect(StreamUtils.componentCollectorSetStyle()),
+								.map(IGenreProvider::translate).collect(CollectionUtils.componentCollectorSetStyle()),
 								s.getValue());
 						return mapac;
-					}).collect(StreamUtils.componentCollectorSetStyle()),
+					}).collect(CollectionUtils.componentCollectorSetStyle()),
 							ritual.patterns().getBasePattern().translate()));
 		}
 		return Command.SINGLE_SUCCESS;

@@ -47,7 +47,7 @@ public sealed interface ISanctuary permits Sanctuary {
 	public static final double BOUNDARY_MAX_LENGTH = 600;
 
 	/**
-	 * Begins constructing a sanctuary at this position
+	 * Begins constructing a sanctuary at this rawPosition
 	 * 
 	 * @param level
 	 * @param pos
@@ -111,8 +111,8 @@ public sealed interface ISanctuary permits Sanctuary {
 	public IDeitySymbol symbol();
 
 	/**
-	 * The lowest y-position in this Sanctuary; the sanctuary's sacred area extends
-	 * down to the next section position below this position
+	 * The lowest y-rawPosition in this Sanctuary; the sanctuary's sacred area extends
+	 * down to the next section rawPosition below this rawPosition
 	 * 
 	 * @return
 	 */
@@ -224,7 +224,7 @@ public sealed interface ISanctuary permits Sanctuary {
 	public void removeSymbolBlock(ServerLevel level, BlockPos pos);
 
 	/**
-	 * Whether the given position is a symbol block of this sanctary
+	 * Whether the given rawPosition is a symbol block of this sanctary
 	 * 
 	 * @param pos
 	 * @return

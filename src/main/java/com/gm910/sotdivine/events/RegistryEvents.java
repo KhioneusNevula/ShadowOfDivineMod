@@ -4,24 +4,12 @@ import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.common.items.ModItems;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
-import com.gm910.sotdivine.concepts.symbol.ISymbolBearer;
-import com.gm910.sotdivine.concepts.symbol.impl.BannerSymbolBearer;
-import com.gm910.sotdivine.concepts.symbol.impl.ISymbolWearer;
-import com.gm910.sotdivine.concepts.symbol.impl.ItemStackSymbolBearer;
-import com.gm910.sotdivine.concepts.symbol.impl.LivingEntitySymbolWearer;
+import com.gm910.sotdivine.language.Languages;
+import com.gm910.sotdivine.language.lexicon.Lexicons;
+import com.gm910.sotdivine.language.phonology.Phonologies;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
-import com.gm910.sotdivine.magic.sanctuary.cap.ISanctuaryInfo;
-import com.gm910.sotdivine.magic.sanctuary.cap.SanctuaryInfo;
 import com.gm910.sotdivine.magic.sphere.Spheres;
-import com.mojang.logging.LogUtils;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BannerBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -41,6 +29,9 @@ public class RegistryEvents {
 		event.dataPackRegistry(ModRegistries.DEITY_SYMBOLS, DeitySymbols.symbolCodec(), DeitySymbols.symbolCodec());
 		event.dataPackRegistry(ModRegistries.RITUAL_PATTERN, RitualPatterns.patternCodec(),
 				RitualPatterns.patternCodec());
+		event.dataPackRegistry(ModRegistries.LEXICONS, Lexicons.lexiconCodec(), Lexicons.lexiconCodec());
+		event.dataPackRegistry(ModRegistries.PHONOLOGIES, Phonologies.phonologyCodec(), Phonologies.phonologyCodec());
+		event.dataPackRegistry(ModRegistries.LANGUAGES, Languages.languageCodec(), Languages.languageCodec());
 
 	}
 

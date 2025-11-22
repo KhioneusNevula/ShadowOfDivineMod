@@ -29,7 +29,7 @@ import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.RitualInstance;
 import com.gm910.sotdivine.magic.sanctuary.storage.ISanctuarySystem;
 import com.gm910.sotdivine.magic.sphere.ISphere;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.base.Functions;
 import com.google.common.collect.Multimap;
@@ -287,7 +287,7 @@ public non-sealed class Deity extends Party implements IDeity {
 	@Override
 	public Component descriptiveInfo(Level level) {
 		return TextUtils.transPrefix("sotd.cmd.deityinfo",
-				this.spheres.stream().map(ISphere::displayName).collect(StreamUtils.componentCollectorCommasPretty()),
+				this.spheres.stream().map(ISphere::displayName).collect(CollectionUtils.componentCollectorCommasPretty()),
 				Component.translatableEscape(this.symbol.bannerPattern().get().translationKey()));
 	}
 
@@ -297,7 +297,7 @@ public non-sealed class Deity extends Party implements IDeity {
 				+ (this.descriptiveName().isPresent() ? "name=\"" + this.descriptiveName().get().getString() + "\""
 						: "id=" + this.uniqueName())
 				+ ",spheres={" + this.spheres().stream().map(ISphere::name).map(Object::toString)
-						.collect(StreamUtils.setStringCollector(","))
+						.collect(CollectionUtils.setStringCollector(","))
 				+ "}}";
 	}
 

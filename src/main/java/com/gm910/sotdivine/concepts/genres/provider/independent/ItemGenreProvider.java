@@ -9,7 +9,7 @@ import com.gm910.sotdivine.concepts.genres.provider.data.ComponentMapProvider;
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.HolderUtils;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WeightedSet;
 import com.mojang.datafixers.util.Either;
@@ -156,7 +156,7 @@ public record ItemGenreProvider(Optional<HolderSet<Item>> items, ComponentMapPro
 						(tg) -> TextUtils.transPrefix("genre.provider.item.tag", ModUtils.toShortString(tg.location())),
 						(ls) -> TextUtils.transPrefix("genre.provider.item.list",
 								ls.stream().map((g) -> TextUtils.transPrefix("cmd.quote", g.get().getName()))
-										.collect(StreamUtils.componentCollectorCommasPretty()))))
+										.collect(CollectionUtils.componentCollectorCommasPretty()))))
 				.orElse(TextUtils.transPrefix("genre.provider.item.data", this.components.translate()));
 	}
 
@@ -165,7 +165,7 @@ public record ItemGenreProvider(Optional<HolderSet<Item>> items, ComponentMapPro
 		return "Item("
 				+ items.map((items) -> items.unwrap().map((tg) -> "#" + ModUtils.toShortString(tg.location()),
 						(ls) -> ls.stream().map((g) -> ModUtils.toShortString(BuiltInRegistries.ITEM.getKey(g.get())))
-								.collect(StreamUtils.setStringCollector(","))))
+								.collect(CollectionUtils.setStringCollector(","))))
 						.orElse("<any>" + this.components + "")
 				+ ")";
 	}
@@ -175,7 +175,7 @@ public record ItemGenreProvider(Optional<HolderSet<Item>> items, ComponentMapPro
 		return "Item{items="
 				+ items.map(items -> items.unwrap().map((tg) -> "#" + ModUtils.toShortString(tg.location()),
 						(ls) -> ls.stream().map((s) -> ModUtils.toShortString(BuiltInRegistries.ITEM.getKey(s.get())))
-								.collect(StreamUtils.setStringCollector(","))))
+								.collect(CollectionUtils.setStringCollector(","))))
 						.orElse("<any>")
 				+ (rarity != 0 ? ",rarity=" + rarity : "") + ",components=" + components.report() + "}";
 	}

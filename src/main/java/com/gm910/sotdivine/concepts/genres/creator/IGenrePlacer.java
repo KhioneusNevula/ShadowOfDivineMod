@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface IGenrePlacer {
 
 	/**
-	 * Try to place an emanation of whatever this is at the given position. Return
+	 * Try to place an emanation of whatever this is at the given rawPosition. Return
 	 * false if not possible.
 	 * 
 	 * @param level

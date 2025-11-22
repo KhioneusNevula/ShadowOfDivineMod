@@ -20,7 +20,7 @@ import com.gm910.sotdivine.magic.emanation.spell.ISpellProperties;
 import com.gm910.sotdivine.magic.emanation.spell.SpellAlignment;
 import com.gm910.sotdivine.magic.emanation.spell.SpellPower;
 import com.gm910.sotdivine.util.ModUtils;
-import com.gm910.sotdivine.util.StreamUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
@@ -295,7 +295,7 @@ public class CombinedEmanation implements IEmanation {
 	public Component translate() {
 		return TextUtils.transPrefix("sotd.emanation.combined" + ("_" + this.order.name().toLowerCase()),
 				this.emanations.stream().map((s) -> TextUtils.transPrefix("sotd.cmd.quote", s.translate()))
-						.collect(StreamUtils.componentCollector("sotd.cmd.list" + (conditional ? ".conditional" : ""),
+						.collect(CollectionUtils.componentCollector("sotd.cmd.list" + (conditional ? ".conditional" : ""),
 								null, null)));
 	}
 

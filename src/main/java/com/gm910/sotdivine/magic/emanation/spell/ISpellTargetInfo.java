@@ -236,15 +236,15 @@ public interface ISpellTargetInfo {
 	}
 
 	/**
-	 * The entity at the target location, i.e. the entity who is being
-	 * punished/enchanted, etc
+	 * The entity at the target, i.e. the entity who is being punished/enchanted,
+	 * etc
 	 * 
 	 * @return
 	 */
 	public Optional<EntityReference<Entity>> opTargetEntity();
 
 	/**
-	 * The position at the target location
+	 * The rawPosition at the target location
 	 * 
 	 * @return
 	 */
