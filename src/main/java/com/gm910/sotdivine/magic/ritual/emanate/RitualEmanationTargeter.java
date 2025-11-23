@@ -194,7 +194,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 	 * Return a map of ritual effects
 	 * 
 	 * @param type
-	 * @param quality
+	 * @param $quality
 	 * @param level
 	 * @param ford
 	 * @return

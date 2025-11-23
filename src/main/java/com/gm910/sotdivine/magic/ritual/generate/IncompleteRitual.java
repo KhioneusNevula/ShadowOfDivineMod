@@ -1,15 +1,15 @@
-package com.gm910.sotdivine.magic.ritual;
+package com.gm910.sotdivine.magic.ritual.generate;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.genres.provider.independent.IGiveableGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.independent.IPlaceableGenreProvider;
+import com.gm910.sotdivine.magic.ritual.IRitual;
+import com.gm910.sotdivine.magic.ritual.Ritual;
 import com.gm910.sotdivine.magic.ritual.emanate.RitualEffectType;
 import com.gm910.sotdivine.magic.ritual.emanate.RitualEmanationTargeter;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatternSet;
@@ -27,17 +27,17 @@ import net.minecraft.server.level.ServerLevel;
  *                  obligatory; the entire map is an "or" set where at minimum
  *                  one is oblgiatory
  */
-public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, RitualType type, RitualQuality quality,
-		Optional<Map<RitualEffectType, RitualEmanationTargeter>> effects, Optional<RitualPatternSet> patterns,
-		Optional<Map<String, IPlaceableGenreProvider<?, ?>>> symbols,
+public record IncompleteRitual(ServerLevel level, Phase phase, IDeity deity, RitualType type,
+		RitualQuality $quality, Optional<Map<RitualEffectType, RitualEmanationTargeter>> effects,
+		Optional<RitualPatternSet> patterns, Optional<Map<String, IPlaceableGenreProvider<?, ?>>> symbols,
 		Optional<Map<Set<? extends IGiveableGenreProvider<?, ?>>, Integer>> offerings) {
 
 	/**
 	 * Instantiates the first phase of generation: the selection of Effects
 	 */
-	public static RitualGeneration phase1Effects(ServerLevel level, IDeity ford, RitualType type,
+	public static IncompleteRitual phase1Effects(ServerLevel level, IDeity ford, RitualType type,
 			RitualQuality quality) {
-		return new RitualGeneration(level, Phase.EFFECTS, ford, type, quality, Optional.empty(), Optional.empty(),
+		return new IncompleteRitual(level, Phase.EFFECTS, ford, type, quality, Optional.empty(), Optional.empty(),
 				Optional.empty(), Optional.empty());
 	}
 
@@ -46,13 +46,13 @@ public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, 
 	 * 
 	 * @param fromSpheres
 	 * @param type
-	 * @param quality
+	 * @param $quality
 	 * @param effects
 	 * @return
 	 */
-	public static RitualGeneration phase2Pattern(RitualGeneration prior,
+	public static IncompleteRitual phase2Pattern(IncompleteRitual prior,
 			Map<RitualEffectType, RitualEmanationTargeter> effects) {
-		return new RitualGeneration(prior.level, Phase.PATTERN, prior.forDeity, prior.type, prior.quality,
+		return new IncompleteRitual(prior.level, Phase.PATTERN, prior.deity, prior.type, prior.$quality,
 				Optional.of(effects), Optional.empty(), Optional.empty(), Optional.empty());
 	}
 
@@ -64,9 +64,9 @@ public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, 
 	 * @param symbols
 	 * @return
 	 */
-	public static RitualGeneration phase2Point5Symbols(RitualGeneration prior, RitualPatternSet patterns) {
+	public static IncompleteRitual phase2Point5Symbols(IncompleteRitual prior, RitualPatternSet patterns) {
 		prior.effects.orElseThrow(() -> new IllegalStateException("No effects in " + prior));
-		return new RitualGeneration(prior.level, Phase.SYMBOLS, prior.forDeity, prior.type, prior.quality,
+		return new IncompleteRitual(prior.level, Phase.SYMBOLS, prior.deity, prior.type, prior.$quality,
 				prior.effects, Optional.of(patterns), Optional.empty(), Optional.empty());
 	}
 
@@ -78,11 +78,11 @@ public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, 
 	 * @param symbols
 	 * @return
 	 */
-	public static RitualGeneration phase3Offerings(RitualGeneration prior,
+	public static IncompleteRitual phase3Offerings(IncompleteRitual prior,
 			Map<String, IPlaceableGenreProvider<?, ?>> symbols) {
 		prior.patterns.orElseThrow(() -> new IllegalStateException("No patterns in " + prior));
 		prior.effects.orElseThrow(() -> new IllegalStateException("No effects in " + prior));
-		return new RitualGeneration(prior.level, Phase.OFFERINGS, prior.forDeity, prior.type, prior.quality,
+		return new IncompleteRitual(prior.level, Phase.OFFERINGS, prior.deity, prior.type, prior.$quality,
 				prior.effects, prior.patterns, Optional.of(symbols), Optional.empty());
 	}
 
@@ -93,12 +93,12 @@ public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, 
 	 * @param offerings
 	 * @return
 	 */
-	public static RitualGeneration phase4Trigger(RitualGeneration prior,
+	public static IncompleteRitual phase4Trigger(IncompleteRitual prior,
 			Map<Set<? extends IGiveableGenreProvider<?, ?>>, Integer> offerings) {
 		prior.patterns.orElseThrow(() -> new IllegalStateException("No patterns in " + prior));
 		prior.effects.orElseThrow(() -> new IllegalStateException("No effects in " + prior));
 		prior.symbols.orElseThrow(() -> new IllegalStateException("No symbols in " + prior));
-		return new RitualGeneration(prior.level, Phase.TRIGGER, prior.forDeity, prior.type, prior.quality,
+		return new IncompleteRitual(prior.level, Phase.TRIGGER, prior.deity, prior.type, prior.$quality,
 				prior.effects, prior.patterns, prior.symbols, Optional.of(offerings));
 	}
 
@@ -109,30 +109,52 @@ public record RitualGeneration(ServerLevel level, Phase phase, IDeity forDeity, 
 	 * @param trigger
 	 * @return
 	 */
-	public static IRitual phase5Completion(RitualGeneration prior, IRitualTrigger trigger) {
+	public static IRitual phase5Completion(IncompleteRitual prior, IRitualTrigger trigger) {
 		if (prior.phase != Phase.TRIGGER)
 			throw new IllegalArgumentException(prior + "");
 		prior.patterns.orElseThrow(() -> new IllegalStateException("No patterns in " + prior));
 		prior.effects.orElseThrow(() -> new IllegalStateException("No effects in " + prior));
 		prior.symbols.orElseThrow(() -> new IllegalStateException("No symbols in " + prior));
 		prior.offerings.orElseThrow(() -> new IllegalStateException("No offerings in " + prior));
-		return new Ritual(prior.type, prior.quality, prior.patterns.get(), prior.effects.get(), prior.symbols.get(),
+		return new Ritual(prior.type, prior.$quality, prior.patterns.get(), prior.effects.get(), prior.symbols.get(),
 				prior.offerings.get(), Objects.requireNonNull(trigger, "Supplied null trigger " + prior));
+	}
+
+	/**
+	 * Return whether the optionals this has are equivalent to those of the given
+	 * ritual's signature
+	 * 
+	 * @param toRitual
+	 * @return
+	 */
+	public boolean signatureEquivalent(IRitual toRitual) {
+		if (this.symbols.isPresent() && !this.symbols.get().equals(toRitual.symbols())) {
+			return false;
+		}
+		if (this.patterns.isPresent()
+				&& !this.patterns.get().getBasePattern().equals(toRitual.patterns().getBasePattern())) {
+			return false;
+		}
+		if (this.offerings.isPresent() && !this.offerings.get().keySet().equals(toRitual.offerings().keySet())) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
 	public final String toString() {
-		return "Generating{(Phase 0) deity=" + forDeity + ",type=" + type + ",quality=" + quality + (effects.isPresent()
-				? ", (Phase 1) effects=" + effects.get()
-						+ (patterns.isPresent()
-								? ", (Phase 2) patterns=" + patterns.get()
-										+ (symbols.isPresent()
+		return "Generating{(Phase 0) deity=" + deity + ",type=" + type + ",$quality=" + $quality
+				+ (effects.isPresent()
+						? ", (Phase 1) effects=" + effects.get()
+								+ (patterns.isPresent()
+										? ", (Phase 2) patterns=" + patterns.get() + (symbols.isPresent()
 												? ", (Phase 2.5) symbols=" + symbols.get()
 														+ (offerings.isPresent() ? ", (Phase 3) offerings=" + offerings
 																: "")
 												: "")
-								: "")
-				: "") + ",in-phase=" + phase + "}";
+										: "")
+						: "")
+				+ ",in-phase=" + phase + "}";
 	}
 
 	public static enum Phase {

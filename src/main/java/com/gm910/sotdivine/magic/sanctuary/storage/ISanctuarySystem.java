@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
+import com.gm910.sotdivine.magic.sanctuary.ICachedSanctuaries;
 import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
 import com.google.common.base.Functions;
 import com.google.common.collect.HashMultiset;
@@ -30,7 +31,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 /**
  * A dimension-specific system of sanctuaries
  */
-public interface ISanctuarySystem {
+public interface ISanctuarySystem extends ICachedSanctuaries {
 
 	public static final String SAVED_DATA_ID = "sotdivine_sanctuaries";
 	/**
@@ -89,14 +90,6 @@ public interface ISanctuarySystem {
 	public void addSanctuary(ISanctuary sanctuary);
 
 	/**
-	 * Return all sanctuaries in this system
-	 * 
-	 * @param dimension
-	 * @return
-	 */
-	public Stream<ISanctuary> getCompleteSanctuaries();
-
-	/**
 	 * Returns both sanctuaries that are fully built and ones that are not
 	 * 
 	 * @return
@@ -111,38 +104,12 @@ public interface ISanctuarySystem {
 	Stream<ISanctuary> getIncompleteSanctuaries();
 
 	/**
-	 * Return all sanctuaries intersecting with this chunk
-	 * 
-	 * @param dimension
-	 * @return
-	 */
-	public Stream<ISanctuary> getSanctuaries(ChunkPos pos);
-
-	/**
 	 * Return all sanctuaries belonging to the specific deity
 	 * 
 	 * @param dimension
 	 * @return
 	 */
 	public Stream<ISanctuary> getSanctuaries(IDeity owner);
-
-	/**
-	 * Return the sanctuary that contains the given rawPosition, or null if none exists
-	 * 
-	 * @param pos
-	 * @return
-	 */
-	public Optional<ISanctuary> getSanctuaryAtPos(BlockPos pos);
-
-	/**
-	 * Return true if this mobID should be allowed to pathfind to the given
-	 * rawPosition; false otherwise
-	 * 
-	 * @param pos
-	 * @param entity
-	 * @return
-	 */
-	public boolean canStandAt(BlockPos pos, Entity entity);
 
 	/**
 	 * Tick this system

@@ -1,8 +1,11 @@
 package com.gm910.sotdivine.magic.sanctuary.cap;
 
+import java.util.Optional;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
 import com.gm910.sotdivine.util.CodecUtils;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -27,6 +30,7 @@ import net.minecraftforge.common.util.LazyOptional;
 public class SanctuaryInfo implements ICapabilitySerializable<CompoundTag>, ISanctuaryInfo {
 
 	private Entity entity;
+	private Optional<ISanctuary> currentSanctuary;
 
 	private final LazyOptional<ISanctuaryInfo> cached = LazyOptional.of(() -> this);
 
@@ -49,6 +53,16 @@ public class SanctuaryInfo implements ICapabilitySerializable<CompoundTag>, ISan
 			return cached.cast();
 		}
 		return LazyOptional.empty();
+	}
+
+	@Override
+	public Optional<ISanctuary> currentSanctuary() {
+		return this.currentSanctuary;
+	}
+
+	@Override
+	public void setCurrentSanctuary(ISanctuary sanctuary) {
+		this.currentSanctuary = Optional.ofNullable(sanctuary);
 	}
 
 	private void addStatus(Permissibility perm, String sanctuaryName, int ticks) {

@@ -3,6 +3,8 @@ package com.gm910.sotdivine.language.phonology;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,24 +65,36 @@ public class Phonology implements IPhonology {
 	public PhonoWord generateSequence(int minsylla, int maxsylla, RandomSource random) {
 		int count = random.nextIntBetweenInclusive(minsylla, maxsylla);
 		Map<String, String> stages = new HashMap<>();
-		List<Phoneme> flatGenerated = new ArrayList<>();
-		for (int i = 0; i < count; i++) {
-			RandomUtils.choose(random, inventory().values()).ifPresentOrElse((s) -> flatGenerated.add(s), () -> {
-				throw new IllegalStateException("Could not get anything from inventory : " + inventory);
-			});
-		}
-		stages.put("stage1", flatGenerated.stream().collect(CollectionUtils.setStringCollector("")));
 
-		List<Syllable> syllables = new ArrayList<>();
 		Supplier<ListMultimap<SyllablePosition, Phoneme>> mapSup = () -> MultimapBuilder
 				.enumKeys(SyllablePosition.class).arrayListValues().build();
-		for (Phoneme sound : flatGenerated) {
-			if (sound.features().getOrDefault(SYLLABIC_FT, 0).equals(1)) {
-				var map = mapSup.get();
-				map.put(SyllablePosition.NUCLEUS, sound);
-				syllables.add(new Syllable(map));
 
-			}
+		List<Syllable> syllables = new ArrayList<>();
+
+		Set<Phoneme> possibleNuclei = new HashSet<>(inventory().values());
+		possibleNuclei.removeIf((s) -> s.features().getOrDefault(SYLLABIC_FT, 0).equals(-1));
+		for (int i = 0; i < count; i++) {
+			RandomUtils.choose(random, possibleNuclei).ifPresentOrElse((s) -> {
+				var map = mapSup.get();
+				map.put(SyllablePosition.NUCLEUS, s);
+				syllables.add(new Syllable(map));
+			}, () -> {
+				throw new IllegalStateException("Could not get any nuclei from inventory : " + possibleNuclei);
+			});
+		}
+		stages.put("stage1",
+				syllables.stream().map((s) -> s.asString()).collect(CollectionUtils.setStringCollector("")));
+
+		Set<Phoneme> possibleOnsetsCodas = new HashSet<>(inventory().values());
+		possibleOnsetsCodas.removeIf((s) -> s.features().getOrDefault(SYLLABIC_FT, 0).equals(1));
+		// first pass: generate onsets
+		for (int i = 0; i < syllables.size(); i++) {
+			Syllable sound = syllables.get(i);
+			RandomUtils.choose(random, possibleOnsetsCodas).ifPresentOrElse((s) -> {
+				sound.phonemes().put(SyllablePosition.ONSET, s);
+			}, () -> {
+				throw new IllegalStateException("Could not get any nuclei from inventory : " + possibleNuclei);
+			});
 		}
 
 		return new PhonoWord(syllables);

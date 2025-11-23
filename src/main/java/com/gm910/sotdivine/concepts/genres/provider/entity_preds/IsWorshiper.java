@@ -5,9 +5,9 @@ import java.util.Optional;
 import com.gm910.sotdivine.concepts.genres.provider.ProviderType;
 import com.gm910.sotdivine.concepts.parties.IPartyLister;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements;
 import com.gm910.sotdivine.network.party_system.ClientParties;
 import com.gm910.sotdivine.util.TextUtils;
+import com.gm910.sotdivine.villagers.ModBrainElements;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

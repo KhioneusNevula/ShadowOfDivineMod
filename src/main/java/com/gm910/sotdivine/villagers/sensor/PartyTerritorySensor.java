@@ -1,11 +1,11 @@
-package com.gm910.sotdivine.concepts.parties.villagers.sensor;
+package com.gm910.sotdivine.villagers.sensor;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements;
+import com.gm910.sotdivine.villagers.ModBrainElements;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;

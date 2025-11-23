@@ -24,6 +24,7 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
@@ -31,6 +32,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.material.MapColor.Brightness;
@@ -174,51 +176,70 @@ class SanctuarySystem extends SavedData implements ISanctuarySystem {
 		incomplete.remove(sanctuary);
 	}
 
-	private void addCompleteSanctuary(ISanctuary sanctuary) {
+	private void addCompleteSanctuary(ISanctuary newSanct) {
 		Supplier<IllegalArgumentException> exsup = () -> new IllegalArgumentException(
-				"Cannot mark empty sanctuary as complete " + sanctuary);
-		int mincx = sanctuary.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.x).min()
+				"Cannot mark empty sanctuary as complete " + newSanct);
+		int mincx = newSanct.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.x).min()
 				.orElseThrow(exsup);
-		int mincz = sanctuary.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.z).min()
+		int mincz = newSanct.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.z).min()
 				.orElseThrow(exsup);
-		int maxcx = sanctuary.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.x).max()
+		int maxcx = newSanct.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.x).max()
 				.orElseThrow(exsup);
-		int maxcz = sanctuary.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.z).max()
+		int maxcz = newSanct.boundaryPositions().stream().map((b) -> new ChunkPos(b)).mapToInt((c) -> c.z).max()
 				.orElseThrow(exsup);
 		ChunkPos minCP = new ChunkPos(mincx, mincz);
 		ChunkPos maxCP = new ChunkPos(maxcx, maxcz);
 		Set<ChunkPos> chunks = new HashSet<>();
+		Set<ISanctuary> remove = new HashSet<>();
 		for (int cx = minCP.x; cx <= maxCP.x; cx++) {
 			for (int cz = minCP.z; cz <= maxCP.z; cz++) {
 				ChunkPos testPos = new ChunkPos(cx, cz);
 				Rectangle2D chunkRect = new Rectangle(testPos.getMinBlockX(), testPos.getMinBlockZ(),
 						testPos.getMaxBlockX() - testPos.getMinBlockX() + 1,
 						testPos.getMaxBlockZ() - testPos.getMinBlockZ() + 1);
-				if (sanctuary.containsOrIntersects(chunkRect)) {
+				if (newSanct.containsOrIntersects(chunkRect)) {
 					chunks.add(testPos);
-					for (ISanctuary sanct2 : chunksToSanctuaries.get(testPos)) {
-						if (sanctuary.allPositionsOnBorder().stream().anyMatch((bp) -> sanct2.contains(bp))
-								|| sanct2.allPositionsOnBorder().stream().anyMatch((bp) -> sanctuary.contains(bp))) {
-							LogUtils.getLogger().debug(
-									"Could not create new sanctuary because one of its positions is already occupied by another");
+					for (ISanctuary existingSanct : chunksToSanctuaries.get(testPos)) {
+						if (newSanct.allPositionsOnBorder().stream().anyMatch((bp) -> existingSanct.contains(bp))
+								|| existingSanct.allPositionsOnBorder().stream()
+										.anyMatch((bp) -> newSanct.contains(bp))) {
+							if (existingSanct.boundaryPositions().stream().allMatch((bp) -> newSanct.contains(bp))
+									&& newSanct.symbol().equals(existingSanct.symbol())) {
+								LogUtils.getLogger().debug(
+										"Replacing an old sanctuary that this new sanctuary completely contains: "
+												+ existingSanct.boundaryPositions());
+								// TODO mark replacement with phenomenon
+								if (existingSanct.deityName() != null) {
+									newSanct.claim(existingSanct.deityName());
+								}
+								remove.add(existingSanct);
+							} else {
+								LogUtils.getLogger().debug(
+										"Could not create new sanctuary because one of its positions is already occupied by another: "
+												+ existingSanct.boundaryPositions());
+
+							}
 							return;
 						}
 					}
+
 				}
 			}
 		}
 		if (chunks.isEmpty()) {
 			throw new IllegalArgumentException("Tried to add sanctuary which intersects no chunk positions");
 		} else {
-			LogUtils.getLogger().debug("Added new sanctuary " + sanctuary.boundaryPositions());
+			LogUtils.getLogger().debug("Added new sanctuary " + newSanct.boundaryPositions());
 		}
-		levelReference.ifPresent((level) -> markBorder(sanctuary, level,
+		levelReference.ifPresent((level) -> markBorder(newSanct, level,
 				(pp) -> defaultParticleEffect(ParticleTypes.HAPPY_VILLAGER).sendParticle(level, pp.getCenter())));
 		chunks.forEach((cp) -> {
-			this.chunksToSanctuaries.put(cp, sanctuary);
-			this.sanctuariesToChunks.put(sanctuary, cp);
+			this.chunksToSanctuaries.put(cp, newSanct);
+			this.sanctuariesToChunks.put(newSanct, cp);
 		});
-		LogUtils.getLogger().debug("Sanctuary crosses chunks " + sanctuariesToChunks.get(sanctuary));
+		remove.forEach((s) -> this.remove(s));
+
+		LogUtils.getLogger().debug("Sanctuary crosses chunks " + sanctuariesToChunks.get(newSanct));
 	}
 
 	@Override
@@ -276,9 +297,25 @@ class SanctuarySystem extends SavedData implements ISanctuarySystem {
 	}
 
 	@Override
+	public Optional<ISanctuary> getSanctuaryAtPos(Position pos) {
+		return chunksToSanctuaries.get(new ChunkPos(BlockPos.containing(pos))).stream().filter((s) -> s.contains(pos))
+				.findFirst();
+	}
+
+	@Override
 	public boolean canStandAt(BlockPos pos, Entity entity) {
 		return chunksToSanctuaries.get(new ChunkPos(pos)).stream().filter((s) -> s.contains(pos))
 				.noneMatch((s) -> s.timeUntilForbidden(entity) <= 0);
+	}
+
+	@Override
+	public Stream<ISanctuary> stream() {
+		return sanctuariesToChunks.keySet().stream();
+	}
+
+	@Override
+	public int size() {
+		return sanctuariesToChunks.keySet().size();
 	}
 
 	@Override

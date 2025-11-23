@@ -9,7 +9,7 @@ import java.util.function.Function;
 import com.gm910.sotdivine.concepts.genres.GenreTypes;
 import com.gm910.sotdivine.concepts.genres.provider.IGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.independent.IEntityGenreProvider;
-import com.gm910.sotdivine.magic.ritual.RitualGeneration;
+import com.gm910.sotdivine.magic.ritual.generate.IncompleteRitual;
 import com.gm910.sotdivine.magic.ritual.trigger.type.IRitualTrigger;
 import com.gm910.sotdivine.magic.ritual.trigger.type.incantation.IncantationTrigger;
 import com.gm910.sotdivine.magic.ritual.trigger.type.item_offering.ItemOfferingTrigger;
@@ -45,8 +45,8 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 					.xmap(MobSacrificeTrigger::new, MobSacrificeTrigger::sacrifice),
 			(rg) -> {
 				var list = Lists.newArrayList(
-						rg.forDeity().spheres().stream().flatMap((x) -> x.getGenres(GenreTypes.SACRED_MOB).stream())
-								.filter((s) -> s.rarity() <= rg.quality().rarity).iterator());
+						rg.deity().spheres().stream().flatMap((x) -> x.getGenres(GenreTypes.SACRED_MOB).stream())
+								.filter((s) -> s.rarity() <= rg.$quality().rarity).iterator());
 				if (list.size() == 0)
 					return null;
 				if (list.size() == 1)
@@ -61,7 +61,7 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 	public static final RitualTriggerType<RightClickTrigger> RIGHT_CLICK = register(ModUtils.path("right_click"),
 			RightClickTrigger.class, () -> RightClickTrigger.CODEC, (rg) -> {
 				if (rg.symbols().get().get(rg.patterns().get().getBasePattern().focusSymbol()).canRightClick()) {
-					var instruments = Lists.newArrayList(rg.forDeity().spheres().stream()
+					var instruments = Lists.newArrayList(rg.deity().spheres().stream()
 							.flatMap((s) -> s.getGenres(GenreTypes.RITUAL_INSTRUMENT).stream()).iterator());
 					Collections.shuffle(instruments);
 					return new RightClickTrigger(instruments.stream().findFirst());
@@ -81,7 +81,7 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 	 */
 	public static final RitualTriggerType<IncantationTrigger> INCANTATION = register(ModUtils.path("incantation"),
 			IncantationTrigger.class, () -> IncantationTrigger.CODEC, (rg) -> {
-				var list = Lists.newArrayList(rg.forDeity().spheres().stream()
+				var list = Lists.newArrayList(rg.deity().spheres().stream()
 						.flatMap((s) -> s.getGenres(GenreTypes.MAGIC_WORD).stream()).iterator());
 				if (list.isEmpty())
 					return null;
@@ -126,7 +126,7 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 	 * @return
 	 */
 	public static final <T extends IRitualTrigger> RitualTriggerType<T> register(ResourceLocation path,
-			Class<? super T> clazz, Supplier<Codec<T>> codec, Function<RitualGeneration, T> factory) {
+			Class<? super T> clazz, Supplier<Codec<T>> codec, Function<IncompleteRitual, T> factory) {
 		var newItem = new RitualTriggerType<>(path, clazz, codec, factory);
 		if (TRIGGERS.containsKey(newItem.path)) {
 			throw new IllegalArgumentException("Already present: " + path + ", trying to register " + newItem);
@@ -138,10 +138,10 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 	private Class<? super T> triggerClass;
 	private Supplier<Codec<T>> codec;
 	private ResourceLocation path;
-	private Function<RitualGeneration, T> factory;
+	private Function<IncompleteRitual, T> factory;
 
 	private RitualTriggerType(ResourceLocation path, Class<? super T> triggerClass, Supplier<Codec<T>> codec,
-			Function<RitualGeneration, T> factory) {
+			Function<IncompleteRitual, T> factory) {
 		this.triggerClass = triggerClass;
 		this.codec = Suppliers.memoize(codec);
 		this.path = path;
@@ -160,7 +160,7 @@ public class RitualTriggerType<T extends IRitualTrigger> {
 		return codec.get();
 	}
 
-	public T createNew(RitualGeneration info) {
+	public T createNew(IncompleteRitual info) {
 		return this.factory.apply(info);
 	}
 

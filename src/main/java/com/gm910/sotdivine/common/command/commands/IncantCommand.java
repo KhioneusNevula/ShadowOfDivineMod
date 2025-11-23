@@ -45,22 +45,17 @@ public class IncantCommand {
 								BlockPos lookPos = BlockPosArgument.getBlockPos(stack, "pos");
 								double searchRadius = RitualPatterns.instance().getMaxPatternDiameter();
 
-								Optional<Entry<IDeity, Stream<IDeity>>> deityInfo = IRitual.identifyWinningDeity(level,
-										lookPos, searchRadius, false);
+								Optional<IDeity> deityInfo = IRitual.identifyWinningDeity(level, lookPos, searchRadius,
+										false);
 								if (deityInfo.isPresent()) {
-									IDeity winner = deityInfo.get().getKey();
-									// LogUtils.getLogger().debug("Winning deity: " + winner + "; " +
-									// winner.report(level));
-									Stream<IDeity> remainingDeities = deityInfo.get().getValue();
-									for (IDeity deity : (Iterable<IDeity>) () -> Streams
-											.concat(Stream.of(winner), remainingDeities).iterator()) {
-										if (IRitual.tryDetectAndInitiateAnyRitual(level, deity, player.getUUID(),
-												searchRadius, new IncantationTriggerEvent(word.translation()),
-												List.of(lookPos))) {
-											LogUtils.getLogger().debug("Ritual started by deity: " + deity);
-											break;
-										}
+									IDeity deity = deityInfo.get();
+									if (IRitual.tryDetectAndInitiateAnyRitual(level, deity, player.getUUID(),
+											searchRadius, new IncantationTriggerEvent(word.translation()),
+											List.of(lookPos))) {
+										LogUtils.getLogger().debug("Ritual started by deity: " + deity);
+
 									}
+
 								}
 							}
 							return Command.SINGLE_SUCCESS;

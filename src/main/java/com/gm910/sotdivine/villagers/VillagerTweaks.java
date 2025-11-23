@@ -1,4 +1,4 @@
-package com.gm910.sotdivine.concepts.parties.villagers;
+package com.gm910.sotdivine.villagers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,11 +19,12 @@ import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
 import com.gm910.sotdivine.concepts.parties.party.resource.type.IRegionResource;
 import com.gm910.sotdivine.concepts.parties.party.resource.type.RegionResource;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements.MemoryModuleTypes;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements.SensorTypes;
 import com.gm910.sotdivine.util.FieldUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WorldUtils;
+import com.gm910.sotdivine.villagers.ModBrainElements.MemoryModuleTypes;
+import com.gm910.sotdivine.villagers.ModBrainElements.SensorTypes;
+import com.gm910.sotdivine.villagers.behavior.SetWalkTargetToSanctuary;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
@@ -39,6 +40,7 @@ import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.util.BrainBuilder;
 
@@ -71,11 +73,17 @@ public class VillagerTweaks {
 
 			// add new sensors
 			sensors.add(SensorTypes.PARTY_TERRITORY.get());
+			sensors.add(SensorTypes.NEAREST_SANCTUARIES.get());
 
 			// add new memories
 			memories.add(MemoryModuleTypes.CURRENT_PARTY_TERRITORY.get());
+			memories.add(MemoryModuleTypes.NEAREST_SANCTUARIES.get());
 			memories.add(MemoryModuleTypes.PARTY_ID.get());
 			memories.add(MemoryModuleTypes.VILLAGE_LEADER.get());
+
+			brainBuilder.addBehaviorToActivityByPriority(0, Activity.PANIC,
+					SetWalkTargetToSanctuary.sanctuary(MemoryModuleTypes.NEAREST_SANCTUARIES.get(), 0.5f * 1.5f));
+			LogUtils.getLogger().debug("Added sanctuary fleeing activity to " + villager);
 
 		} else {
 
@@ -89,6 +97,7 @@ public class VillagerTweaks {
 
 			// add new memories
 			memories.put(MemoryModuleTypes.CURRENT_PARTY_TERRITORY.get(), Optional.empty());
+			memories.put(MemoryModuleTypes.NEAREST_SANCTUARIES.get(), Optional.empty());
 			memories.put(MemoryModuleTypes.PARTY_ID.get(), Optional.empty());
 			memories.put(MemoryModuleTypes.VILLAGE_LEADER.get(), Optional.empty());
 

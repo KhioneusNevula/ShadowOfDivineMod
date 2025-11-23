@@ -30,7 +30,6 @@ import com.gm910.sotdivine.concepts.genres.provider.independent.IGiveableGenrePr
 import com.gm910.sotdivine.concepts.genres.provider.independent.IPlaceableGenreProvider;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements.MemoryModuleTypes;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;
@@ -46,6 +45,7 @@ import com.gm910.sotdivine.magic.ritual.properties.RitualType;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
+import com.gm910.sotdivine.villagers.ModBrainElements.MemoryModuleTypes;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -188,39 +188,39 @@ public class SOTDInfoCommand {
 								.executes(stack -> listRituals(stack,
 										DeityArgument.getDeity(stack, "deity", DeityArgument.ERROR_DEITY_INVALID),
 										stack.getArgument("type", RitualType.class), null))
-								.then(Commands.argument("quality", EnumArgument.enumArgument(RitualQuality.class))
+								.then(Commands.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
 										.executes(stack -> listRituals(stack,
 												DeityArgument.getDeity(stack, "deity",
 														DeityArgument.ERROR_DEITY_INVALID),
 												stack.getArgument("type", RitualType.class),
-												stack.getArgument("quality", RitualQuality.class)))))
-						.then(Commands.argument("quality", EnumArgument.enumArgument(RitualQuality.class))
+												stack.getArgument("$quality", RitualQuality.class)))))
+						.then(Commands.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
 								.executes(stack -> listRituals(stack,
 										DeityArgument.getDeity(stack, "deity", DeityArgument.ERROR_DEITY_INVALID), null,
-										stack.getArgument("quality", RitualQuality.class)))
+										stack.getArgument("$quality", RitualQuality.class)))
 								.then(Commands.argument("type", EnumArgument.enumArgument(RitualType.class))
 										.executes(stack -> listRituals(stack,
 												DeityArgument.getDeity(stack, "deity",
 														DeityArgument.ERROR_DEITY_INVALID),
 												stack.getArgument("type", RitualType.class),
-												stack.getArgument("quality", RitualQuality.class)))))))
+												stack.getArgument("$quality", RitualQuality.class)))))))
 						.then(Commands.literal("start"))
 						.then(Commands.literal("place").then(Commands.argument("deity", DeityArgument.argument()).then(
 								Commands.argument("type", EnumArgument.enumArgument(RitualType.class)).then(Commands
-										.argument("quality", EnumArgument.enumArgument(RitualQuality.class))
+										.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
 										.then(Commands.argument("pos", BlockPosArgument.blockPos())
 												.executes(stack -> placeRitual(stack,
 														BlockPosArgument.getBlockPos(stack, "pos"),
 														DeityArgument.getDeity(stack, "deity",
 																DeityArgument.ERROR_DEITY_INVALID),
 														stack.getArgument("type", RitualType.class),
-														stack.getArgument("quality", RitualQuality.class), false))
+														stack.getArgument("$quality", RitualQuality.class), false))
 												.then(Commands.literal("spawn_offerings").executes(stack -> placeRitual(
 														stack, BlockPosArgument.getBlockPos(stack, "pos"),
 														DeityArgument.getDeity(stack, "deity",
 																DeityArgument.ERROR_DEITY_INVALID),
 														stack.getArgument("type", RitualType.class),
-														stack.getArgument("quality", RitualQuality.class), true)))))))))
+														stack.getArgument("$quality", RitualQuality.class), true)))))))))
 				.then(Commands.literal("emanation").then(Commands.literal("list").then(Commands
 						.argument("sphere", SphereArgument.argument())
 						.then(Commands.argument("type", EnumArgument.enumArgument(DeityInteractionType.class))

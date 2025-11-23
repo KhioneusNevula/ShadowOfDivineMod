@@ -1,5 +1,6 @@
 package com.gm910.sotdivine.magic.sanctuary.type;
 
+import java.awt.Point;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
@@ -7,24 +8,24 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
 import com.gm910.sotdivine.magic.sanctuary.cap.ISanctuaryInfo;
-import com.mojang.logging.LogUtils;
+import com.gm910.sotdivine.util.CollectionUtils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * Sanctuary implementation
@@ -96,7 +97,7 @@ public non-sealed class Sanctuary implements ISanctuary {
 			}
 		}
 
-		if (this.deityName != null && IPartySystem.get((ServerLevel) entity.level()).deityByName(deityName)
+		if (this.deityName != null && IPartySystem.get((ServerLevel) entity.level()).getDeityByName(deityName)
 				.orElse(null) instanceof IDeity deity) {
 			if (deity.permitsInSanctuary((ServerLevel) entity.level(), entity)) {
 				return Integer.MAX_VALUE;
@@ -137,6 +138,17 @@ public non-sealed class Sanctuary implements ISanctuary {
 	}
 
 	@Override
+	public Stream<BlockPos> interiorPositions(Predicate<BlockPos> allow) {
+
+		return CollectionUtils
+				.stream2D(this.boundary.getBounds().getLocation(),
+						new Point((int) this.boundary.getBounds().getMaxX(), (int) this.boundary.getBounds().getMaxY()))
+				.flatMap((i) -> IntStream.rangeClosed(this.lowerLimitY(), this.upperLimitY())
+						.mapToObj((inte) -> new BlockPos(i.x, inte, i.y)))
+				.filter((a) -> this.contains(a)).filter(allow);
+	}
+
+	@Override
 	public SanctuaryBoundaryProber boundaryProber() {
 		return prober;
 	}
@@ -158,8 +170,9 @@ public non-sealed class Sanctuary implements ISanctuary {
 				&& pos.getY() <= this.upperLimitY() && pos.getY() >= this.lowerLimitY();
 	}
 
-	public boolean contains(Vec3 pos) {
-		return Path2D.contains(boundary.getPathIterator(null), pos.x(), pos.y());
+	public boolean contains(Position pos) {
+		return (Path2D.contains(boundary.getPathIterator(null), pos.x(), pos.z(), 1, 1))
+				&& pos.y() <= this.upperLimitY() && pos.y() >= this.lowerLimitY();
 	}
 
 	@Override

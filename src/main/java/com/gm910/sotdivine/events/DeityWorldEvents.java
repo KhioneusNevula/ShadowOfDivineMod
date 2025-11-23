@@ -1,6 +1,5 @@
 package com.gm910.sotdivine.events;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -17,17 +16,14 @@ import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.party.resource.type.DimensionResource;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.ritual.trigger.type.right_click.RightClickTriggerEvent;
 import com.gm910.sotdivine.magic.sanctuary.cap.ISanctuaryInfo;
 import com.gm910.sotdivine.magic.sanctuary.storage.ISanctuarySystem;
 import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
-import com.gm910.sotdivine.magic.sanctuary.type.Sanctuary;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.gm910.sotdivine.util.FieldUtils;
-import com.gm910.sotdivine.util.WorldUtils;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
@@ -43,10 +39,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityReference;
-import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -57,7 +50,6 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -100,12 +92,11 @@ public class DeityWorldEvents {
 
 	@SubscribeEvent
 	public static void attackEntity(LivingDamageEvent event) {
-		if (event.getEntity().level() instanceof ServerLevel level1
-				&& event.getSource().getEntity() instanceof Entity surce) {
-			if (ISanctuarySystem.get(level1).getSanctuaryAtPos(surce.blockPosition())
-					.orElse(null) instanceof ISanctuary flamer) {
-				event.getEntity().getCapability(ISanctuaryInfo.CAPABILITY).ifPresent(
-						(cap) -> cap.permitEntryTo(flamer.uniqueName(), (int) Config.sanctuaryPermissionTime));
+		if (event.getEntity().level() instanceof ServerLevel && event.getSource().getEntity() instanceof Entity surce) {
+			ISanctuaryInfo surceinfo = ISanctuaryInfo.get(surce);
+			ISanctuaryInfo attInfo = ISanctuaryInfo.get(event.getEntity());
+			if (surceinfo.currentSanctuary().orElse(null) instanceof ISanctuary flamer) {
+				attInfo.permitEntryTo(flamer.uniqueName(), (int) Config.sanctuaryPermissionTime);
 
 				new ParticleSpecification(ParticleTypes.END_ROD, Vec3.ZERO, new Vec3(0.2, 0.2, 0.2), 0, 20, false,
 						false)
@@ -133,23 +124,20 @@ public class DeityWorldEvents {
 		if (event.getEntity().level() instanceof ServerLevel level1) {
 			if (event.getEntity() instanceof ServerPlayer player) {
 				double searchRadius = RitualPatterns.instance().getMaxPatternDiameter();
-				LOGGER.debug("Checking click on " + event.getTarget() + " from hand of " + event.getEntity());
 
-				Optional<Entry<IDeity, Stream<IDeity>>> deityInfo = IRitual.identifyWinningDeity(level1, event.getPos(),
-						searchRadius, true);
+				Optional<IDeity> deityInfo = IRitual.identifyWinningDeity(level1, event.getPos(), searchRadius, true);
 
-				IDeity winner = deityInfo.get().getKey();
-				LogUtils.getLogger().debug("Winning deity: " + winner + "; " + winner.report(level1));
-				Stream<IDeity> remainingDeities = deityInfo.get().getValue();
-				for (IDeity deity : (Iterable<IDeity>) () -> Streams.concat(Stream.of(winner), remainingDeities)
-						.iterator()) {
+				if (deityInfo.isPresent()) {
+
+					IDeity deity = deityInfo.get();
+					LogUtils.getLogger().debug("Winning deity: " + deity + "; " + deity.report(level1));
 					if (IRitual.tryDetectAndInitiateAnyRitual(level1, deity, event.getEntity().getUUID(), searchRadius,
 							new RightClickTriggerEvent(Optional.of(player), event.getHand(), event.getItemStack()),
 							List.of(event.getPos()))) {
 						LogUtils.getLogger().debug("Ritual started by deity: " + deity);
 						event.setCancellationResult(InteractionResult.SUCCESS_SERVER);
-						break;
 					}
+
 				}
 			}
 
@@ -167,24 +155,21 @@ public class DeityWorldEvents {
 		if (event.getEntity().level() instanceof ServerLevel level1) {
 			if (event.getEntity() instanceof ServerPlayer player) {
 				double searchRadius = RitualPatterns.instance().getMaxPatternDiameter();
-				LOGGER.debug("Checking click on " + event.getLevel().getBlockState(event.getPos()) + " from hand of "
-						+ event.getEntity());
+				// LOGGER.debug("Checking click on " +
+				// event.getLevel().getBlockState(event.getPos()) + " from hand of "
+				// + event.getEntity());
 
-				Optional<Entry<IDeity, Stream<IDeity>>> deityInfo = IRitual.identifyWinningDeity(level1, event.getPos(),
-						searchRadius, true);
-
-				IDeity winner = deityInfo.get().getKey();
-				LogUtils.getLogger().debug("Winning deity: " + winner + "; " + winner.report(level1));
-				Stream<IDeity> remainingDeities = deityInfo.get().getValue();
-				for (IDeity deity : (Iterable<IDeity>) () -> Streams.concat(Stream.of(winner), remainingDeities)
-						.iterator()) {
-					if (IRitual.tryDetectAndInitiateAnyRitual(level1, deity, event.getEntity().getUUID(), searchRadius,
+				Optional<IDeity> deityInfo = IRitual.identifyWinningDeity(level1, event.getPos(), searchRadius, true);
+				if (deityInfo.isPresent()) {
+					IDeity winner = deityInfo.get();
+					LogUtils.getLogger().debug("Winning deity of click: " + winner + "; " + winner.report(level1));
+					if (IRitual.tryDetectAndInitiateAnyRitual(level1, winner, event.getEntity().getUUID(), searchRadius,
 							new RightClickTriggerEvent(Optional.of(player), event.getHand(), event.getItemStack()),
 							List.of(event.getPos()))) {
-						LogUtils.getLogger().debug("Ritual started by deity: " + deity);
+						LogUtils.getLogger().debug("Ritual started by deity: " + winner);
 						event.setCancellationResult(InteractionResult.SUCCESS_SERVER);
-						break;
 					}
+
 				}
 			}
 
@@ -205,6 +190,30 @@ public class DeityWorldEvents {
 	public static void updateEvent(LivingTickEvent event) {
 
 		if (event.getEntity().level() instanceof ServerLevel level1) {
+
+			if (ISanctuarySystem.get(level1).getSanctuaryAtPos(event.getEntity().blockPosition())
+					.orElse(null) instanceof ISanctuary flamer) {
+				ISanctuaryInfo.get(event.getEntity()).setCurrentSanctuary(flamer);
+
+				int timeLeft = flamer.timeUntilForbidden(event.getEntity());
+				if (timeLeft <= Config.sanctuaryEscapeTime) {
+					if (timeLeft <= 0) {
+						if (level1.getGameTime() % 20 == 0) {
+							event.getEntity().setRemainingFireTicks(24);
+							event.getEntity().hurtServer(level1,
+									new DamageSource(DamageTypes.EXPLOSION.getOrThrow(level1)), 0.3f);
+						}
+						event.getEntity().knockback(0.3f, event.getEntity().getViewVector(0.0f).x,
+								event.getEntity().getViewVector(0.0f).z);
+						new ParticleSpecification(ParticleTypes.ENCHANT, Vec3.ZERO, new Vec3(0.2, 0.2, 0.2), 0, 12,
+								false, false).sendParticle((ServerLevel) level1, event.getEntity().position());
+					}
+				}
+
+			} else {
+				ISanctuaryInfo.get(event.getEntity()).setCurrentSanctuary(null);
+			}
+
 			if (event.getEntity() instanceof ServerPlayer player) {
 
 				IPartySystem system = IPartySystem.get(level1);
@@ -245,13 +254,12 @@ public class DeityWorldEvents {
 					if (item.isOnFire()
 							|| (level1.getGameTime() - index) % (item.getTags().contains("thrown") ? 20 : 100) == 0) {
 
-						Optional<Entry<IDeity, Stream<IDeity>>> deityInfo = IRitual.identifyWinningDeity(level1,
-								item.blockPosition(), searchRadius, false);
+						Optional<IDeity> deityInfo = IRitual.identifyWinningDeity(level1, item.blockPosition(),
+								searchRadius, false);
 
 						if (deityInfo.isEmpty()) {
 						} else {
-							if (Streams.concat(Stream.of(deityInfo.get().getKey()), deityInfo.get().getValue())
-									.flatMap((d) -> d.spheres().stream())
+							if (deityInfo.get().spheres().stream()
 									.noneMatch((s) -> s.canOffer(level1, item.getItem()))) {
 								continue;
 							}
@@ -283,26 +291,6 @@ public class DeityWorldEvents {
 						}
 					}
 				}
-			} else {
-				if (ISanctuarySystem.get(level1).getSanctuaryAtPos(event.getEntity().blockPosition())
-						.orElse(null) instanceof ISanctuary flamer) {
-					int timeLeft = flamer.timeUntilForbidden(event.getEntity());
-					if (timeLeft <= Config.sanctuaryEscapeTime) {
-						if (timeLeft <= 0) {
-							if (level1.getGameTime() % 20 == 0) {
-								event.getEntity().setRemainingFireTicks(24);
-								event.getEntity().hurtServer(level1,
-										new DamageSource(DamageTypes.EXPLOSION.getOrThrow(level1)), 0.3f);
-							}
-							event.getEntity().knockback(0.3f, event.getEntity().getViewVector(0.0f).x,
-									event.getEntity().getViewVector(0.0f).z);
-							new ParticleSpecification(ParticleTypes.ENCHANT, Vec3.ZERO, new Vec3(0.2, 0.2, 0.2), 0, 12,
-									false, false).sendParticle((ServerLevel) level1, event.getEntity().position());
-						}
-					}
-
-				}
-
 			}
 
 		}

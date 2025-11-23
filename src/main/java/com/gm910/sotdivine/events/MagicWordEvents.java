@@ -115,21 +115,17 @@ public class MagicWordEvents {
 				positions.add(exPos.relative(dir));
 			}
 			for (BlockPos lookPos : positions) {
-				Optional<Entry<IDeity, Stream<IDeity>>> deityInfo = IRitual.identifyWinningDeity(level, lookPos,
-						searchRadius, false);
+				Optional<IDeity> deityInfo = IRitual.identifyWinningDeity(level, lookPos, searchRadius, false);
 				if (deityInfo.isPresent()) {
-					IDeity winner = deityInfo.get().getKey();
+					IDeity winner = deityInfo.get();
 					// LogUtils.getLogger().debug("Winning deity: " + winner + "; " +
 					// winner.report(level));
-					Stream<IDeity> remainingDeities = deityInfo.get().getValue();
-					for (IDeity deity : (Iterable<IDeity>) () -> Streams.concat(Stream.of(winner), remainingDeities)
-							.iterator()) {
-						if (IRitual.tryDetectAndInitiateAnyRitual(level, deity, player.getUUID(), searchRadius,
-								new IncantationTriggerEvent(packet.magicWord()), List.of(lookPos))) {
-							LogUtils.getLogger().debug("Ritual started by deity: " + deity);
-							break posloop;
-						}
+					if (IRitual.tryDetectAndInitiateAnyRitual(level, winner, player.getUUID(), searchRadius,
+							new IncantationTriggerEvent(packet.magicWord()), List.of(lookPos))) {
+						LogUtils.getLogger().debug("Ritual started by deity: " + winner);
+						break posloop;
 					}
+
 				}
 			}
 		}

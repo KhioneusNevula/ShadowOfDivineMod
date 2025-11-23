@@ -30,6 +30,7 @@ import com.gm910.sotdivine.magic.emanation.IEmanation;
 import com.gm910.sotdivine.magic.emanation.spell.ISpellTargetInfo;
 import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.RitualInstance;
+import com.gm910.sotdivine.magic.ritual.generate.RitualGeneration;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.gm910.sotdivine.util.TextUtils;
@@ -90,7 +91,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	 * A number representing the bonus ratio that an unselected elment gets over a
 	 * selected one
 	 */
-	public static final float UNPICKED_BONUS_FACTOR = 10f;
+	public static final float UNPICKED_BONUS_FACTOR = 1000f;
 
 	/**
 	 * Pick a number of deity spheres
@@ -167,7 +168,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	 */
 	public static void addRitualsTo(ServerLevel level, IDeity deity) {
 
-		((Deity) deity).rituals.addAll(IRitual.generateRituals(level, deity));
+		((Deity) deity).rituals.addAll(RitualGeneration.generateRituals(level, deity));
 	}
 
 	/**
@@ -195,6 +196,14 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 				finalName = ls.get();
 				finalName = ("" + finalName.charAt(0)).toUpperCase() + finalName.substring(1);
 				break;
+			}
+		}
+		if (finalName != null) {
+			for (IDeity dei : system.allDeities()) {
+				if (dei.descriptiveName().isPresent()
+						&& dei.descriptiveName().equals(Optional.of(Component.literal(finalName)))) {
+					return null;
+				}
 			}
 		}
 		// assert (finalName != null) : ("Failed to make name for deity...");

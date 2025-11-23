@@ -1,4 +1,4 @@
-package com.gm910.sotdivine.concepts.parties.villagers.poi;
+package com.gm910.sotdivine.villagers.poi;
 
 import java.util.Arrays;
 import java.util.Set;

@@ -26,6 +26,9 @@ public enum DeityInteractionType {
 	FAILED_CAST,
 	/** A singular SPELL, which may be targeted at a block or entity */
 	SPELL,
+	/** The manifestation of a deity's power to an individual */
+	THEOPHANY,
+
 	/** The effects of an ATTACK from one deity to another on the world */
 	ATTACK,
 	/** The effects of a deity taking damage on the world */
@@ -44,8 +47,6 @@ public enum DeityInteractionType {
 	 * than just a block or entity
 	 */
 	LEGISLATE,
-	/** The manifestation of a deity at a location */
-	THEOPHANY,
 	/** The effects of a deity putting a palyer in a VISION */
 	VISION,
 	/** A manifestation of a sign that a deity is about to do something big */

@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.deity.personality.IDeityStat;
+import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.party.relation.IPartyMemory;
 import com.gm910.sotdivine.concepts.parties.party.relation.IRelationship;
 import com.gm910.sotdivine.concepts.parties.party.relation.MemoryType;
@@ -121,7 +122,7 @@ public interface IPartyLister {
 	 * @param id
 	 * @return
 	 */
-	public Optional<? extends IDeityInfo> deityByName(String id);
+	public Optional<? extends IDeityInfo> getDeityByName(String id);
 
 	/**
 	 * Returns stream of deities based on a given sphere
@@ -575,7 +576,7 @@ public interface IPartyLister {
 		}
 
 		@Override
-		public Optional<? extends IDeityInfo> deityByName(String name) {
+		public Optional<? extends IDeityInfo> getDeityByName(String name) {
 			return allDeities.stream().filter((m) -> m.uniqueName().equals(name)).findAny();
 		}
 

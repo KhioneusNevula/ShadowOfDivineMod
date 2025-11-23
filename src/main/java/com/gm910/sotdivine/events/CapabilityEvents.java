@@ -15,6 +15,7 @@ import com.gm910.sotdivine.magic.sanctuary.cap.SanctuaryInfo;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -40,8 +41,11 @@ public class CapabilityEvents {
 	public static void attachCaps2(AttachCapabilitiesEvent.Entities event) {
 		if (event.getObject() instanceof LivingEntity ban) {
 			event.addCapability(ISymbolWearer.CAPABILITY_PATH, new LivingEntitySymbolWearer(ban));
+			event.addCapability(ISanctuaryInfo.CAPABILITY_PATH, new SanctuaryInfo(ban));
+			if (ban instanceof ServerPlayer) {
+				LogUtils.getLogger().debug("Attaching caps to player ");
+			}
 		}
-		event.addCapability(ISanctuaryInfo.CAPABILITY_PATH, new SanctuaryInfo(event.getObject()));
 	}
 
 	@SubscribeEvent

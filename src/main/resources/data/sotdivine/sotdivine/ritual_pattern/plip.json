@@ -1,9 +1,12 @@
 {
 	"focus":"X",
+	"genres":{
+		"B":"sotdivine:building_block"
+	},
 	"template":[[	"***",
 					"***",
 					"***"], 
-				[	"***",
+				[	"*B*",
 					"*X*",
 					"***"]]
 }

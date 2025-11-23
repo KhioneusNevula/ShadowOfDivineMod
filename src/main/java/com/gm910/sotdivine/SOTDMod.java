@@ -12,8 +12,6 @@ import com.gm910.sotdivine.concepts.genres.IGenreType;
 import com.gm910.sotdivine.concepts.genres.provider.data.CodecsComponentMatchers;
 import com.gm910.sotdivine.concepts.genres.provider.entity_preds.CodecsTypeSpecificProviders;
 import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
-import com.gm910.sotdivine.concepts.parties.villagers.ModBrainElements;
-import com.gm910.sotdivine.concepts.parties.villagers.poi.ModPoiTypes;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.language.Languages;
 import com.gm910.sotdivine.language.lexicon.Lexicons;
@@ -22,6 +20,8 @@ import com.gm910.sotdivine.magic.emanation.EmanationType;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.sphere.Spheres;
 import com.gm910.sotdivine.network.ModNetwork;
+import com.gm910.sotdivine.villagers.ModBrainElements;
+import com.gm910.sotdivine.villagers.poi.ModPoiTypes;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.Minecraft;

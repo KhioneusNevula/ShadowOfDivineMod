@@ -23,7 +23,7 @@ public enum RitualQuality {
 	FINE(2.0f, 18, SpellPower.HARD, 16),
 
 	/**
-	 * For a good quality ritual
+	 * For a good $quality ritual
 	 */
 	GOOD(3.0f, 32, SpellPower.POWERFUL, 64),
 

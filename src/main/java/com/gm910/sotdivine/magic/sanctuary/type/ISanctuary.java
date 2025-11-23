@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.gm910.sotdivine.Config;
@@ -15,13 +16,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * A Sanctuary is a region of space delineated as belonging to a deity using
@@ -111,8 +112,8 @@ public sealed interface ISanctuary permits Sanctuary {
 	public IDeitySymbol symbol();
 
 	/**
-	 * The lowest y-rawPosition in this Sanctuary; the sanctuary's sacred area extends
-	 * down to the next section rawPosition below this rawPosition
+	 * The lowest y-rawPosition in this Sanctuary; the sanctuary's sacred area
+	 * extends down to the next section rawPosition below this rawPosition
 	 * 
 	 * @return
 	 */
@@ -182,12 +183,19 @@ public sealed interface ISanctuary permits Sanctuary {
 	public boolean contains(BlockPos pos);
 
 	/**
-	 * Whether a sanctuary contains this vec3
+	 * Whether a sanctuary contains this position
 	 * 
 	 * @param pos
 	 * @return
 	 */
-	public boolean contains(Vec3 pos);
+	public boolean contains(Position pos);
+
+	/**
+	 * Returns a stream of block positions inside this sanctuary
+	 * 
+	 * @return
+	 */
+	public Stream<BlockPos> interiorPositions(Predicate<BlockPos> allow);
 
 	/**
 	 * The dimension this sanctuary is in

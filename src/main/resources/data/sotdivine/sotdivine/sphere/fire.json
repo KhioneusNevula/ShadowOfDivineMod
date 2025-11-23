@@ -132,6 +132,26 @@
 					],
 					"spell_properties": {
 						"alignment": "curse",
+						"difficulty":"normal"
+					}
+				}
+			},
+			{
+				"type": "sotdivine:spawn",
+				"data": {
+					"name": "nethereal_summoning",
+					"entities": [
+						 {
+							"data": "minecraft:blaze",
+							"weight": 2
+						},
+						 {
+							"data": "minecraft:magma_cube",
+							"weight": 2
+						}
+					],
+					"spell_properties": {
+						"alignment": "curse",
 						"difficulty":"hard"
 					}
 				}

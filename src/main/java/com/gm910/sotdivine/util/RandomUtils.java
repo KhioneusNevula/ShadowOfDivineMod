@@ -24,7 +24,7 @@ public class RandomUtils {
 		if (size == 0)
 			return Optional.empty();
 		int index = size == 1 ? 1 : random.nextIntBetweenInclusive(1, size);
-		return stream.map((s) -> (T) s).limit(index).findFirst();
+		return stream.map((s) -> (T) s).limit(index).reduce((s1, s2) -> s2);
 	}
 
 	/**

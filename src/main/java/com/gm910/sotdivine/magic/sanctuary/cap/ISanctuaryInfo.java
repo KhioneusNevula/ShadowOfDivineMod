@@ -1,11 +1,17 @@
 package com.gm910.sotdivine.magic.sanctuary.cap;
 
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
+import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
 import com.gm910.sotdivine.util.ModUtils;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 /**
  * A mob's internal storage of information pertaining to worldly sanctuaries
@@ -16,6 +22,11 @@ public interface ISanctuaryInfo {
 
 	public static final Capability<ISanctuaryInfo> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
 	});
+
+	public static ISanctuaryInfo get(ICapabilityProvider provider) {
+		return provider.getCapability(CAPABILITY).orElseThrow(
+				() -> new UnsupportedOperationException("Object " + provider + " does not have this capability"));
+	}
 
 	/**
 	 * return true if this entity was banned recently from a sanctuary, i.e. more
@@ -83,5 +94,19 @@ public interface ISanctuaryInfo {
 	 * @param sanctuaryName
 	 */
 	public void liftBan(String sanctuaryName);
+
+	/**
+	 * Sets the current sanctuary this is in (to avoid cosntant lookups)
+	 * 
+	 * @param sanctuary
+	 */
+	public void setCurrentSanctuary(@Nullable ISanctuary sanctuary);
+
+	/**
+	 * Returns the current sanctuary this is in
+	 * 
+	 * @return
+	 */
+	public Optional<ISanctuary> currentSanctuary();
 
 }

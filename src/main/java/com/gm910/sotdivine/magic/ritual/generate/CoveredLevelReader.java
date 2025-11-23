@@ -1,4 +1,4 @@
-package com.gm910.sotdivine.magic.ritual;
+package com.gm910.sotdivine.magic.ritual.generate;
 
 import java.util.List;
 import java.util.Map;

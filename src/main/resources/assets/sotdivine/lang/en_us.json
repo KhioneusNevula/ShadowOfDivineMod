@@ -215,7 +215,8 @@
   	"sotd.emanation.spawn": "Spawn %1$s",
   	"sotd.emanation.spawn.smite_lightning": "Smite",
   	"sotd.emanation.spawn.undead": "Raise Unliving",
-  	"sotd.emanation.spawn.fire_smite": "Nethereal Summoning",
+  	"sotd.emanation.spawn.netheral_summoning": "Nethereal Summoning",
+  	"sotd.emanation.spawn.fire_smite": "Flamestrike",
   	
   	"sotd.pattern.unnamed": "<Unnamed Pattern>",
   	"sotd.pattern.sotdivine.circle": "Circle",

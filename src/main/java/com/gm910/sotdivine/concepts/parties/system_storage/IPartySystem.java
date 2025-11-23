@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.parties.IPartyLister;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
-import com.gm910.sotdivine.concepts.parties.villagers.poi.ModPoiTypes;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
 import com.gm910.sotdivine.concepts.symbol.ISymbolBearer;
@@ -21,6 +20,7 @@ import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
 import com.gm910.sotdivine.magic.ritual.trigger.type.IRitualTriggerEvent;
 import com.gm910.sotdivine.magic.sphere.ISphere;
+import com.gm910.sotdivine.villagers.poi.ModPoiTypes;
 import com.google.common.base.Functions;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Either;
@@ -127,7 +127,7 @@ public interface IPartySystem extends IPartyLister {
 	}
 
 	@Override
-	public default Optional<IDeity> deityByName(String id) {
+	public default Optional<IDeity> getDeityByName(String id) {
 		return getPartyByName(id).filter((a) -> a instanceof IDeity).map((a) -> (IDeity) a);
 	}
 

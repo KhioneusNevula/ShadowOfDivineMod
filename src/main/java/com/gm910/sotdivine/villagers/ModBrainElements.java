@@ -1,11 +1,14 @@
-package com.gm910.sotdivine.concepts.parties.villagers;
+package com.gm910.sotdivine.villagers;
 
 import java.util.Collection;
 import java.util.Optional;
 
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
-import com.gm910.sotdivine.concepts.parties.villagers.sensor.PartyTerritorySensor;
+import com.gm910.sotdivine.magic.sanctuary.CachedSanctuaries;
+import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
+import com.gm910.sotdivine.villagers.sensor.NearestSanctuariesSensor;
+import com.gm910.sotdivine.villagers.sensor.PartyTerritorySensor;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.world.entity.EntityReference;
@@ -51,6 +54,12 @@ public final class ModBrainElements {
 				.register("party_id", () -> new MemoryModuleType<>(Optional.of(Codec.STRING)));
 
 		/**
+		 * Memory module for what sanctuaries are closest
+		 */
+		public static final RegistryObject<MemoryModuleType<CachedSanctuaries>> NEAREST_SANCTUARIES = SOTDMod.MEMORY_MODULE_TYPES
+				.register("nearest_sanctuaries", () -> new MemoryModuleType<>(Optional.empty()));
+
+		/**
 		 * A memory module for who the leader of the village is
 		 */
 		public static final RegistryObject<MemoryModuleType<EntityReference<LivingEntity>>> VILLAGE_LEADER = SOTDMod.MEMORY_MODULE_TYPES
@@ -70,6 +79,12 @@ public final class ModBrainElements {
 		 */
 		public static final RegistryObject<SensorType<PartyTerritorySensor>> PARTY_TERRITORY = SOTDMod.SENSOR_TYPES
 				.register("party_territory", () -> new SensorType<>(PartyTerritorySensor::new));
+
+		/**
+		 * Sensor that senses what sanctuary we are near
+		 */
+		public static final RegistryObject<SensorType<NearestSanctuariesSensor>> NEAREST_SANCTUARIES = SOTDMod.SENSOR_TYPES
+				.register("nearest_sanctuaries", () -> new SensorType<>(NearestSanctuariesSensor::new));
 	}
 
 }

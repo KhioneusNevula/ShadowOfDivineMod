@@ -65,7 +65,7 @@ public non-sealed class Ritual implements IRitual {
 		if (CODEC == null) {
 			CODEC = RecordCodecBuilder
 					.create(instance -> instance.group(RitualType.CODEC.fieldOf("type").forGetter(IRitual::ritualType),
-							RitualQuality.CODEC.fieldOf("quality").forGetter(IRitual::ritualQuality),
+							RitualQuality.CODEC.fieldOf("$quality").forGetter(IRitual::ritualQuality),
 							RitualPatternSet.codec().fieldOf("patterns").forGetter(IRitual::patterns),
 							Codec.unboundedMap(RitualEffectType.CODEC, RitualEmanationTargeter.codec())
 									.optionalFieldOf("effects", Map.of()).forGetter((x) -> ((Ritual) x).effects),
@@ -154,6 +154,7 @@ public non-sealed class Ritual implements IRitual {
 
 				success = succ.runEmanations(instance, level, deity, atPos, pattern, caster, intensity, banners,
 						shields, offerings.keySet());
+				LogUtils.getLogger().debug(success + " running stupid useless ritual " + instance.ritual());
 			} else {
 
 				LogUtils.getLogger().debug("No success effect");

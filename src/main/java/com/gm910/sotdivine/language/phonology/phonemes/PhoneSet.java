@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.gm910.sotdivine.language.phonology.IPhonology;
 import com.gm910.sotdivine.util.CodecUtils;
@@ -59,15 +60,15 @@ public record PhoneSet(Map<String, Object> features, Set<String> exact, PhoneSet
 
 		Codec<Map<String, Object>> featuresProper = Codec.unboundedMap(Codec.STRING,
 				CodecUtils.multiCodecEither(Codec.BOOL, Codec.INT, Codec.STRING));
-		Codec<PhoneSet> phoneSetCodec = Codec.recursive("phoneSetCodec",
-				pscodec -> RecordCodecBuilder.create(instance -> instance
+		Function<Codec<PhoneSet>, Codec<PhoneSet>> phoneSetCodecRecursive = (pscodec) -> RecordCodecBuilder
+				.create(instance -> instance
 						.group(CodecUtils.multiCodecEither(anyMap, featuresProper).optionalFieldOf("features", Map.of())
 								.forGetter(PhoneSet::features),
 								CodecUtils.listOrSingleCodec(Codec.STRING).optionalFieldOf("and", List.of())
 										.forGetter((s) -> new ArrayList<>(s.exact())),
 								pscodec.optionalFieldOf("not", EMPTY).forGetter(PhoneSet::excluded))
-						.apply(instance, (f, e, ex) -> new PhoneSet(Map.copyOf(f), new HashSet<>(e), ex))));
-		return CodecUtils.multiCodecEither(fromStringList, phoneSetCodec);
+						.apply(instance, (f, e, ex) -> new PhoneSet(Map.copyOf(f), new HashSet<>(e), ex)));
+		return Codec.recursive("phoneSet", (recursor) -> CodecUtils.multiCodecEither(fromStringList, phoneSetCodecRecursive.apply(recursor)));
 	}
 
 	public static final Codec<PhoneSet> CODEC = createCodec();

@@ -84,10 +84,9 @@ public class SanctuaryBoundaryProber {
 			if (cmf || toolong || (visited && !collided)) {
 				mover.remove();
 				if (cmf)
-					LogUtils.getLogger()
-							.debug("Probe reached world boundary (" + mover.pos.toShortString() + ") from "
-									+ mover.pivotPos + ": " + mover.pathBlocks.stream().map(BlockPos::toShortString)
-											.map((s) -> "(" + s + ")").collect(CollectionUtils.setStringCollector(", ")));
+					LogUtils.getLogger().debug("Probe reached world boundary (" + mover.pos.toShortString() + ") from "
+							+ mover.pivotPos + ": " + mover.pathBlocks.stream().map(BlockPos::toShortString)
+									.map((s) -> "(" + s + ")").collect(CollectionUtils.setStringCollector(", ")));
 				if (toolong)
 					// LogUtils.getLogger().debug("Probe moved too long a distance (length=" +
 					// mover.length + ") ("
@@ -102,8 +101,6 @@ public class SanctuaryBoundaryProber {
 			}
 
 			if ((!mover.fresh() || !mover.isOriented()) && canSelectBlock(mover.pos)) {
-				ISanctuarySystem.get(level).getSanctuaryAtPos(mover.pos)
-						.ifPresent((san) -> ISanctuarySystem.get(level).reaffirmSanctuary(level, san));
 				// if we looped back on our original pathType and the pathType is longer than 3,
 				// complete
 				if (collided) {
@@ -276,9 +273,9 @@ public class SanctuaryBoundaryProber {
 	 *                        pillar is the block we should add to the boundary,
 	 *                        then add it
 	 * @param blockedBy       what block to not pass through
-	 * @param signifyMovement an optional function to create an effect at a rawPosition
-	 *                        to signify movement to it; first rawPosition is
-	 *                        currentpos, second is the starting pos
+	 * @param signifyMovement an optional function to create an effect at a
+	 *                        rawPosition to signify movement to it; first
+	 *                        rawPosition is currentpos, second is the starting pos
 	 * @param signifyFailure  same as signify movement, but for positiosn the mover
 	 *                        fails to move to
 	 */
