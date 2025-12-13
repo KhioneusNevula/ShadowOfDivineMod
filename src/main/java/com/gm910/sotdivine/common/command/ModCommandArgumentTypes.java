@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.common.command.args.GenrePlacementMapArgument;
 import com.gm910.sotdivine.common.command.args.GenreProviderArgument;
+import com.gm910.sotdivine.common.command.args.ImpressionTypeArgument;
 import com.gm910.sotdivine.common.command.args.MagicWordArgument;
 import com.gm910.sotdivine.common.command.args.RitualPatternArgument;
 import com.gm910.sotdivine.common.command.args.SphereArgument;
@@ -66,6 +67,10 @@ public class ModCommandArgumentTypes {
 	public static final RegistryObject<ArgumentTypeInfo<GenreProviderArgument, SingletonArgumentInfo<GenreProviderArgument>.Template>> GENRE_PROVIDER = register(
 			"genre_provider", GenreProviderArgument.class,
 			() -> SingletonArgumentInfo.contextAware((s) -> new GenreProviderArgument(s)));
+
+	public static final RegistryObject<ArgumentTypeInfo<ImpressionTypeArgument, SingletonArgumentInfo<ImpressionTypeArgument>.Template>> IMPRESSION_TYPE = register(
+			"impression_type", ImpressionTypeArgument.class,
+			() -> SingletonArgumentInfo.contextFree(ImpressionTypeArgument::argument));
 
 	public static final RegistryObject<ArgumentTypeInfo<RitualPatternArgument, SingletonArgumentInfo<RitualPatternArgument>.Template>> RITUAL_PATTERN = register(
 			"ritual_pattern", RitualPatternArgument.class,

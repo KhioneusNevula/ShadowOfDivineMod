@@ -83,7 +83,6 @@ public class VillagerTweaks {
 
 			brainBuilder.addBehaviorToActivityByPriority(0, Activity.PANIC,
 					SetWalkTargetToSanctuary.sanctuary(MemoryModuleTypes.NEAREST_SANCTUARIES.get(), 0.5f * 1.5f));
-			LogUtils.getLogger().debug("Added sanctuary fleeing activity to " + villager);
 
 		} else {
 

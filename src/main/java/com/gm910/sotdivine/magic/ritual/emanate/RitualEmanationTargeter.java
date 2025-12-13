@@ -113,24 +113,24 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 	 * @return
 	 */
 	public boolean runEmanations(@Nullable RitualInstance ritual, ServerLevel level, IDeity deity, GlobalPos atPos,
-			IRitualPattern pattern, @Nullable UUID caster, float intensity, Collection<BlockPos> banners,
-			Collection<? extends Entity> shields, Collection<ItemEntity> offerings) {
+			IRitualPattern pattern, @Nullable UUID caster, float intensity, Collection<ItemEntity> offerings) {
 		LogUtils.getLogger().debug("running " + this);
 
 		boolean[] out = { false };
 
-		if (this.elementTargeter.contains(RitualElement.RECOGNIZED_SYMBOL)) {
-			banners.stream().forEach((ex) -> {
-				out[0] = deity.triggerEmanation(this.emanation,
-						ISpellTargetInfo.builder(deity, level).targetPos(ex).build(), intensity, ritual) != null
-						|| out[0];
-			});
-			shields.stream().forEach((ex) -> {
-				out[0] = deity.triggerEmanation(this.emanation,
-						ISpellTargetInfo.builder(deity, level).branch(this.alsoTargetEntityPositions,
-								(b) -> b.targetEntityAndPos(ex), (b) -> b.targetEntity(ex)).build(),
-						intensity, ritual) != null || out[0];
-			});
+		if (this.elementTargeter.contains(RitualElement.CENTER)) {
+			out[0] = deity.triggerEmanation(this.emanation,
+					ISpellTargetInfo.builder(deity, level).targetPos(atPos.pos()).build(), intensity, ritual) != null
+					|| out[0];
+
+		}
+		if (this.elementTargeter.contains(RitualElement.AREA_RANDOM)) {
+			pattern.getAllBlockPositions().map((v) -> atPos.pos().offset(v))
+					.filter((x) -> level.random.nextFloat() <= 10f / pattern.blockCount()).forEach((ex) -> {
+						out[0] = deity.triggerEmanation(this.emanation,
+								ISpellTargetInfo.builder(deity, level).targetPos(ex).build(), intensity, ritual) != null
+								|| out[0];
+					});
 		}
 		if (this.elementTargeter.contains(RitualElement.OFFERING)) {
 			offerings.stream().forEach((ex) -> {
@@ -263,7 +263,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 			Collections.shuffle(list);
 			if (!list.isEmpty()) {
 				map.put(RitualEffectType.FAIL_TICK,
-						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.RECOGNIZED_SYMBOL)));
+						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.AREA_RANDOM)));
 			}
 		}
 		if (level.random.nextFloat() > 0.2f) {
@@ -272,7 +272,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 			Collections.shuffle(list);
 			if (!list.isEmpty()) {
 				map.put(RitualEffectType.INTERRUPTION,
-						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.RECOGNIZED_SYMBOL)));
+						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.AREA_RANDOM)));
 			}
 		}
 		return map;

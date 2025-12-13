@@ -7,31 +7,13 @@ import com.gm910.sotdivine.util.HolderUtils;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BannerPattern;
 
 record DeitySymbol(Holder<BannerPattern> bannerPattern, Optional<HolderSet<ISphere>> preferredSpheres,
 		Optional<HolderSet<ISphere>> allowedSpheres, Optional<HolderSet<ISphere>> forbiddenSpheres,
 		Optional<HolderSet<Block>> effigies) implements IDeitySymbol {
-	@Override
-	public Holder<BannerPattern> bannerPattern() {
-		return bannerPattern;
-	}
-
-	@Override
-	public Optional<HolderSet<ISphere>> allowedSpheres() {
-		return allowedSpheres;
-	}
-
-	@Override
-	public Optional<HolderSet<ISphere>> forbiddenSpheres() {
-		return forbiddenSpheres;
-	}
-
-	@Override
-	public Optional<HolderSet<ISphere>> preferredSpheres() {
-		return preferredSpheres;
-	}
 
 	@Override
 	public boolean equals(Object obj) {

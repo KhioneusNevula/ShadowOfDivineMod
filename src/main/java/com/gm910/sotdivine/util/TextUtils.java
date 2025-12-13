@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 /**
  * For text components and other things
@@ -47,6 +48,73 @@ public class TextUtils {
 	 */
 	public static Component literal(String string) {
 		return Component.literal(string);
+	}
+
+	/**
+	 * Return a translation with a fallback option (also uses "escape"
+	 * functionality)
+	 */
+	public static Component translationWithFallback(String key, Component fallback, Object... args) {
+		for (int i = 0; i < args.length; i++) {
+			Object object = args[i];
+			if (!TranslatableContents.isAllowedPrimitiveArgument(object) && !(object instanceof Component)) {
+				args[i] = String.valueOf(object);
+			}
+		}
+		return Component.translatableWithFallback(key, fallback.getString(), args);
+	}
+
+	/**
+	 * Return a translation which recurses through each fallback in the list before
+	 * reaching the final fallback. The components given must be translation
+	 * components; the last one can be any kind of component
+	 */
+	public static Component translationWithFallback(String key, List<Component> fallback, Object... args) {
+		Component finalC = null;
+		for (Component c : fallback.reversed()) {
+			if (finalC == null) {
+				finalC = c;
+			} else {
+				finalC = translationWithFallback(((TranslatableContents) c.getContents()).getKey(), finalC,
+						((TranslatableContents) c.getContents()).getArgs());
+			}
+		}
+
+		return translationWithFallback(key, finalC, args);
+	}
+
+	/**
+	 * Return a translation which recurses through each fallback in the list before
+	 * reaching the final fallback. The components given must be translation
+	 * components; the last one can be any kind of component
+	 */
+	public static Component translationWithFallbacks(String key, List<? extends Component> fallback, Object... args) {
+		Component finalC = null;
+		for (Component c : fallback.reversed()) {
+			if (finalC == null) {
+				finalC = c;
+			} else {
+				finalC = translationWithFallback(((TranslatableContents) c.getContents()).getKey(), finalC,
+						((TranslatableContents) c.getContents()).getArgs());
+			}
+		}
+
+		return translationWithFallback(key, finalC, args);
+	}
+
+	/**
+	 * same as {@link #translationWithFallback(String, List, Object...)} but with
+	 * the last component explicitly separated
+	 */
+	public static Component translationWithFallbacks(String key, List<? extends Component> fallback,
+			Component finalComp, Object... args) {
+		Component finalC = finalComp;
+		for (Component c : fallback.reversed()) {
+			finalC = translationWithFallback(((TranslatableContents) c.getContents()).getKey(), finalC,
+					((TranslatableContents) c.getContents()).getArgs());
+		}
+
+		return translationWithFallback(key, finalC, args);
 	}
 
 	/**

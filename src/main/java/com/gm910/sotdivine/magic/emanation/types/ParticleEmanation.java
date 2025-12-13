@@ -40,6 +40,16 @@ public class ParticleEmanation extends AbstractEmanation {
 		this.particles = new HashSet<>(particles);
 	}
 
+	@Override
+	public boolean createsObject() {
+		return false;
+	}
+
+	@Override
+	public boolean damagesTarget() {
+		return false;
+	}
+
 	public Set<ParticleSpecification> particles() {
 		return particles;
 	}

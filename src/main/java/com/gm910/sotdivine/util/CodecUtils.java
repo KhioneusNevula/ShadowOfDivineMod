@@ -1,5 +1,6 @@
 package com.gm910.sotdivine.util;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang3.SerializationException;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterators;
@@ -26,6 +28,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 
 public class CodecUtils {
 
@@ -313,6 +320,32 @@ public class CodecUtils {
 			}
 		}, (s) -> DataResult.error(() -> "Do not turn float into string", s + ""))).xmap((s) -> Either.unwrap(s),
 				Either::left);
+	}
+
+	/**
+	 * Same as {@link CodecUtils#caselessEnumCodec(Class)} but for streams
+	 * 
+	 * @param <T>
+	 * @param clazz
+	 * @return
+	 */
+	public static <T extends Enum<T>> StreamCodec<ByteBuf, T> enumStreamCodec(Class<T> clazz) {
+		return new StreamCodec<ByteBuf, T>() {
+			@Override
+			public T decode(ByteBuf bf) {
+				int ord = bf.readInt();
+				try {
+					return clazz.getEnumConstants()[ord];
+				} catch (Exception e) {
+					throw new SerializationException("Invalid " + clazz.getSimpleName() + " index \"" + ord + "\"", e);
+				}
+			}
+
+			@Override
+			public void encode(ByteBuf bf, T en) {
+				bf.writeInt(en.ordinal());
+			}
+		};
 	}
 
 	/**

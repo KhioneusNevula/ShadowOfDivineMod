@@ -3,8 +3,13 @@ package com.gm910.sotdivine.network;
 import java.util.List;
 
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
+import com.gm910.sotdivine.magic.theophany.client.ImpressionsClient;
+import com.gm910.sotdivine.network.packet_types.ClientboundImpressionsUpdatePacket;
+import com.gm910.sotdivine.network.packet_types.ClientboundMeditationPacket;
 import com.gm910.sotdivine.network.packet_types.ClientboundTellrawNotificationPacket;
+import com.gm910.sotdivine.network.packet_types.ServerboundImpressionsUpdatePacket;
 import com.gm910.sotdivine.network.packet_types.ServerboundIncantationChatPacket;
+import com.gm910.sotdivine.network.packet_types.ServerboundMeditationPacket;
 import com.gm910.sotdivine.network.party_system.ClientboundPartySystemUpdatePacket;
 import com.gm910.sotdivine.util.ModUtils;
 import com.mojang.datafixers.util.Either;
@@ -31,8 +36,17 @@ public class ModNetwork {
 					ClientboundPartySystemUpdatePacket::handle)
 			.add(ClientboundTellrawNotificationPacket.class, ClientboundTellrawNotificationPacket.STREAM_CODEC,
 					ClientboundTellrawNotificationPacket::handle)
-			.serverbound().add(ServerboundIncantationChatPacket.class, ServerboundIncantationChatPacket.STREAM_CODEC,
+			.add(ClientboundImpressionsUpdatePacket.class, ClientboundImpressionsUpdatePacket.STREAM_CODEC,
+					ImpressionsClient::handlePackageFromServer)
+			.add(ClientboundMeditationPacket.class, ClientboundMeditationPacket.STREAM_CODEC,
+					ClientboundMeditationPacket::handle)
+			.serverbound()
+			.add(ServerboundIncantationChatPacket.class, ServerboundIncantationChatPacket.STREAM_CODEC,
 					ServerboundIncantationChatPacket::handle)
+			.add(ServerboundImpressionsUpdatePacket.class, ServerboundImpressionsUpdatePacket.STREAM_CODEC,
+					ServerboundImpressionsUpdatePacket::handle)
+			.add(ServerboundMeditationPacket.class, ServerboundMeditationPacket.STREAM_CODEC,
+					ServerboundMeditationPacket::handle)
 			.build();
 
 	private ModNetwork() {

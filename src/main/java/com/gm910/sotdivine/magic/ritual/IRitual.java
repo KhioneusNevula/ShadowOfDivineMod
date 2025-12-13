@@ -113,7 +113,7 @@ public sealed interface IRitual permits Ritual {
 			Either<Entity, BlockPos> either = entry.getKey();
 			if (either.map((p) -> system.convertShieldPatterns(world, p, winner),
 					(p) -> system.convertBannerPatterns(world, p, winner)).booleanValue()) {
-				var didConversionEmanation = winner.triggerAnEmanation(DeityInteractionType.SYMBOL_CONVERSION,
+				winner.triggerAnEmanation(DeityInteractionType.SYMBOL_CONVERSION,
 						ISpellTargetInfo.builder(winner, world)
 								.branch(either, (l, b) -> b.targetEntityAndPos(l), (r, b) -> b.targetPos(r)).build(),
 						1.0f);
@@ -155,24 +155,15 @@ public sealed interface IRitual permits Ritual {
 						"Found matching rituals for pos " + focusPos + " and event " + triggerEvent + "; iterating");
 				for (Entry<IRitual, IRitualPattern> ritEntry : rituals) {
 
-					/*LogUtils.getLogger().debug(
-							"Checking ritual for pos " + focusPos + " and event " + triggerEvent + ": " + ritEntry);*/
 					Map<ItemEntity, Integer> offeringItems = ritEntry.getKey().offeringsPresent(level, focusPos,
 							ritEntry.getValue());
 					if (offeringItems != null) {
 						LogUtils.getLogger().debug("Matched to ritual " + ritEntry);
-						IRitual.convertOrRecognizeSymbols(level, focusPos, searchRadius, deity);
-						// get all the shield/banner holders
-						Set<Entity> shieldHolders = new HashSet<>();
-						Set<BlockPos> bannerPoses = new HashSet<>();
-						deity.findDeitySymbols(level, focusPos, searchRadius).forEach(
-								(e) -> e.ifLeft((s) -> shieldHolders.add(s)).ifRight((s) -> bannerPoses.add(s)));
+						// IRitual.convertOrRecognizeSymbols(level, focusPos, searchRadius, deity);
 
-						// TODO calc parameters
 						ritEntry.getKey().initiateRitual(level, deity, causer,
 								GlobalPos.of(level.dimension(), focusPos), ritEntry.getValue(),
-								new RitualParameters(Map.of()), triggerEvent, bannerPoses, shieldHolders,
-								offeringItems);
+								new RitualParameters(Map.of()), triggerEvent, offeringItems);
 						return true;
 					} else {
 						LogUtils.getLogger().debug("Inadequate offerings for " + focusPos + " and event " + triggerEvent
@@ -180,8 +171,6 @@ public sealed interface IRitual permits Ritual {
 					}
 				}
 			} else {
-				/*LogUtils.getLogger()
-						.debug("Failed to instrument any ritual at blockpos " + focusPos + " for deity: " + deity);*/
 			}
 		}
 		return false;
@@ -331,8 +320,7 @@ public sealed interface IRitual permits Ritual {
 	 * @param
 	 */
 	public void initiateRitual(ServerLevel level, IDeity deity, UUID caster, GlobalPos atPos, IRitualPattern pattern,
-			IRitualParameters parameters, IRitualTriggerEvent event, Collection<BlockPos> banners,
-			Collection<? extends Entity> shields, Map<ItemEntity, Integer> offerings);
+			IRitualParameters parameters, IRitualTriggerEvent event, Map<ItemEntity, Integer> offerings);
 
 	/**
 	 * Signals to the ritual to run its 'interrupt' effect or 'fail' effect

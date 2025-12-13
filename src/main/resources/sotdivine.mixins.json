@@ -6,6 +6,9 @@
   	"pathfinding.PathfindingContextMixin",
   	"pathfinding.PathTypeCacheMixin",
   	"entity.ItemFrameMixin",
-  	"block.BlockStateMixin"
+  	"entity.PlayerMixin",
+  	"block.BlockStateMixin",
+  	"gui.LoomMenuMixin",
+  	"gui.LoomScreenMixin"
   ]
 }

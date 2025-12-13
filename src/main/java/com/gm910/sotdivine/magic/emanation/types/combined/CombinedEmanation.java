@@ -55,6 +55,8 @@ public class CombinedEmanation implements IEmanation {
 	private final boolean aggtargetsEntity;
 	private final boolean aggtargetsPos;
 	private final boolean aggdurative;
+	private final boolean aggdamages;
+	private final boolean aggcreates;
 
 	public CombinedEmanation(Collection<IEmanation> emanations, ExecutionOrder order, Optional<Boolean> conditional,
 			Optional<SpellAlignment> alignment) {
@@ -70,6 +72,8 @@ public class CombinedEmanation implements IEmanation {
 		this.aggtargetsEntity = emanations.stream().anyMatch(IEmanation::targetsEntity);
 		this.aggtargetsPos = emanations.stream().anyMatch(IEmanation::targetsPos);
 		this.aggdurative = emanations.stream().anyMatch(IEmanation::isDurative);
+		this.aggdamages = emanations.stream().anyMatch(IEmanation::damagesTarget);
+		this.aggcreates = emanations.stream().anyMatch(IEmanation::createsObject);
 	}
 
 	public List<IEmanation> getEmanationsList() {
@@ -79,6 +83,16 @@ public class CombinedEmanation implements IEmanation {
 	@Override
 	public boolean isDurative() {
 		return this.aggdurative;
+	}
+
+	@Override
+	public boolean createsObject() {
+		return this.aggcreates;
+	}
+
+	@Override
+	public boolean damagesTarget() {
+		return this.aggdamages;
 	}
 
 	public ExecutionOrder getOrder() {
@@ -294,9 +308,9 @@ public class CombinedEmanation implements IEmanation {
 	@Override
 	public Component translate() {
 		return TextUtils.transPrefix("sotd.emanation.combined" + ("_" + this.order.name().toLowerCase()),
-				this.emanations.stream().map((s) -> TextUtils.transPrefix("sotd.cmd.quote", s.translate()))
-						.collect(CollectionUtils.componentCollector("sotd.cmd.list" + (conditional ? ".conditional" : ""),
-								null, null)));
+				this.emanations.stream().map((s) -> TextUtils.transPrefix("sotd.cmd.quote", s.translate())).collect(
+						CollectionUtils.componentCollector("sotd.cmd.list" + (conditional ? ".conditional" : ""), null,
+								null)));
 	}
 
 	@Override

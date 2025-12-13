@@ -11,6 +11,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -47,7 +48,7 @@ public record ParticleSpecification(ParticleOptions particle, Vec3 offset, Vec3 
 	}
 
 	/**
-	 * Display the particle specified here at the given rawPosition
+	 * Display the particle specified here at the given position
 	 * 
 	 * @param level
 	 * @param pos
@@ -55,6 +56,30 @@ public record ParticleSpecification(ParticleOptions particle, Vec3 offset, Vec3 
 	public void sendParticle(ServerLevel level, Vec3 pos) {
 		level.sendParticles(this.particle, force, alwaysVisible, pos.add(offset).x, pos.add(offset).y,
 				pos.add(offset).z, count, delta.x, delta.y, delta.z, speed);
+	}
+
+	/**
+	 * Display the particle specified here at the given position to only the given
+	 * player
+	 * 
+	 * @param level
+	 * @param pos
+	 */
+	public void sendParticle(ServerPlayer player, Vec3 pos) {
+		player.level().sendParticles(player, this.particle, force, alwaysVisible, pos.add(offset).x, pos.add(offset).y,
+				pos.add(offset).z, count, delta.x, delta.y, delta.z, speed);
+	}
+
+	/**
+	 * Display the particle specified here at the given position to the given
+	 * player(s)
+	 * 
+	 * @param level
+	 * @param pos
+	 */
+	public void sendParticle(Iterable<ServerPlayer> players, Vec3 pos) {
+		players.forEach(player -> player.level().sendParticles(player, this.particle, force, alwaysVisible,
+				pos.add(offset).x, pos.add(offset).y, pos.add(offset).z, count, delta.x, delta.y, delta.z, speed));
 	}
 
 	@Override

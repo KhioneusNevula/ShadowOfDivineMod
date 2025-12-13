@@ -1,11 +1,9 @@
 package com.gm910.sotdivine.events;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -23,11 +21,15 @@ import com.gm910.sotdivine.magic.sanctuary.cap.ISanctuaryInfo;
 import com.gm910.sotdivine.magic.sanctuary.storage.ISanctuarySystem;
 import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
 import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.magic.theophany.cap.IMind;
+import com.gm910.sotdivine.network.ModNetwork;
+import com.gm910.sotdivine.network.packet_types.ClientboundImpressionsUpdatePacket;
+import com.gm910.sotdivine.network.packet_types.ServerboundMeditationPacket;
 import com.gm910.sotdivine.util.FieldUtils;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -36,6 +38,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityReference;
@@ -45,10 +49,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent.LevelTickEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -61,6 +67,10 @@ public class DeityWorldEvents {
 	@SubscribeEvent
 	public static void generateDeities(PlayerLoggedInEvent event) {
 		if (event.getEntity() instanceof ServerPlayer player) {
+			var exp = IMind.get(player);
+			for (var ip : exp.getAllImpressions()) {
+				ModNetwork.sendToClient(ClientboundImpressionsUpdatePacket.add(ip, exp.getTimetracker(ip)), player);
+			}
 			IPartySystem system = IPartySystem.get(player.level());
 			if (system.getPartyByName(player.getUUID().toString()).isEmpty()) { // add player party
 				system.addParty(IParty.createEntity(player, player.getDisplayName()), player.level());
@@ -189,7 +199,11 @@ public class DeityWorldEvents {
 	@SubscribeEvent
 	public static void updateEvent(LivingTickEvent event) {
 
-		if (event.getEntity().level() instanceof ServerLevel level1) {
+		if (event.getEntity().level() instanceof ServerLevel level1 && event.getEntity().isAlive()) {
+
+			event.getEntity().getCapability(IMind.CAPABILITY).ifPresent((exp) -> {
+				exp.tick();
+			});
 
 			if (ISanctuarySystem.get(level1).getSanctuaryAtPos(event.getEntity().blockPosition())
 					.orElse(null) instanceof ISanctuary flamer) {

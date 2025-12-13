@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.common.command.args.GenrePlacementMapArgument;
 import com.gm910.sotdivine.common.command.args.GenreProviderArgument;
+import com.gm910.sotdivine.common.command.args.ImpressionTypeArgument;
 import com.gm910.sotdivine.common.command.args.RitualPatternArgument;
 import com.gm910.sotdivine.common.command.args.SphereArgument;
 import com.gm910.sotdivine.common.command.args.SymbolArgument;
@@ -43,6 +45,10 @@ import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.ritual.properties.RitualQuality;
 import com.gm910.sotdivine.magic.ritual.properties.RitualType;
 import com.gm910.sotdivine.magic.sphere.ISphere;
+import com.gm910.sotdivine.magic.theophany.cap.IMind;
+import com.gm910.sotdivine.magic.theophany.cap.ImpressionTimetracker;
+import com.gm910.sotdivine.magic.theophany.impression.IImpression;
+import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.villagers.ModBrainElements.MemoryModuleTypes;
@@ -59,6 +65,8 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -66,9 +74,12 @@ import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -91,6 +102,9 @@ import net.minecraft.world.level.block.entity.BannerPatternLayers.Layer;
 import net.minecraftforge.server.command.EnumArgument;
 
 public class SOTDInfoCommand {
+
+	private static final DynamicCommandExceptionType ERROR_INVALID_TAG = new DynamicCommandExceptionType(
+			p_308347_ -> Component.translatableEscape("argument.nbt.invalid", p_308347_));
 
 	private static final DynamicCommandExceptionType ERROR_INVALID_DIMENSION = new DynamicCommandExceptionType(
 			p_308347_ -> Component.translatableEscape("argument.dimension.invalid", p_308347_));
@@ -205,22 +219,27 @@ public class SOTDInfoCommand {
 												stack.getArgument("type", RitualType.class),
 												stack.getArgument("$quality", RitualQuality.class)))))))
 						.then(Commands.literal("start"))
-						.then(Commands.literal("place").then(Commands.argument("deity", DeityArgument.argument()).then(
-								Commands.argument("type", EnumArgument.enumArgument(RitualType.class)).then(Commands
-										.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
-										.then(Commands.argument("pos", BlockPosArgument.blockPos())
-												.executes(stack -> placeRitual(stack,
-														BlockPosArgument.getBlockPos(stack, "pos"),
-														DeityArgument.getDeity(stack, "deity",
-																DeityArgument.ERROR_DEITY_INVALID),
-														stack.getArgument("type", RitualType.class),
-														stack.getArgument("$quality", RitualQuality.class), false))
-												.then(Commands.literal("spawn_offerings").executes(stack -> placeRitual(
-														stack, BlockPosArgument.getBlockPos(stack, "pos"),
-														DeityArgument.getDeity(stack, "deity",
-																DeityArgument.ERROR_DEITY_INVALID),
-														stack.getArgument("type", RitualType.class),
-														stack.getArgument("$quality", RitualQuality.class), true)))))))))
+						.then(Commands.literal("place").then(Commands.argument("deity", DeityArgument.argument())
+								.then(Commands.argument("type", EnumArgument.enumArgument(RitualType.class))
+										.then(Commands
+												.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
+												.then(Commands.argument("pos", BlockPosArgument.blockPos())
+														.executes(stack -> placeRitual(stack,
+																BlockPosArgument.getBlockPos(stack, "pos"),
+																DeityArgument.getDeity(stack, "deity",
+																		DeityArgument.ERROR_DEITY_INVALID),
+																stack.getArgument("type", RitualType.class),
+																stack.getArgument("$quality", RitualQuality.class),
+																false))
+														.then(Commands.literal("spawn_offerings")
+																.executes(stack -> placeRitual(stack,
+																		BlockPosArgument.getBlockPos(stack, "pos"),
+																		DeityArgument.getDeity(stack, "deity",
+																				DeityArgument.ERROR_DEITY_INVALID),
+																		stack.getArgument("type", RitualType.class),
+																		stack.getArgument("$quality",
+																				RitualQuality.class),
+																		true)))))))))
 				.then(Commands.literal("emanation").then(Commands.literal("list").then(Commands
 						.argument("sphere", SphereArgument.argument())
 						.then(Commands.argument("type", EnumArgument.enumArgument(DeityInteractionType.class))
@@ -259,7 +278,45 @@ public class SOTDInfoCommand {
 														1, false)))))
 				.then(Commands.literal("sanctuary")
 						.then(Commands.literal("list").then(Commands.argument("chunk", ColumnPosArgument.columnPos())))
-						.then(Commands.literal("count"))));
+						.then(Commands.literal("count")))
+				.then(Commands.literal("impression").then(Commands.literal("list")).then(Commands.literal("give")
+						.then(Commands.argument("targets", EntityArgument.players()).then(Commands
+								.argument("type", ImpressionTypeArgument.argument())
+								.then(Commands.argument("deity", DeityArgument.argument()).then(Commands
+										.argument("duration", IntegerArgumentType.integer(1))
+										.executes(stack -> giveImpression(stack,
+												EntityArgument.getPlayers(stack, "targets"),
+												ImpressionTypeArgument.getType(stack, "type"),
+												IntegerArgumentType.getInteger(stack, "duration"),
+												DeityArgument.getDeity(stack, "deity", ERROR_ENTITY_INVALID), null))
+										.then(Commands.argument("impression definition", NbtTagArgument.nbtTag())
+												.executes(stack -> giveImpression(stack,
+														EntityArgument.getPlayers(stack, "targets"),
+														ImpressionTypeArgument.getType(stack, "type"),
+														IntegerArgumentType.getInteger(stack, "duration"),
+														DeityArgument.getDeity(stack, "deity", ERROR_ENTITY_INVALID),
+														NbtTagArgument.getNbtTag(stack,
+																"impression definition")))))))))));
+	}
+
+	private static int giveImpression(CommandContext<CommandSourceStack> stack, Collection<ServerPlayer> players,
+			ImpressionType<?> type, int duration, IDeity dei, @Nullable Tag def) throws CommandSyntaxException {
+		for (ServerPlayer player : players) {
+			IImpression imp = null;
+			if (def == null)
+				imp = type.createTest(player, dei);
+			else {
+				var res = type.codec()
+						.decode(stack.getSource().registryAccess().createSerializationContext(NbtOps.INSTANCE), def);
+				if (res.isError()) {
+					throw ERROR_INVALID_TAG.create(def);
+				}
+				imp = res.result().get().getFirst();
+			}
+			IMind.get(player).addImpression(imp,
+					new ImpressionTimetracker(dei.uniqueName(), player.level().getGameTime(), duration));
+		}
+		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int listPatterns(CommandContext<CommandSourceStack> stack) {
@@ -325,28 +382,24 @@ public class SOTDInfoCommand {
 	private static int listSymbols(CommandContext<CommandSourceStack> stack) {
 		for (var entry : DeitySymbols.instance().getDeitySymbolMap().entrySet()) {
 			stack.getSource()
-					.sendSystemMessage(
-							TextUtils.transPrefix("cmd.list.item", TextUtils.transPrefix(
-									"cmd.symbols.line"
-											+ (entry.getValue().preferredSpheres().isPresent() ? "_pref" : "")
-											+ (entry.getValue().forbiddenSpheres().isPresent() ? "_forb"
-													: "")
-											+ (entry.getValue().allowedSpheres().isPresent() ? "_all" : ""),
-									entry.getKey(),
-									Component.translatableEscape(
-											entry.getValue().bannerPattern().get().translationKey()),
-									entry.getValue().preferredSpheres()
-											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(CollectionUtils.componentCollectorSetStyle()))
-											.orElse(Component.empty()),
-									entry.getValue().forbiddenSpheres()
-											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(CollectionUtils.componentCollectorSetStyle()))
-											.orElse(Component.empty()),
-									entry.getValue().allowedSpheres()
-											.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
-													.collect(CollectionUtils.componentCollectorSetStyle()))
-											.orElse(Component.empty()))));
+					.sendSystemMessage(TextUtils.transPrefix("cmd.list.item", TextUtils.transPrefix(
+							"cmd.symbols.line" + (entry.getValue().preferredSpheres().isPresent() ? "_pref" : "")
+									+ (entry.getValue().forbiddenSpheres().isPresent() ? "_forb" : "")
+									+ (entry.getValue().allowedSpheres().isPresent() ? "_all" : ""),
+							entry.getKey(),
+							Component.translatableEscape(entry.getValue().bannerPattern().get().translationKey()),
+							entry.getValue().preferredSpheres()
+									.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
+											.collect(CollectionUtils.componentCollectorSetStyle()))
+									.orElse(Component.empty()),
+							entry.getValue().forbiddenSpheres()
+									.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
+											.collect(CollectionUtils.componentCollectorSetStyle()))
+									.orElse(Component.empty()),
+							entry.getValue().allowedSpheres()
+									.map((s) -> s.stream().map(Holder::get).map(ISphere::displayName)
+											.collect(CollectionUtils.componentCollectorSetStyle()))
+									.orElse(Component.empty()))));
 		}
 		return Command.SINGLE_SUCCESS;
 

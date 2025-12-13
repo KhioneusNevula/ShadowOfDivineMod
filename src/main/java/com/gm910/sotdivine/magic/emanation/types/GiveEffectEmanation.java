@@ -15,6 +15,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,6 +46,17 @@ public class GiveEffectEmanation extends AbstractEmanation {
 	@Override
 	protected String emanationName() {
 		return "Effect(" + effectInstance + ")";
+	}
+
+	@Override
+	public boolean createsObject() {
+		return false;
+	}
+
+	@Override
+	public boolean damagesTarget() {
+		return effectInstance.getEffect().get().isInstantenous()
+				&& effectInstance.getEffect().get().getCategory() == MobEffectCategory.HARMFUL;
 	}
 
 	@Override

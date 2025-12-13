@@ -49,6 +49,20 @@ public interface IEmanation {
 	public boolean isDurative();
 
 	/**
+	 * If this emanation damages its target
+	 * 
+	 * @return
+	 */
+	public boolean damagesTarget();
+
+	/**
+	 * If this emanation generates a new thing in the world
+	 * 
+	 * @return
+	 */
+	public boolean createsObject();
+
+	/**
 	 * Return true if this effect failed to trigger.
 	 * 
 	 * @param info

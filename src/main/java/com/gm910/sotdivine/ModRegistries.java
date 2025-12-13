@@ -9,6 +9,7 @@ import com.gm910.sotdivine.language.phonology.IPhonology;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
 import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
 import com.gm910.sotdivine.magic.sphere.ISphere;
+import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.util.ModUtils;
 
 import net.minecraft.core.Registry;
@@ -22,6 +23,8 @@ public class ModRegistries {
 	public static final ResourceKey<Registry<ISphere>> SPHERES = ResourceKey.createRegistryKey(ModUtils.path("sphere"));
 	public static final ResourceKey<Registry<IGenreType<?>>> GENRE_TYPES = ResourceKey
 			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "genre_type"));
+	public static final ResourceKey<Registry<ImpressionType<?>>> IMPRESSION_TYPES = ResourceKey
+			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "impression_type"));
 	public static final ResourceKey<Registry<PartyResourceType<?>>> PARTY_RESOURCE_TYPES = ResourceKey
 			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "resource_type"));
 	public static final ResourceKey<Registry<IRitualPattern>> RITUAL_PATTERN = ResourceKey

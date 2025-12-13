@@ -112,27 +112,24 @@ public non-sealed class Ritual implements IRitual {
 
 	@Override
 	public void initiateRitual(ServerLevel level, IDeity deity, UUID caster, GlobalPos atPos, IRitualPattern pattern,
-			IRitualParameters parameters, IRitualTriggerEvent event, Collection<BlockPos> banners,
-			Collection<? extends Entity> shields, Map<ItemEntity, Integer> offerings) {
+			IRitualParameters parameters, IRitualTriggerEvent event, Map<ItemEntity, Integer> offerings) {
 
 		if (level.random.nextFloat() > 0.2f) {
-			var list = Lists.newArrayList(deity.spheres().stream()
+			/*var list = Lists.newArrayList(deity.spheres().stream()
 					.flatMap((s) -> s.emanationsOfType(DeityInteractionType.SYMBOL_RECOGNITION).stream()).iterator());
 			Collections.shuffle(list);
 			if (!list.isEmpty()) {
 				new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.RECOGNIZED_SYMBOL)).runEmanations(
 						null, level, deity, atPos, pattern, caster, 1f, banners, shields, offerings.keySet());
-			}
+			}*/
 		}
 
 		float intensity = parameters.aggregateIntensity();
 		RitualInstance instance = new RitualInstance(this, new EntityReference<Entity>(caster), atPos, pattern,
-				intensity, banners, shields.stream().<EntityReference<Entity>>map(EntityReference::new).toList(),
-				offerings.keySet().stream().map(EntityReference::new).toList());
+				intensity, offerings.keySet().stream().map(EntityReference::new).toList());
 
 		if (this.effects.get(RitualEffectType.SIGNIFIER) instanceof RitualEmanationTargeter signifier) {
-			signifier.runEmanations(null, level, deity, atPos, pattern, caster, intensity, banners, shields,
-					offerings.keySet());
+			signifier.runEmanations(null, level, deity, atPos, pattern, caster, intensity, offerings.keySet());
 		}
 		var player = new EntityReference<ServerPlayer>(caster).getEntity(level, ServerPlayer.class);
 
@@ -152,8 +149,8 @@ public non-sealed class Ritual implements IRitual {
 						deity.descriptiveName().orElse(Component.literal(deity.uniqueName())),
 						succ.emanation().translate()));
 
-				success = succ.runEmanations(instance, level, deity, atPos, pattern, caster, intensity, banners,
-						shields, offerings.keySet());
+				success = succ.runEmanations(instance, level, deity, atPos, pattern, caster, intensity,
+						offerings.keySet());
 				LogUtils.getLogger().debug(success + " running stupid useless ritual " + instance.ritual());
 			} else {
 
@@ -178,8 +175,7 @@ public non-sealed class Ritual implements IRitual {
 			LogUtils.getLogger().debug("Succeeded at starting ritual");
 		} else {
 			if (this.effects.get(RitualEffectType.FAIL_START) instanceof RitualEmanationTargeter fail) {
-				fail.runEmanations(instance, level, deity, atPos, pattern, caster, intensity, banners, shields,
-						offerings.keySet());
+				fail.runEmanations(instance, level, deity, atPos, pattern, caster, intensity, offerings.keySet());
 			}
 			LogUtils.getLogger().debug("Failed to start ritual");
 		}
@@ -199,15 +195,11 @@ public non-sealed class Ritual implements IRitual {
 		if (interrupt) {
 			if (this.effects.get(RitualEffectType.INTERRUPTION) instanceof RitualEmanationTargeter succ) {
 				succ.runEmanations(instance, level, deity, atPos, pattern, instance.caster().getUUID(), intensity,
-						instance.banners(),
-						instance.shields().stream().map((s) -> s.getEntity(level, Entity.class)).toList(),
 						instance.offerings().stream().map((s) -> s.getEntity(level, ItemEntity.class)).toList());
 			}
 		} else {
 			if (this.effects.get(RitualEffectType.FAIL_TICK) instanceof RitualEmanationTargeter fail) {
 				fail.runEmanations(instance, level, deity, atPos, pattern, instance.caster().getUUID(), intensity,
-						instance.banners(),
-						instance.shields().stream().map((s) -> s.getEntity(level, Entity.class)).toList(),
 						instance.offerings().stream().map((s) -> s.getEntity(level, ItemEntity.class)).toList());
 			}
 		}

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.magic.sphere.ISphere;
+import com.gm910.sotdivine.magic.theophany.impression.IImpression;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -12,6 +13,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryFixedCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BannerPattern;
 

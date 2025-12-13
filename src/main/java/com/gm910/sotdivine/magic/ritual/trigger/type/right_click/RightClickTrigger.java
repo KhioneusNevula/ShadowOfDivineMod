@@ -23,7 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 public record RightClickTrigger(Optional<? extends IGiveableGenreProvider<?, ?>> instrument) implements IRitualTrigger {
 
 	public static final Codec<RightClickTrigger> CODEC = IGenreProvider.codec()
-			.comapFlatMap((s) -> s instanceof IGiveableGenreProvider<?,?> ggp ? DataResult.success(ggp)
+			.comapFlatMap((s) -> s instanceof IGiveableGenreProvider<?, ?> ggp ? DataResult.success(ggp)
 					: DataResult.error(() -> "Not giveable " + s), IGenreProvider.class::cast)
 			.optionalFieldOf("instrument").codec()
 			.xmap((o) -> new RightClickTrigger(o), (rct) -> rct.instrument().map((s) -> (IGiveableGenreProvider) s));

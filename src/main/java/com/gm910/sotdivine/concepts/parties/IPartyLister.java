@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.deity.personality.IDeityStat;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
@@ -53,10 +55,10 @@ public interface IPartyLister {
 	/**
 	 * Returns a party lister regardless of client or server side
 	 * 
-	 * @param level
+	 * @param level If this is null, return the client side lister
 	 * @return
 	 */
-	public static IPartyLister getLister(Level level) {
+	public static IPartyLister getLister(@Nullable Level level) {
 		if (level instanceof ServerLevel serv) {
 			return IPartySystem.get(serv);
 		}

@@ -2,6 +2,7 @@ package com.gm910.sotdivine.concepts.symbol;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 
 import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.concepts.symbol.impl.ISymbolWearer;
-import com.gm910.sotdivine.util.FieldUtils;
 import com.gm910.sotdivine.util.ModUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -27,11 +27,14 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
+import net.minecraft.client.renderer.MaterialMapper;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -210,6 +213,17 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 		return Streams.concat(
 				entity.getCapability(ISymbolBearer.CAPABILITY).resolve().stream().flatMap((s) -> s.getSymbols()),
 				entity.getCapability(ISymbolWearer.CAPABILITY).resolve().stream().flatMap((s) -> s.getSymbols()));
+	}
+
+	/**
+	 * Return resource lcoation of the icon of the symbol
+	 * 
+	 * @param symbol
+	 * @return
+	 */
+	public ResourceLocation getSymbolIconPath(IDeitySymbol symbol) {
+		return Optional.ofNullable(SYMBOLS.inverse().get(symbol)).map(aa -> aa.withPrefix("symbol/"))
+				.orElseGet(MissingTextureAtlasSprite::getLocation);
 	}
 
 	/**

@@ -11,7 +11,9 @@ public enum SpellTrait implements IExtensibleEnum {
 	 * Whether this SPELL changes all nearby banners to only show the deity's symbol
 	 */
 	BANNER_FLIP,
-	/** Whether this SPELL protects an entity/rawPosition from other deities' spells */
+	/**
+	 * Whether this SPELL protects an entity/rawPosition from other deities' spells
+	 */
 	PROTECTION,
 	/** Whether this SPELL absorbs energy for the deity */
 	ABSORB;

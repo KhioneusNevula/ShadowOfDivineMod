@@ -17,8 +17,7 @@ import net.minecraft.world.entity.item.ItemEntity;
  * An instance of an active ritual,
  */
 public record RitualInstance(IRitual ritual, EntityReference<Entity> caster, GlobalPos focusPos,
-		IRitualPattern successfulPattern, float intensity, Collection<BlockPos> banners,
-		Collection<EntityReference<Entity>> shields, Collection<EntityReference<ItemEntity>> offerings) {
+		IRitualPattern successfulPattern, float intensity, Collection<EntityReference<ItemEntity>> offerings) {
 	private static Codec<RitualInstance> CODEC = null;
 
 	public static Codec<RitualInstance> codec() {
@@ -30,13 +29,10 @@ public record RitualInstance(IRitual ritual, EntityReference<Entity> caster, Glo
 							IRitualPattern.eitherCodec().fieldOf("successful_pattern")
 									.forGetter(RitualInstance::successfulPattern),
 							Codec.FLOAT.fieldOf("intensity").forGetter(RitualInstance::intensity),
-							Codec.list(BlockPos.CODEC).fieldOf("banners").forGetter((s) -> new ArrayList<>(s.banners)),
-							Codec.list(EntityReference.<Entity>codec()).fieldOf("shields")
-									.forGetter((s) -> new ArrayList<>(s.shields)),
 							Codec.list(EntityReference.<ItemEntity>codec()).fieldOf("offerings")
 									.forGetter((s) -> new ArrayList<>(s.offerings))
 
-					).apply(instance, (r, c, f, sp, i, b, s, o) -> new RitualInstance(r, c, f, sp, i, b, s, o)));
+					).apply(instance, (r, c, f, sp, i, o) -> new RitualInstance(r, c, f, sp, i, o)));
 		}
 		return CODEC;
 	}

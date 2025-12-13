@@ -1,9 +1,12 @@
 package com.gm910.sotdivine;
 
+import java.util.Collection;
+
 import org.slf4j.Logger;
 
 import com.gm910.sotdivine.common.blocks.ModBlocks;
 import com.gm910.sotdivine.common.command.ModCommandArgumentTypes;
+import com.gm910.sotdivine.common.effects.ModEffects;
 import com.gm910.sotdivine.common.items.ModItems;
 import com.gm910.sotdivine.common.misc.ModCreativeTabs;
 import com.gm910.sotdivine.common.misc.ModDataComponents;
@@ -19,6 +22,7 @@ import com.gm910.sotdivine.language.phonology.Phonologies;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.network.ModNetwork;
 import com.gm910.sotdivine.villagers.ModBrainElements;
 import com.gm910.sotdivine.villagers.poi.ModPoiTypes;
@@ -28,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -37,6 +42,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
@@ -61,6 +68,9 @@ public final class SOTDMod {
 	// Create a Deferred Register to hold Items which will all be registered under
 	// the "examplemod" namespace
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+	// Create a Deferred Register to hold effects
+	public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS,
+			MODID);
 
 	// defered register for banner patterns
 	public static final DeferredRegister<BannerPattern> BANNER_PATTERNS = DeferredRegister
@@ -93,10 +103,13 @@ public final class SOTDMod {
 			MODID);
 
 	/**
-	 * Emanation Type register
+	 * Emanation Usage register
 	 */
 	public static final DeferredRegister<EmanationType<?>> EMANATION_TYPES = DeferredRegister
 			.create(ModRegistries.EMANATION_TYPES, SOTDMod.MODID);
+
+	public static final DeferredRegister<ImpressionType<?>> IMPRESSION_TYPES = DeferredRegister
+			.create(ModRegistries.IMPRESSION_TYPES, MODID);
 
 	/**
 	 * Party resource types register
@@ -114,6 +127,8 @@ public final class SOTDMod {
 		ModBlocks.init();
 		ITEMS.register(modBusGroup);
 		ModItems.init();
+		EFFECTS.register(modBusGroup);
+		ModEffects.init();
 		BANNER_PATTERNS.register(modBusGroup);
 		CREATIVE_MODE_TABS.register(modBusGroup);
 		ModCreativeTabs.init();
@@ -133,6 +148,8 @@ public final class SOTDMod {
 		EMANATION_TYPES.register(modBusGroup);
 		PartyResourceType.init();
 		PARTY_RESOURCE_TYPES.register(modBusGroup);
+		ImpressionType.init();
+		IMPRESSION_TYPES.register(modBusGroup);
 
 		ModCommandArgumentTypes.init();
 		COMMAND_ARGUMENT_TYPES.register(modBusGroup);
@@ -171,15 +188,21 @@ public final class SOTDMod {
 			event.accept(ModItems.EXAMPLE_BLOCK_ITEM);
 	}
 
-	// You can use EventBusSubscriber to automatically register all static methods
-	// in the class annotated with @SubscribeEvent
-	@Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
-	public static class ClientModEvents {
-		@SubscribeEvent
-		public static void onClientSetup(FMLClientSetupEvent event) {
-			// Some client setup code
-			LOGGER.info("HELLO FROM CLIENT SETUP");
-			LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+	public record EitherContext(Collection<IKeyConflictContext> ctxt) implements IKeyConflictContext {
+
+		@Override
+		public boolean isActive() {
+			for (IKeyConflictContext ct : ctxt) {
+				if (ct.isActive())
+					return true;
+			}
+			return false;
 		}
+
+		@Override
+		public boolean conflicts(IKeyConflictContext other) {
+			return ctxt.contains(other);
+		}
+
 	}
 }

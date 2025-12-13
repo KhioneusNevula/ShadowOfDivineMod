@@ -13,6 +13,8 @@ import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.sanctuary.cap.ISanctuaryInfo;
 import com.gm910.sotdivine.magic.sanctuary.cap.SanctuaryInfo;
 import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.magic.theophany.cap.Mind;
+import com.gm910.sotdivine.magic.theophany.cap.IMind;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.server.level.ServerPlayer;
@@ -23,12 +25,24 @@ import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 
 @Mod.EventBusSubscriber(modid = SOTDMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CapabilityEvents {
+
+	@SubscribeEvent
+	public static void attachCaps(PlayerEvent.Clone event) {
+		if (event.isWasDeath()) {
+			event.getEntity().getCapability(IMind.CAPABILITY)
+					.ifPresent((cap) -> event.getOriginal().getCapability(IMind.CAPABILITY)
+							.ifPresent((ocap) -> cap.deserializeNBT(event.getEntity().registryAccess(),
+									ocap.serializeNBT(event.getEntity().registryAccess()))));
+
+		}
+	}
 
 	@SubscribeEvent
 	public static void attachCaps(AttachCapabilitiesEvent.BlockEntities event) {
@@ -42,9 +56,11 @@ public class CapabilityEvents {
 		if (event.getObject() instanceof LivingEntity ban) {
 			event.addCapability(ISymbolWearer.CAPABILITY_PATH, new LivingEntitySymbolWearer(ban));
 			event.addCapability(ISanctuaryInfo.CAPABILITY_PATH, new SanctuaryInfo(ban));
+			event.addCapability(IMind.CAPABILITY_PATH, new Mind(ban));
 			if (ban instanceof ServerPlayer) {
 				LogUtils.getLogger().debug("Attaching caps to player ");
 			}
+
 		}
 	}
 

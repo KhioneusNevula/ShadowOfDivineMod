@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 /**
  * Retrieve party info on the client side
  */
-@OnlyIn(Dist.CLIENT)
 public class ClientParties {
 
 	/**

@@ -92,6 +92,16 @@ public class SpawnEmanation extends AbstractEmanation {
 		return Component.translatableEscape("sotd.emanation.spawn." + name);
 	}
 
+	@Override
+	public boolean createsObject() {
+		return true;
+	}
+
+	@Override
+	public boolean damagesTarget() {
+		return false;
+	}
+
 	public WeightedList<EntityType<?>> getEntities() {
 		return mobs;
 	}
