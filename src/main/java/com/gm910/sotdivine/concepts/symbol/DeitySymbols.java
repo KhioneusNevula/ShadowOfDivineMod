@@ -203,7 +203,7 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	}
 
 	/**
-	 * Gets a stream of deity symbols from a given entity, worn or inherent
+	 * Gets a stream of deity symbols from a given uuid, worn or inherent
 	 * 
 	 * @param level
 	 * @param pos
@@ -252,7 +252,7 @@ public class DeitySymbols extends SimpleJsonResourceReloadListener<IDeitySymbol>
 	}
 
 	/**
-	 * Convert all symbols in the entity to the given symbol
+	 * Convert all symbols in the uuid to the given symbol
 	 * 
 	 * @param level
 	 * @param pos

@@ -25,7 +25,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 /**
- * Capability provider of symbol bearer for entities with shields
+ * Capability block of symbol bearer for entities with shields
  */
 public class SanctuaryInfo implements ICapabilitySerializable<CompoundTag>, ISanctuaryInfo {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.gm910.sotdivine.common.misc.ParticleSpecification;
-import com.gm910.sotdivine.magic.theophany.cap.IMind;
+import com.gm910.sotdivine.magic.impression.cap.IMindsEye;
 import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.ModUtils;
 import com.gm910.sotdivine.util.TextUtils;
@@ -65,7 +65,7 @@ public class PlayerVibrationUser implements VibrationSystem.User {
 	public boolean canReceiveVibration(ServerLevel level, BlockPos source, Holder<GameEvent> eventHolder,
 			GameEvent.Context ctxt) {
 		return !player.isDeadOrDying() && player.isAlive() && level.getWorldBorder().isWithinBounds(source)
-				&& IMind.get(player).isMeditating();
+				&& IMindsEye.get(player).isMeditating();
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class PlayerVibrationUser implements VibrationSystem.User {
 			@Nullable Entity entitySource, @Nullable Entity trueEntitySource, float distance) {
 		if (!player.isDeadOrDying()) {
 			level.broadcastEntityEvent(player, (byte) 61);
-			if (IMind.get(player).isMeditating()) {
+			if (IMindsEye.get(player).isMeditating()) {
 				new ParticleSpecification(ParticleTypes.FLASH, Vec3.ZERO, Vec3.ZERO, 0f, 20, true, true)
 						.sendParticle((ServerPlayer) player, sourcePos.getCenter());
 				String transKey = "meditation.interruption." + event.unwrapKey().get().location().toLanguageKey();
@@ -115,7 +115,7 @@ public class PlayerVibrationUser implements VibrationSystem.User {
 				((ServerPlayer) player).displayClientMessage(
 						entitySource == player ? forPlayer : (entitySource != null ? forEntity : forBlock), true);
 
-				IMind.get(player).forceStopMeditating();
+				IMindsEye.get(player).forceStopMeditating();
 			}
 		}
 	}

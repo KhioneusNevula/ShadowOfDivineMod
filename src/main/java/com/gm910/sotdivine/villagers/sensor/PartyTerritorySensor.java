@@ -14,7 +14,7 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.level.ChunkPos;
 
 /**
- * Senses what party's territory an entity is currently in
+ * Senses what party's territory an uuid is currently in
  * 
  * @author borah
  *

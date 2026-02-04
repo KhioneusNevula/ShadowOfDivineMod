@@ -56,7 +56,7 @@ public interface ISanctuarySystem extends ICachedSanctuaries {
 			obtain = SanctuarySystem.cachedSystems.get(level);
 		} else {
 			LogUtils.getLogger()
-					.debug("Retrieving and caching instanceof SanctuarySystem for world " + level.toString());
+					.debug("Retrieving and caching instanceof SacntuarySystem for world " + level.toString());
 
 			obtain = level.getDataStorage().computeIfAbsent(SAVE_TYPE);
 

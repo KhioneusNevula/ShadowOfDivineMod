@@ -23,7 +23,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
 /**
- * Capability provider of symbol bearer for banners
+ * Capability block of symbol bearer for banners
  */
 public class BannerSymbolBearer implements ICapabilityProvider, ISymbolBearer {
 

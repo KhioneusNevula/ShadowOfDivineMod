@@ -67,8 +67,8 @@ public class VillagerTweaks {
 		if (brainBuilder != null) {
 
 			Collection<SensorType<? extends Sensor<? super Villager>>> sensors = FieldUtils
-					.getInstanceField("sensorTypes", "sensorTypes", brainBuilder);
-			Collection<MemoryModuleType<?>> memories = FieldUtils.getInstanceField("memoryTypes", "memoryTypes",
+					.getInstanceFieldOfThisOrSupertype("sensorTypes", "sensorTypes", brainBuilder);
+			Collection<MemoryModuleType<?>> memories = FieldUtils.getInstanceFieldOfThisOrSupertype("memoryTypes", "memoryTypes",
 					brainBuilder);
 
 			// add new sensors
@@ -87,7 +87,7 @@ public class VillagerTweaks {
 		} else {
 
 			Map<SensorType<? extends Sensor<? super Villager>>, Sensor<? super Villager>> sensors = FieldUtils
-					.getInstanceField("sensors", "e", villager.getBrain());
+					.getInstanceFieldOfThisOrSupertype("sensors", "e", villager.getBrain());
 			Map<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> memories = villager.getBrain()
 					.getMemories();
 
@@ -190,7 +190,7 @@ public class VillagerTweaks {
 					TextUtils.literal("Village at " + "[" + centra.getX() + "," + centra.getZ() + ","
 							+ level.dimension().location() + "]"),
 					villageChunks.stream().map((r) -> new RegionResource(r, level.dimension())).toList());
-			system.addParty(party, level);
+			system.addParty(party, level.getServer());
 		}
 		party.memberCollection().add(new EntityReference<>(villager));
 		// party.setResourceAmount(new IDResource(villager.getUUID()), 1);

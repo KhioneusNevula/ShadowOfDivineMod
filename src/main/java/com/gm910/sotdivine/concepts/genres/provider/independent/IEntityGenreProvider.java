@@ -10,8 +10,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
 /**
- * Genre provider for something which can target a specific entity or
- * create/transform an entity
+ * Genre block for something which can target a specific uuid or
+ * create/transform an uuid
  * 
  * @param <T>
  * @param <G>
@@ -32,7 +32,7 @@ public interface IEntityGenreProvider<T, G> extends IGenreProvider<T, G> {
 	 * transformation is possible and the given entity is empty)
 	 * 
 	 * @param level
-	 * @param entity
+	 * @param uuid
 	 * @return
 	 */
 	@Nullable

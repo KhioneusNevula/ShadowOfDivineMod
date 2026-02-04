@@ -88,6 +88,22 @@
   	
   	"sotd.cmd.genre.list.start": "Listing %1$s genres for type %2$s in sphere %3$s:",
   	
+  	"sotd.cmd.remove.possessor": "Removing possessor %2$s from entity %1$s",
+  	"sotd.cmd.remove.possessors": "Removing possessor from %1$s entities",
+  	"sotd.cmd.remove.possessee": "Removing entity %1$s from possessee %2$s",
+  	"sotd.cmd.remove.possessees": "Removing %1$s entities from their possessees",
+  	"sotd.cmd.start.possess": "%1$s is now possessing %2$s",
+  	"sotd.cmd.possess.cannot": "%1$s is not capable of possessing %2$s.",
+  	"sotd.cmd.soul.none": "%1$s has no lifelike properties.",
+  	"sotd.cmd.lifestate.query": "%2$s is currently in the life state: %1$s.",
+  	"sotd.cmd.lifestate.change": "Changed %2$s into life state: %1$s.",
+  	"sotd.cmd.lifestate.name.living": "Living",
+  	"sotd.cmd.lifestate.name.dead": "Dead",
+  	"sotd.cmd.lifestate.name.undead": "Undead",
+  	"sotd.cmd.lifestate.name.ghost": "Ghost",
+  	"sotd.cmd.lifestate.name.nonliving": "Nonliving",
+  	"sotd.cmd.lifestate.name.undying": "Undying",
+  	
   	"sotd.cmd.ritual.element.recognized_symbol": "Recognized-Symbol",
   	"sotd.cmd.ritual.element.offering": "Offering",
   	"sotd.cmd.ritual.element.target": "Ritual-Target",

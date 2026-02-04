@@ -206,11 +206,11 @@ public sealed interface ISanctuary permits Sanctuary {
 
 	/**
 	 * Return how many ticks this sanctuary will remain accessible to the given
-	 * entity to enter; return {@link Integer#MAX_VALUE} (or
+	 * uuid to enter; return {@link Integer#MAX_VALUE} (or
 	 * {@link Config#sanctuaryEscapeTime} + 1) if it is always accessible, and
 	 * return a smaller value otherwise
 	 * 
-	 * @param entity
+	 * @param uuid
 	 * @return
 	 */
 	public int timeUntilForbidden(Entity entity);

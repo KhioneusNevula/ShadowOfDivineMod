@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 
 /**
- * Genre provider for something which can be placed at a block rawPosition in the
+ * Genre block for something which can be placed at a block rawPosition in the
  * world
  * 
  * @param <T>

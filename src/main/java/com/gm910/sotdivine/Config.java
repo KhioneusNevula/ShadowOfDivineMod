@@ -19,12 +19,16 @@ public class Config {
 	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 	private static final ForgeConfigSpec.FloatValue SANCTUARY_ESCAPE_TIME = BUILDER.comment(
-			"The amount of time (in seconds) an entity is allowed to remain in a sanctuary after it has been rejected")
+			"The amount of time (in seconds) an uuid is allowed to remain in a sanctuary after it has been rejected")
 			.defineInRange("sanctuaryEscapeTime", 10, 0, Float.MAX_VALUE);
 
 	private static final ForgeConfigSpec.FloatValue SANCTUARY_PERMISSION_TIME = BUILDER.comment(
-			"The amount of time (in seconds) an entity is allowed to remain in a sanctuary if let in by an attack")
+			"The amount of time (in seconds) an uuid is allowed to remain in a sanctuary if let in by an attack")
 			.defineInRange("sanctuaryPermissionTime", 30, 0, Float.MAX_VALUE);
+
+	private static final ForgeConfigSpec.IntValue MAX_SOULS_BEFORE_REPLACEMENT = BUILDER.comment(
+			"The maximum number of (non-persistent) slain souls able to be stored per player. If this is zero, only persistent souls are stored.")
+			.defineInRange("maxSoulsBeforeReplacement", 16, 0, Integer.MAX_VALUE);
 
 	// a list of strings that are treated as resource locations for items
 	private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
@@ -34,16 +38,22 @@ public class Config {
 	static final ForgeConfigSpec SPEC = BUILDER.build();
 
 	/**
-	 * The time allowed for an entity to escape a sanctuary after it has been
+	 * The time allowed for an uuid to escape a sanctuary after it has been
 	 * rejected
 	 */
 	public static float sanctuaryEscapeTime;
 
 	/**
-	 * The time allowed for for an entity to remain in a sanctuary when it has been
+	 * The time allowed for for an uuid to remain in a sanctuary when it has been
 	 * allowed in due to a violation
 	 */
 	public static float sanctuaryPermissionTime;
+
+	/**
+	 * Maximum number of nonsignificant souls permitted in afterlife before they get
+	 * replaced
+	 */
+	public static int maxSoulsBeforeReplacement;
 	public static Set<Item> items;
 
 	private static boolean validateItemName(final Object obj) {
@@ -55,6 +65,7 @@ public class Config {
 
 		sanctuaryEscapeTime = SANCTUARY_ESCAPE_TIME.get() * 20f;
 		sanctuaryPermissionTime = SANCTUARY_PERMISSION_TIME.get() * 20f;
+		maxSoulsBeforeReplacement = MAX_SOULS_BEFORE_REPLACEMENT.get();
 
 		// convert the list of strings into a set of items
 		items = ITEM_STRINGS.get().stream()

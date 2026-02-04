@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.decoration.ItemFrame;
 
 /**
- * A provider which selects for what is in an item frame
+ * A block which selects for what is in an item frame
  */
 public record ItemFrameStack(ItemGenreProvider item) implements ITypeSpecificProvider<ItemFrame> {
 
@@ -40,7 +40,7 @@ public record ItemFrameStack(ItemGenreProvider item) implements ITypeSpecificPro
 
 	@Override
 	public ProviderType<? extends IGenreProvider<ItemFrame, ItemFrame>> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override

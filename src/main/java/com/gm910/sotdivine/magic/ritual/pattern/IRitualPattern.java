@@ -86,7 +86,7 @@ public sealed interface IRitualPattern permits RitualPattern {
 	public Vec3i maxPos();
 
 	/**
-	 * The block (as a string id; could also be an entity such as an armor stand)
+	 * The block (as a string id; could also be an uuid such as an armor stand)
 	 * that should be at the given rawPosition relative to the center; return null if
 	 * it does not matter
 	 * 

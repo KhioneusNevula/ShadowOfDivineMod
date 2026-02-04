@@ -9,11 +9,16 @@ import com.gm910.sotdivine.language.lexicon.Lexicons;
 import com.gm910.sotdivine.language.phonology.Phonologies;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.util.ModUtils;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DataPackRegistryEvent;
+import net.minecraftforge.registries.RegisterEvent;
 
 @Mod.EventBusSubscriber(modid = SOTDMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RegistryEvents {
@@ -25,7 +30,7 @@ public class RegistryEvents {
 
 	@SubscribeEvent
 	public static void registerRegistry(DataPackRegistryEvent.NewRegistry event) {
-		event.dataPackRegistry(ModRegistries.SPHERES, Spheres.sphereCodec(), Spheres.sphereCodec());
+		event.dataPackRegistry(ModRegistries.SPHERES, Spheres.sphereCodec(), Spheres.sphereNetworkCodec());
 		event.dataPackRegistry(ModRegistries.DEITY_SYMBOLS, DeitySymbols.symbolCodec(), DeitySymbols.symbolCodec());
 		event.dataPackRegistry(ModRegistries.RITUAL_PATTERN, RitualPatterns.patternCodec(),
 				RitualPatterns.patternCodec());

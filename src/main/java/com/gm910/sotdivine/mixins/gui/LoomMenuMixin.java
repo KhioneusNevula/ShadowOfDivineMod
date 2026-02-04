@@ -2,6 +2,7 @@ package com.gm910.sotdivine.mixins.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.spongepowered.asm.mixin.Final;
@@ -12,14 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.gm910.sotdivine.magic.theophany.cap.IMind;
-import com.gm910.sotdivine.magic.theophany.client.ImpressionsClient;
-import com.gm910.sotdivine.magic.theophany.impression.types.DeityImpression;
+import com.gm910.sotdivine.magic.impression.IImpression;
+import com.gm910.sotdivine.magic.impression.cap.IMindsEye;
+import com.gm910.sotdivine.magic.impression.client.ImpressionsClient;
+import com.gm910.sotdivine.magic.impression.types.DeityImpression;
 import com.google.common.collect.Streams;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.LoomScreen;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.tags.BannerPatternTags;
@@ -55,16 +54,20 @@ public abstract class LoomMenuMixin extends AbstractContainerMenu {
 
 		if (stack.isEmpty()) {
 			List<Holder<BannerPattern>> holders = new ArrayList<>();
-			(player.level().isClientSide ? ImpressionsClient.allImpressions()
-					: Streams.stream(IMind.get(player).getAllImpressions()))
-					.flatMap((i) -> i instanceof DeityImpression di ? Stream.of(di) : Stream.empty())
-					.sorted((di, di2) -> di.deity().compareTo(di2.deity())).forEach((imp) -> {
-						imp.getDeityInfo(player.level()).ifPresent(deity -> {
-							holders.add(
-									this.patternGetter.getOrThrow(deity.symbol().bannerPattern().unwrapKey().get()));
+			Consumer<Stream<IImpression>> checkForPatterns = stream -> {
+				stream.flatMap((i) -> i instanceof DeityImpression di ? Stream.of(di) : Stream.empty())
+						.sorted((di, di2) -> di.deity().compareTo(di2.deity())).forEach((imp) -> {
+							imp.getDeityInfo(player.level()).ifPresent(deity -> {
+								holders.add(this.patternGetter
+										.getOrThrow(deity.symbol().bannerPattern().unwrapKey().get()));
+							});
 						});
-					});
-
+			};
+			if (player.level().isClientSide) {
+				ImpressionsClient.runOnAllImpressions(checkForPatterns);
+			} else {
+				checkForPatterns.accept(Streams.stream(IMindsEye.get(player).getAllImpressions()));
+			}
 			this.patternGetter.get(BannerPatternTags.NO_ITEM_REQUIRED).ifPresent((x) -> x.forEach(y -> holders.add(y)));
 			ci.setReturnValue(holders);
 		}

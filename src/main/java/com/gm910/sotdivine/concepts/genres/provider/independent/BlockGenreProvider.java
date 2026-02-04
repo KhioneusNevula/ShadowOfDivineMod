@@ -85,7 +85,7 @@ public record BlockGenreProvider(Either<HolderSet<Block>, HolderSet<Fluid>> kind
 								if (b.kind().left().isEmpty()) {
 									return DataResult.error(() -> "Fluid-kind cannot be converted into Block: " + b);
 								}
-								return DataResult.error(() -> "No point converting from complex provider into block",
+								return DataResult.error(() -> "No point converting from complex block into block",
 										b.kind.left().get());
 							});
 			Codec<BlockGenreProvider> fluidRegistryCodec = RegistryCodecs.homogeneousList(Registries.FLUID)
@@ -95,7 +95,7 @@ public record BlockGenreProvider(Either<HolderSet<Block>, HolderSet<Fluid>> kind
 									return DataResult.error(() -> "Block-kind cannot be converted into fluid: " + b);
 								}
 								return DataResult.error(
-										() -> "No point converting from complex provider into simple fluid",
+										() -> "No point converting from complex block into simple fluid",
 										b.kind.right().get());
 							});
 			Codec<BlockGenreProvider> blockOrFluidCodec = Codec.either(blockRegistryCodec, fluidRegistryCodec)
@@ -288,7 +288,8 @@ public record BlockGenreProvider(Either<HolderSet<Block>, HolderSet<Fluid>> kind
 
 	@Override
 	public BlockCreator generateRandom(ServerLevel level, Optional<BlockPos> placer) {
-		BlockPos pos = placer.orElse(level.players().getFirst().blockPosition());
+		BlockPos pos = placer
+				.orElse(level.players().isEmpty() ? BlockPos.ZERO : level.players().getFirst().blockPosition());
 		Stream<BlockState> states = kind.map((block) -> {
 			List<Block> blocks = Lists.newArrayList(block.stream().filter(Holder::isBound).map(Holder::get).iterator());
 			Collections.shuffle(blocks);

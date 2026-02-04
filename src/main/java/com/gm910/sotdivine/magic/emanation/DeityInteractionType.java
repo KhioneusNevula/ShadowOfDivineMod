@@ -13,7 +13,7 @@ public enum DeityInteractionType {
 	ACCEPT_OFFERING,
 	/**
 	 * An emanation that occurs when a deity finds one of its symbols during an
-	 * offering or something similar. Targets the entity with the symbol or the
+	 * offering or something similar. Targets the uuid with the symbol or the
 	 * rawPosition of the block it is at
 	 */
 	SYMBOL_RECOGNITION,
@@ -24,7 +24,7 @@ public enum DeityInteractionType {
 	SYMBOL_CONVERSION,
 	/** An emanation that occurs when a deity spell fails */
 	FAILED_CAST,
-	/** A singular SPELL, which may be targeted at a block or entity */
+	/** A singular SPELL, which may be targeted at a block or uuid */
 	SPELL,
 	/** The manifestation of a deity's power to an individual */
 	THEOPHANY,
@@ -44,7 +44,7 @@ public enum DeityInteractionType {
 	REVITALIZE,
 	/**
 	 * A massive SPELL cast by a deity that usually affects the whole world rather
-	 * than just a block or entity
+	 * than just a block or uuid
 	 */
 	LEGISLATE,
 	/** The effects of a deity putting a palyer in a VISION */

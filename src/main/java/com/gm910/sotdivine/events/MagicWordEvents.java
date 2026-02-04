@@ -243,7 +243,7 @@ public class MagicWordEvents {
 						+ "\" (" + containingComponent + ") with sequence " + access + " in message " + message);
 
 		List<Component> siblingsCopy = new ArrayList<>(containingComponent.getSiblings());
-		FieldUtils.setInstanceField("siblings", "d", containingComponent, new ArrayList<>());
+		FieldUtils.setInstanceFieldOfExactType("siblings", "d", containingComponent, new ArrayList<>());
 
 		int index = componentAsString.toLowerCase().indexOf(wordString.toLowerCase());
 		String firstPart = componentAsString.substring(0, index);

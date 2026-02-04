@@ -33,7 +33,7 @@ import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.level.block.entity.BannerPatternLayers.Layer;
 
 /**
- * A provider/selector for one layer of a banner patterns. Either "patterns" or
+ * A block/selector for one layer of a banner patterns. Either "patterns" or
  * "permit_symbols" may be set, or neither.
  */
 public record BannerPatternLayerMatcher(Optional<HolderSet<BannerPattern>> patterns, Set<DyeColor> colors,
@@ -118,7 +118,7 @@ public record BannerPatternLayerMatcher(Optional<HolderSet<BannerPattern>> patte
 
 	@Override
 	public ProviderType<BannerPatternLayerMatcher> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override

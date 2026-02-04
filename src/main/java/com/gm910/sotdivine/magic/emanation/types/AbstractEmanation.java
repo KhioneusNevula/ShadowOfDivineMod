@@ -31,7 +31,7 @@ public abstract class AbstractEmanation implements IEmanation {
 	}
 
 	/**
-	 * If this targetInfo has a globalPos or entity, return the level it belongs to
+	 * If this targetInfo has a globalPos or uuid, return the level it belongs to
 	 * 
 	 * @param info
 	 * @return
@@ -46,7 +46,7 @@ public abstract class AbstractEmanation implements IEmanation {
 	}
 
 	/**
-	 * Get the entity in a spellInfo from a server level
+	 * Get the uuid in a spellInfo from a server level
 	 * 
 	 * @param level
 	 * @param entityRef

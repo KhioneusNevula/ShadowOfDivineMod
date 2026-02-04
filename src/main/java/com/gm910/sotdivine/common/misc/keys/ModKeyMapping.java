@@ -1,7 +1,7 @@
 package com.gm910.sotdivine.common.misc.keys;
 
 import com.gm910.sotdivine.events.ClientEvents;
-import com.gm910.sotdivine.magic.theophany.client.MeditationScreen;
+import com.gm910.sotdivine.magic.impression.client.MeditationScreen;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 import com.mojang.blaze3d.platform.InputConstants.Type;
 

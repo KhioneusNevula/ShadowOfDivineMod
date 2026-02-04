@@ -3,13 +3,15 @@ package com.gm910.sotdivine;
 import com.gm910.sotdivine.concepts.genres.IGenreType;
 import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
+import com.gm910.sotdivine.dimension.powers.DimensionPowerType;
 import com.gm910.sotdivine.language.ILanguage;
 import com.gm910.sotdivine.language.lexicon.ILexicon;
 import com.gm910.sotdivine.language.phonology.IPhonology;
+import com.gm910.sotdivine.magic.afterlife.anchors.AfterlifeAnchorType;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
+import com.gm910.sotdivine.magic.impression.ImpressionType;
 import com.gm910.sotdivine.magic.ritual.pattern.IRitualPattern;
 import com.gm910.sotdivine.magic.sphere.ISphere;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.util.ModUtils;
 
 import net.minecraft.core.Registry;
@@ -20,6 +22,10 @@ public class ModRegistries {
 
 	public static final ResourceKey<Registry<EmanationType<?>>> EMANATION_TYPES = ResourceKey
 			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "emanation_type"));
+	public static final ResourceKey<Registry<DimensionPowerType<?>>> DIMENSION_POWER_TYPES = ResourceKey
+			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "dimension_power_type"));
+	public static final ResourceKey<Registry<AfterlifeAnchorType<?>>> ANCHOR_TYPES = ResourceKey
+			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "anchor_type"));
 	public static final ResourceKey<Registry<ISphere>> SPHERES = ResourceKey.createRegistryKey(ModUtils.path("sphere"));
 	public static final ResourceKey<Registry<IGenreType<?>>> GENRE_TYPES = ResourceKey
 			.createRegistryKey(ResourceLocation.fromNamespaceAndPath(SOTDMod.MODID, "genre_type"));

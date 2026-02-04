@@ -2,9 +2,9 @@ package com.gm910.sotdivine.network.packet_types;
 
 import java.util.Optional;
 
-import com.gm910.sotdivine.magic.theophany.cap.ImpressionTimetracker;
-import com.gm910.sotdivine.magic.theophany.impression.IImpression;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
+import com.gm910.sotdivine.magic.impression.IImpression;
+import com.gm910.sotdivine.magic.impression.ImpressionType;
+import com.gm910.sotdivine.magic.impression.cap.ImpressionTimetracker;
 import com.gm910.sotdivine.util.CodecUtils;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -25,6 +25,10 @@ public record ClientboundImpressionsUpdatePacket(Action action, Optional<IImpres
 		return new ClientboundImpressionsUpdatePacket(Action.REMOVE, Optional.of(imp), Optional.empty());
 	}
 
+	public static ClientboundImpressionsUpdatePacket update(IImpression imp) {
+		return new ClientboundImpressionsUpdatePacket(Action.UPDATE, Optional.of(imp), Optional.empty());
+	}
+
 	public static ClientboundImpressionsUpdatePacket clear() {
 		return new ClientboundImpressionsUpdatePacket(Action.CLEAR, Optional.empty(), Optional.empty());
 	}
@@ -37,7 +41,7 @@ public record ClientboundImpressionsUpdatePacket(Action action, Optional<IImpres
 					ClientboundImpressionsUpdatePacket::additionalInfo, ClientboundImpressionsUpdatePacket::new);
 
 	public static enum Action {
-		ADD, REMOVE, CLEAR
+		ADD, REMOVE, CLEAR, UPDATE
 	}
 
 }

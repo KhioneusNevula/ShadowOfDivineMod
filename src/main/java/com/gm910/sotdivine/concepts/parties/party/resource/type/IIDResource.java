@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.gm910.sotdivine.concepts.parties.party.resource.IPartyResource;
 
 /**
- * Resource for a party which is an individual unique entity
+ * Resource for a party which is an individual unique uuid
  * 
  * @author borah
  *

@@ -20,6 +20,7 @@ import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -59,9 +60,9 @@ class PartySystem extends SavedData implements IPartySystem {
 	}
 
 	@Override
-	public void markDirty(ServerLevel level) {
+	public void markDirty(MinecraftServer server) {
 		this.setDirty();
-		ModNetwork.sendPartySystemToClients(this, level.getServer());
+		ModNetwork.sendPartySystemToClients(this, server);
 	}
 
 	@Override
@@ -90,7 +91,7 @@ class PartySystem extends SavedData implements IPartySystem {
 	}
 
 	@Override
-	public void addParty(IParty party, ServerLevel level) {
+	public void addParty(IParty party, MinecraftServer level) {
 		this.markDirty(level);
 		if (party instanceof IDeity) {
 			this.deities.put(party.uniqueName(), (IDeity) party);

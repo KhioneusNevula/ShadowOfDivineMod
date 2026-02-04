@@ -22,7 +22,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
 /**
- * Capability provider of symbol bearer for entities with shields
+ * Capability block of symbol bearer for entities with shields
  */
 public class ItemStackSymbolBearer implements ICapabilityProvider, ISymbolBearer {
 

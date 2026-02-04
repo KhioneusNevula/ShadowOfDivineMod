@@ -3,7 +3,7 @@ package com.gm910.sotdivine.network;
 import java.util.List;
 
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
-import com.gm910.sotdivine.magic.theophany.client.ImpressionsClient;
+import com.gm910.sotdivine.magic.impression.client.ImpressionsClient;
 import com.gm910.sotdivine.network.packet_types.ClientboundImpressionsUpdatePacket;
 import com.gm910.sotdivine.network.packet_types.ClientboundMeditationPacket;
 import com.gm910.sotdivine.network.packet_types.ClientboundTellrawNotificationPacket;

@@ -63,8 +63,8 @@ public interface IParty extends IPartyInfo {
 			(a, b, c, d, mems, memors, nam, rels, res) -> new Party(a, b, c, d, mems, memors, rels, nam, res)));
 
 	/**
-	 * Creates a party as an individual entity, usually a player; also include a
-	 * small component to give this entity a name
+	 * Creates a party as an individual uuid, usually a player; also include a
+	 * small component to give this uuid a name
 	 * 
 	 * @param id
 	 * @param rawPosition
@@ -93,7 +93,7 @@ public interface IParty extends IPartyInfo {
 	}
 
 	/**
-	 * If this is an entity, try to convert unique name to uUID
+	 * If this is an uuid, try to convert unique name to uUID
 	 * 
 	 * @return
 	 */
@@ -111,7 +111,7 @@ public interface IParty extends IPartyInfo {
 	}
 
 	/**
-	 * Method that returns a casted entity if this is a single entity of the given
+	 * Method that returns a casted uuid if this is a single uuid of the given
 	 * class
 	 * 
 	 * @param world
@@ -123,7 +123,7 @@ public interface IParty extends IPartyInfo {
 	}
 
 	/**
-	 * If this party is an individual entity, return the entity reference
+	 * If this party is an individual uuid, return the uuid reference
 	 * 
 	 * @return
 	 */
@@ -143,7 +143,7 @@ public interface IParty extends IPartyInfo {
 	public Collection<EntityReference<Entity>> memberCollection();
 
 	/**
-	 * Create and return a relationship with the givne entity
+	 * Create and return a relationship with the givne uuid
 	 * 
 	 * @param randomUUID
 	 * @return

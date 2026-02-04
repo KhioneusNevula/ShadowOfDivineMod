@@ -42,6 +42,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -50,7 +51,7 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 /**
  * A ritual emanation targeter which can optionally target the rawPosition(s) of
  * instances of the given (placeable) genre and optionally target instances of a
- * given (entity) genre in the ritual
+ * given (uuid) genre in the ritual
  * 
  * @param alsoTargetEntityPositions whether this ritual should target the
  *                                  positions of entities as well as the
@@ -103,7 +104,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 	}
 
 	/**
-	 * Matches this emanation to every entity or rawPosition relevant and run it.
+	 * Matches this emanation to every uuid or rawPosition relevant and run it.
 	 * Return false if all emanations failed
 	 * 
 	 * @param level
@@ -200,7 +201,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 	 * @return
 	 */
 	public static Map<RitualEffectType, RitualEmanationTargeter> createRitualEmanations(RitualType type,
-			RitualQuality quality, ServerLevel level, IDeity ford, Collection<IRitual> existingRituals) {
+			RitualQuality quality, RandomSource random, IDeity ford, Collection<IRitual> existingRituals) {
 		Map<RitualEffectType, RitualEmanationTargeter> map = new HashMap<>();
 		/*EntityGenreProvider worshiperPred = new EntityGenreProvider(
 				EntityTypePredicate.of(level.holderLookup(Registries.ENTITY_TYPE), ModEntityTags.WORSHIPER),
@@ -236,7 +237,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 			break;
 		}
 
-		if (level.random.nextFloat() > 0.2f) {
+		if (random.nextFloat() > 0.2f) {
 			var list = Lists.newArrayList(ford.spheres().stream()
 					.flatMap((s) -> s.emanationsOfType(DeityInteractionType.ACCEPT_OFFERING).stream()).iterator());
 			Collections.shuffle(list);
@@ -245,7 +246,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.OFFERING)));
 			}
 		}
-		if (level.random.nextFloat() > 0.2f) {
+		if (random.nextFloat() > 0.2f) {
 			// curse
 			var list = Lists.newArrayList(
 					ford.spheres().stream().flatMap((s) -> s.emanationsOfType(DeityInteractionType.SPELL).stream())
@@ -257,7 +258,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.TARGET)));
 			}
 		}
-		if (level.random.nextFloat() > 0.2f) {
+		if (random.nextFloat() > 0.2f) {
 			var list = Lists.newArrayList(ford.spheres().stream()
 					.flatMap((s) -> s.emanationsOfType(DeityInteractionType.FAILED_CAST).stream()).iterator());
 			Collections.shuffle(list);
@@ -266,7 +267,7 @@ public record RitualEmanationTargeter(IEmanation emanation, Optional<IPlaceableG
 						new RitualEmanationTargeter(list.getFirst(), Set.of(RitualElement.AREA_RANDOM)));
 			}
 		}
-		if (level.random.nextFloat() > 0.2f) {
+		if (random.nextFloat() > 0.2f) {
 			var list = Lists.newArrayList(ford.spheres().stream()
 					.flatMap((s) -> s.emanationsOfType(DeityInteractionType.FAILED_CAST).stream()).iterator());
 			Collections.shuffle(list);

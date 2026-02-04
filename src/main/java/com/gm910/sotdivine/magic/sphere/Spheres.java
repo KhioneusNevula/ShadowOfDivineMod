@@ -31,6 +31,7 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 	private static Optional<Spheres> INSTANCE = Optional.empty();
 	private Map<ISphere, PoiType> ritualPoiTypes = new HashMap<>();
 	private static Codec<ISphere> CODEC;
+	private static Codec<ISphere> NCODEC;
 
 	/**
 	 * Codec that retrieves spheres based on their resource location
@@ -47,6 +48,12 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 		if (CODEC == null)
 			CODEC = Codec.lazyInitialized(Sphere::createCodec);
 		return CODEC;
+	}
+
+	public static final Codec<ISphere> sphereNetworkCodec() {
+		if (NCODEC == null)
+			NCODEC = Codec.lazyInitialized(Sphere::createNetworkCodec);
+		return NCODEC;
 	}
 
 	private Spheres(Provider prov) {
@@ -150,18 +157,18 @@ public class Spheres extends SimpleJsonResourceReloadListener<ISphere> {
 	}
 
 	public static void initTest(HolderLookup.Provider provider) {
-		// provider.lookup(ISphere.SPHERES).get().listTagIds().collect(ModUtils.setStringCollector(","));
+		// block.lookup(ISphere.SPHERES).get().listTagIds().collect(ModUtils.setStringCollector(","));
 		/*
 		 * LOGGER.debug("TEST SPHERE json: " +
 		 * sphereCodec().encodeStart(JsonOps.INSTANCE, new Sphere(
-		 * Map.of(GenreTypes.DIMENSION, Set.of(BuiltinDimensionTypes.NETHER),
+		 * Map.of(GenreTypes.DIMENSION_THEME, Set.of(BuiltinDimensionTypes.NETHER),
 		 * GenreTypes.OFFERING, Set.of(ItemPredicate.Builder.item().of(null,
 		 * Items.GOLDEN_SWORD)
 		 * 
 		 * .withComponents(DataComponentMatchers.Builder.components()
 		 * .partial(DataComponentPredicates.ENCHANTMENTS,
 		 * EnchantmentsPredicate.enchantments(List.of(new EnchantmentPredicate(
-		 * provider.lookupOrThrow(Registries.ENCHANTMENT)
+		 * block.lookupOrThrow(Registries.ENCHANTMENT)
 		 * .getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))))
 		 * .build())
 		 * 

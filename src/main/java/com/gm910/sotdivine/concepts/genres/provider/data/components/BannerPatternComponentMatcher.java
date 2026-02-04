@@ -169,7 +169,7 @@ public class BannerPatternComponentMatcher implements IComponentMatcherProvider<
 
 	@Override
 	public ProviderType<BannerPatternComponentMatcher> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override

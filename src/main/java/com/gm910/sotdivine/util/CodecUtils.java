@@ -1,6 +1,5 @@
 package com.gm910.sotdivine.util;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,6 +21,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
+import com.google.common.collect.Table.Cell;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -30,9 +30,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 
 public class CodecUtils {
 
@@ -143,6 +141,48 @@ public class CodecUtils {
 	}
 
 	/**
+	 * Similar to {@link #multimapCodec(Codec, Codec, Supplier)} but stores as a
+	 * compound list of entries, rather than a map of lists
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param <M>
+	 * @param key
+	 * @param val
+	 * @param mmap
+	 * @return
+	 */
+	public static <K, V, M extends Multimap<K, V>> Codec<M> multimapCodecFromList(String keyLabel, Codec<K> key,
+			String valueLabel, Codec<V> val, Supplier<M> mmap) {
+		return Codec
+				.list(RecordCodecBuilder
+						.<Pair<K, V>>create(
+								instance -> instance
+										.group(key.fieldOf(keyLabel).forGetter(Pair::getFirst),
+												val.fieldOf(valueLabel).forGetter(Pair::getSecond))
+										.apply(instance, Pair::of)))
+				.xmap((m) -> m.stream().collect(Multimaps.toMultimap(Pair::getFirst, Pair::getSecond, mmap)), (m) -> m
+						.entries().stream().map((e) -> Pair.of(e.getKey(), e.getValue())).collect(Collectors.toList()));
+	}
+
+	/**
+	 * See {@link #multimapCodecFromList(String, Codec, String, Codec, Supplier)};
+	 * labels are "key" and "value"
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param <M>
+	 * @param key
+	 * @param val
+	 * @param mmap
+	 * @return
+	 */
+	public static <K, V, M extends Multimap<K, V>> Codec<M> multimapCodecFromList(Codec<K> key, Codec<V> val,
+			Supplier<M> mmap) {
+		return multimapCodecFromList("key", key, "value", val, mmap);
+	}
+
+	/**
 	 * Codec which interprets structures of the form "X":["Y", "Z",...] or "X":"Y"
 	 * as Multimaps
 	 * 
@@ -188,6 +228,83 @@ public class CodecUtils {
 	 */
 	public static <K, V> Codec<Multimap<K, V>> multimapCodec(Codec<K> keys, Codec<V> vals) {
 		return multimapCodec(keys, vals, () -> MultimapBuilder.hashKeys().arrayListValues().build());
+	}
+
+	/**
+	 * Codec for a cell of a table
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param key1
+	 * @param ker2
+	 * @param val
+	 * @param rowLabel the field where the row is written
+	 * 
+	 * @param colLabel the field the column is written to
+	 * 
+	 * @param valLabel the field the value is written to
+	 * @return
+	 */
+	public static <R, C, V> Codec<Cell<R, C, V>> cellCodec(String rowLabel, Codec<R> key1, String colLabel,
+			Codec<C> key2, String valLabel, Codec<V> val) {
+		return RecordCodecBuilder.create(instance -> instance.group(key1.fieldOf(rowLabel).forGetter(Cell::getRowKey),
+				key2.fieldOf(colLabel).forGetter(Cell::getColumnKey), val.fieldOf(valLabel).forGetter(Cell::getValue))
+				.apply(instance, CollectionUtils::cell));
+	}
+
+	/**
+	 * Codec for a cell of a table
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param key1
+	 * @param ker2
+	 * @param val
+	 * @return
+	 */
+	public static <R, C, V> Codec<Cell<R, C, V>> cellCodec(Codec<R> key1, Codec<C> key2, Codec<V> val) {
+		return cellCodec("row", key1, "column", key2, "value", val);
+	}
+
+	/**
+	 * Creates a codec for a table stored as a list of cells isntead of a
+	 * multi-level structure
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param <M>
+	 * @param cellCodec
+	 * @param sup
+	 * @return
+	 */
+	public static <R, C, V> Codec<Table<R, C, V>> tableCodecAsList(Codec<R> rc, Codec<C> cc, Codec<V> vc) {
+		return tableCodecAsList(cellCodec(rc, cc, vc), () -> HashBasedTable.create());
+	}
+
+	/**
+	 * Creates a codec for a table stored as a list of cells isntead of a
+	 * multi-level structure
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param <M>
+	 * @param cellCodec
+	 * @param sup
+	 * @return
+	 */
+	public static <R, C, V, M extends Table<R, C, V>> Codec<M> tableCodecAsList(Codec<Cell<R, C, V>> cellCodec,
+			Supplier<M> sup) {
+		return Codec.list(cellCodec).xmap((ls) -> {
+			M newTable = sup.get();
+			ls.forEach(cell -> newTable.put(cell.getRowKey(), cell.getColumnKey(), cell.getValue()));
+			return newTable;
+		}, tab -> {
+			return tab.cellSet().stream().toList();
+		});
 	}
 
 	/**
@@ -370,14 +487,13 @@ public class CodecUtils {
 	 */
 	public static <T extends Enum<T>> Codec<T> caselessEnumCodec(Class<T> clazz, Function<String, String> errormsg) {
 		return Codec.STRING.comapFlatMap((s) -> {
-			T out;
-			try {
-				out = Enum.valueOf(clazz, s.toUpperCase().replace("[- ]", "_"));
-				return DataResult.success(out);
-			} catch (Exception e) {
-				return DataResult.error(() -> errormsg.apply(s));
+			for (T enuma : clazz.getEnumConstants()) {
+				if (enuma.name().equalsIgnoreCase(s.replace("[- ]", "_"))) {
+					return DataResult.success(enuma);
+				}
 			}
-		}, (r) -> r.name());
+			return DataResult.error(() -> errormsg.apply(s));
+		}, (r) -> r.name().toLowerCase());
 	}
 
 }

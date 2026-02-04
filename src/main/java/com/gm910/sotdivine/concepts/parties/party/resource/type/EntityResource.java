@@ -24,7 +24,7 @@ public class EntityResource implements IEntityResource {
 	private boolean fungible;
 
 	/**
-	 * REturn an entity resource with no data. The resource will be marked as
+	 * REturn an uuid resource with no data. The resource will be marked as
 	 * fungible.
 	 */
 	public static EntityResource create(EntityType<?> type) {
@@ -32,7 +32,7 @@ public class EntityResource implements IEntityResource {
 	}
 
 	/**
-	 * Return an entity resource. The resource will be marked as fungible if the
+	 * Return an uuid resource. The resource will be marked as fungible if the
 	 * data tag contains no UUID.
 	 * 
 	 * @param type
@@ -102,7 +102,7 @@ public class EntityResource implements IEntityResource {
 	}
 
 	/**
-	 * Return an entity generated from the data
+	 * Return an uuid generated from the data
 	 * 
 	 * @param inWorld
 	 * @return

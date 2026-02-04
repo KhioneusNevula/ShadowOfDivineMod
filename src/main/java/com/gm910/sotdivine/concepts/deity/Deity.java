@@ -53,6 +53,7 @@ public non-sealed class Deity extends Party implements IDeity {
 	protected Set<EmanationInstance> runningEmanations;
 	protected Map<EmanationInstance, RitualInstance> emanationsToRituals;
 	protected Multimap<RitualInstance, EmanationInstance> ritualsToEmanations;
+	private boolean finished;
 
 	protected Deity(String unique, Collection<ISphere> spheres, Map<IDeityStat, Float> stats, Component name,
 			IDeitySymbol symbol) {
@@ -71,7 +72,7 @@ public non-sealed class Deity extends Party implements IDeity {
 
 	protected Deity(IParty partyData, List<ISphere> spheres, Map<IDeityStat, Float> stats, IDeitySymbol symbol,
 			List<IRitual> rituals, List<EmanationInstance> runningEms,
-			List<Pair<EmanationInstance, RitualInstance>> ritualEms) {
+			List<Pair<EmanationInstance, RitualInstance>> ritualEms, boolean finished) {
 		super(false, partyData.uniqueName(), false, false, partyData.memberCollection(),
 				new ArrayList<IPartyMemory>(partyData.allMemories()),
 				partyData.knownParties().stream()
@@ -93,6 +94,7 @@ public non-sealed class Deity extends Party implements IDeity {
 			emanationsToRituals.put(pair.getFirst(), pair.getSecond());
 			ritualsToEmanations.put(pair.getSecond(), pair.getFirst());
 		});
+		this.finished = finished;
 	}
 
 	private void removeEmanation(EmanationInstance instance, boolean interrupt) {
@@ -171,6 +173,16 @@ public non-sealed class Deity extends Party implements IDeity {
 						}
 					}
 				});
+	}
+
+	@Override
+	public boolean finishedGeneration() {
+		return finished;
+	}
+
+	@Override
+	public void setFinished() {
+		finished = true;
 	}
 
 	@Override
@@ -274,26 +286,28 @@ public non-sealed class Deity extends Party implements IDeity {
 
 	@Override
 	public String report() {
-		return "Deity{spheres=" + this.spheres + ",stats=" + this.stats + ",symbol=" + this.symbol
-				+ ",running_emanations=" + this.runningEmanations + ",partyData=" + super.report() + "}";
+		return (!finished ? "*" : "") + "Deity{spheres=" + this.spheres + ",stats=" + this.stats + ",symbol="
+				+ this.symbol + ",running_emanations=" + this.runningEmanations + ",partyData=" + super.report() + "}";
 	}
 
 	@Override
 	public String report(Level level) {
-		return "Deity{spheres=" + this.spheres + ",stats=" + this.stats + ",symbol=" + this.symbol
-				+ ",running_emanations=" + this.runningEmanations + ",partyData=" + super.report(level) + "}";
+		return (!finished ? "*" : "") + "Deity{spheres=" + this.spheres + ",stats=" + this.stats + ",symbol="
+				+ this.symbol + ",running_emanations=" + this.runningEmanations + ",partyData=" + super.report(level)
+				+ "}";
 	}
 
 	@Override
 	public Component descriptiveInfo(Level level) {
 		return TextUtils.transPrefix("sotd.cmd.deityinfo",
-				this.spheres.stream().map(ISphere::displayName).collect(CollectionUtils.componentCollectorCommasPretty()),
+				this.spheres.stream().map(ISphere::displayName)
+						.collect(CollectionUtils.componentCollectorCommasPretty()),
 				Component.translatableEscape(this.symbol.bannerPattern().get().translationKey()));
 	}
 
 	@Override
 	public String toString() {
-		return "Deity{"
+		return (!finished ? "*" : "") + "Deity{"
 				+ (this.descriptiveName().isPresent() ? "name=\"" + this.descriptiveName().get().getString() + "\""
 						: "id=" + this.uniqueName())
 				+ ",spheres={" + this.spheres().stream().map(ISphere::name).map(Object::toString)

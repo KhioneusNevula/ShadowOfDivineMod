@@ -53,7 +53,7 @@ public record ItemGenreProvider(Optional<HolderSet<Item>> items, ComponentMapPro
 									return DataResult.success(p.items.get());
 								}
 								return DataResult.error(
-										() -> "No point in converting from complex item provider into item set",
+										() -> "No point in converting from complex item block into item set",
 										p.items.get());
 							});
 			Codec<ItemGenreProvider> stackCodec = ItemStack.CODEC
@@ -63,7 +63,7 @@ public record ItemGenreProvider(Optional<HolderSet<Item>> items, ComponentMapPro
 											Map.of()),
 									p.getRarity().ordinal() + 0.0f),
 							(p) -> DataResult
-									.error(() -> "No point in converting from item provider " + p + " to item stack"));
+									.error(() -> "No point in converting from item block " + p + " to item stack"));
 			Codec<ItemGenreProvider> registryOrStackCodec = Codec.either(registryCodec, stackCodec).xmap(Either::unwrap,
 					(s) -> Either.right(s));
 			Codec<ItemGenreProvider> constructionCodec = RecordCodecBuilder

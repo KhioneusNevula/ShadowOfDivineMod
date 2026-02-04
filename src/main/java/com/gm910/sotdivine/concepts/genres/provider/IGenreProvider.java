@@ -12,11 +12,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Rarity;
 
 /**
- * A provider for a specific genre
+ * A block for a specific genre
  * 
- * @param <T> What this provider tests (e.g. a {@link BlockGenreProvider} tests
+ * @param <T> What this block tests (e.g. a {@link BlockGenreProvider} tests
  *            a BlockPos
- * @param <G> What this provider generates (e.g. a {@link BlockGenreProvider}
+ * @param <G> What this block generates (e.g. a {@link BlockGenreProvider}
  *            provides a {@link BlockCreator}
  */
 public interface IGenreProvider<T, G> {
@@ -35,7 +35,17 @@ public interface IGenreProvider<T, G> {
 						(s) -> clazz.isAssignableFrom(s.providerType().providerClass()) ? DataResult.success((T) s)
 								: DataResult
 										.error(() -> "Wrong type of genreProvider: " + s.getClass().getSimpleName()),
-						(s) -> s);
+						(s) -> s)
+				.comapFlatMap((gp) -> {
+					try {
+						gp.providerType();
+					} catch (Exception e) {
+						e.printStackTrace();
+						return DataResult.error(() -> "Provider does not have a valid type: " + gp + "; created error "
+								+ e.getMessage());
+					}
+					return DataResult.success(gp);
+				}, s -> s);
 	}
 
 	/**
@@ -57,7 +67,7 @@ public interface IGenreProvider<T, G> {
 	public boolean matches(ServerLevel level, T instance);
 
 	/**
-	 * Generate an provider of this provider (with an optional prior emanation of
+	 * Generate an block of this block (with an optional prior emanation of
 	 * the given thing, if needed)
 	 * 
 	 * @param level
@@ -67,7 +77,7 @@ public interface IGenreProvider<T, G> {
 	public G generateRandom(ServerLevel level, Optional<T> prior);
 
 	/**
-	 * Returns this provider, but in a more elaborated form
+	 * Returns this block, but in a more elaborated form
 	 * 
 	 * @return
 	 */
@@ -76,14 +86,14 @@ public interface IGenreProvider<T, G> {
 	}
 
 	/**
-	 * Return the type of this provider
+	 * Return the type of this block
 	 * 
 	 * @return
 	 */
 	public ProviderType<? extends IGenreProvider<T, G>> providerType();
 
 	/**
-	 * A rarity metric to determine how hard a genre provider is to obtain. This
+	 * A rarity metric to determine how hard a genre block is to obtain. This
 	 * scale is from 0f (common) to 4f (epic)
 	 */
 	public default float rarity() {
@@ -100,7 +110,7 @@ public interface IGenreProvider<T, G> {
 	}
 
 	/**
-	 * Translates this provider and returns it
+	 * Translates this block and returns it
 	 * 
 	 * @return
 	 */

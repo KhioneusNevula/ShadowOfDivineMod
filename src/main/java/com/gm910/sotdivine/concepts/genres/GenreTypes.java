@@ -19,6 +19,8 @@ import com.gm910.sotdivine.concepts.genres.provider.independent.BlockGenreProvid
 import com.gm910.sotdivine.concepts.genres.provider.independent.EntityGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.independent.IPlaceableGenreProvider;
 import com.gm910.sotdivine.concepts.genres.provider.independent.ItemGenreProvider;
+import com.gm910.sotdivine.dimension.DimensionTheme;
+import com.gm910.sotdivine.dimension.powers.IDimensionPower;
 import com.gm910.sotdivine.util.CodecUtils;
 import com.gm910.sotdivine.util.ModUtils;
 import com.google.common.base.Suppliers;
@@ -31,7 +33,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.registries.DeferredRegister.RegistryHolder;
 import net.minecraftforge.registries.RegistryBuilder;
 
@@ -96,10 +97,18 @@ public class GenreTypes {
 			ProviderType.EQUIPMENT, Range.atLeast(0), false, false);
 
 	/**
-	 * A dimension type that a deity has power in relation to
+	 * Dimension generation settings to create a custom dimension
 	 */
-	public static final GenreType<ResourceKey<DimensionType>> DIMENSION = register(ModUtils.path("dimension"),
-			ResourceKey.class, () -> ResourceKey.codec(Registries.DIMENSION_TYPE), Range.atLeast(0), false, false);
+	public static final GenreType<DimensionTheme> DIMENSION_THEME = register(ModUtils.path("dimension_theme"),
+			DimensionTheme.class, () -> DimensionTheme.CODEC, Range.atLeast(0), false, false,
+			() -> DimensionTheme.NETWORK_CODEC);
+
+	/**
+	 * Dimension property give a custom dimension special effects
+	 */
+	public static final GenreType<IDimensionPower> DIMENSION_POWER = register(ModUtils.path("dimension_power"),
+			IDimensionPower.class, () -> IDimensionPower.codec(), Range.atLeast(0), false, false,
+			() -> IDimensionPower.codec());
 
 	/**
 	 * A biome that a deity has power in relation to
@@ -134,7 +143,7 @@ public class GenreTypes {
 			Range<Integer> amountPermitted, boolean give, boolean place) {
 		LogUtils.getLogger().debug("Registering genre type " + id);// + " to registry " + SOTDMod.GENRE_TYPES);
 		var gen = new GenreType<T>(id, provider.providerClass(), () -> provider.codec().get(), amountPermitted, give,
-				place);
+				place, () -> provider.codec().get());
 		GENRES.put(id, gen);
 		SOTDMod.GENRE_TYPES.register(id.getPath(), () -> gen);
 		return gen;
@@ -153,10 +162,27 @@ public class GenreTypes {
 			Collection<ProviderType<? extends T>> provider, Class<? super T> clazz, Range<Integer> amountPermitted,
 			boolean give, boolean place) {
 		LogUtils.getLogger().debug("Registering genre type " + id);// + " to registry " + SOTDMod.GENRE_TYPES);
+		Supplier<Codec<T>> codigo = () -> CodecUtils
+				.multiCodecEither(provider.stream().map((s) -> s.codec().get()).iterator());
+		var gen = new GenreType<T>(id, clazz, codigo, amountPermitted, give, place, codigo);
+		GENRES.put(id, gen);
+		SOTDMod.GENRE_TYPES.register(id.getPath(), () -> gen);
+		return gen;
+	}
 
-		var gen = new GenreType<T>(id, clazz,
-				() -> CodecUtils.multiCodecEither(provider.stream().map((s) -> s.codec().get()).iterator()),
-				amountPermitted, give, place);
+	/**
+	 * Register a genre
+	 * 
+	 * @param <T>
+	 * @param id
+	 * @param sphere
+	 * @return
+	 */
+
+	public static <T> GenreType<T> register(ResourceLocation id, Class<? super T> clazz, Supplier<Codec<T>> codec,
+			Range<Integer> amountPermitted, boolean give, boolean place, Supplier<Codec<T>> networkCodec) {
+		LogUtils.getLogger().debug("Registering genre type " + id);// + " to registry " + SOTDMod.GENRE_TYPES);
+		var gen = new GenreType<T>(id, clazz, codec, amountPermitted, give, place, networkCodec);
 		GENRES.put(id, gen);
 		SOTDMod.GENRE_TYPES.register(id.getPath(), () -> gen);
 		return gen;
@@ -174,7 +200,7 @@ public class GenreTypes {
 	public static <T> GenreType<T> register(ResourceLocation id, Class<? super T> clazz, Supplier<Codec<T>> codec,
 			Range<Integer> amountPermitted, boolean give, boolean place) {
 		LogUtils.getLogger().debug("Registering genre type " + id);// + " to registry " + SOTDMod.GENRE_TYPES);
-		var gen = new GenreType<T>(id, clazz, codec, amountPermitted, give, place);
+		var gen = new GenreType<T>(id, clazz, codec, amountPermitted, give, place, codec);
 		GENRES.put(id, gen);
 		SOTDMod.GENRE_TYPES.register(id.getPath(), () -> gen);
 		return gen;
@@ -221,12 +247,13 @@ public class GenreTypes {
 		private Supplier<Codec<T>> codec;
 		private Supplier<Codec<Collection<T>>> setCodec;
 		private Supplier<Codec<Collection<?>>> setCodec2;
+		private Supplier<Codec<Collection<?>>> setCodecN;
 		private Range<Integer> ap;
 		private boolean giveable;
 		private boolean placeable;
 
 		GenreType(ResourceLocation name, Class<? super T> clazz, Supplier<Codec<T>> codec,
-				Range<Integer> amountPermitted, boolean giveable, boolean placeable) {
+				Range<Integer> amountPermitted, boolean giveable, boolean placeable, Supplier<Codec<T>> networkCodec) {
 			this.name = name;
 			this.clazz = clazz;
 			this.codec = Suppliers.memoize(codec::get);
@@ -234,6 +261,8 @@ public class GenreTypes {
 			this.setCodec = Suppliers
 					.memoize(() -> Codec.list(this.codec.get()).xmap((l) -> new HashSet<>(l), ArrayList::new));
 			this.setCodec2 = Suppliers.memoize(() -> Codec.list(this.codec.get()).xmap((l) -> new HashSet<>(l),
+					(b) -> b.stream().map((x) -> (T) x).toList()));
+			this.setCodecN = Suppliers.memoize(() -> Codec.list(networkCodec.get()).xmap((l) -> new HashSet<>(l),
 					(b) -> b.stream().map((x) -> (T) x).toList()));
 			this.giveable = giveable;
 			this.placeable = placeable;
@@ -272,6 +301,11 @@ public class GenreTypes {
 		@Override
 		public Codec<Collection<?>> typelessGenreSetCodec() {
 			return this.setCodec2.get();
+		}
+
+		@Override
+		public Codec<Collection<?>> typelessGenreSetNetworkCodec() {
+			return this.setCodecN.get();
 		}
 
 		@Override

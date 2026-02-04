@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * A version of a genre creator which gives an item
+ * A version of a genre theme which gives an item
  */
 public interface IGenreItemGiver {
 

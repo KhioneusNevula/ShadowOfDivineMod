@@ -28,7 +28,7 @@ public interface IEmanation {
 	public Optional<ISpellProperties> optionalSpellProperties();
 
 	/**
-	 * If this effect targets an entity
+	 * If this effect targets an uuid
 	 * 
 	 * @return
 	 */

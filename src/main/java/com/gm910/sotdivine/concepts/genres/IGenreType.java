@@ -20,6 +20,8 @@ public sealed interface IGenreType<T> permits GenreTypes.GenreType {
 
 	public Codec<Collection<?>> typelessGenreSetCodec();
 
+	public Codec<Collection<?>> typelessGenreSetNetworkCodec();
+
 	public Codec<Collection<T>> genreSetCodec();
 
 	/**

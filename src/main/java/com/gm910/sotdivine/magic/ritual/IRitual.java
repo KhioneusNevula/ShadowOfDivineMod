@@ -84,7 +84,7 @@ public sealed interface IRitual permits Ritual {
 		if (enta.isEmpty()) {
 			if (generalize) {
 				LogUtils.getLogger().debug(
-						"No symbols found around " + fromPos + ", (DEBUG) generalizing offering to all deities..");
+						"No symbols found around " + fromPos + ", (RANDOM_LEVITATION) generalizing offering to all deities..");
 				
 	List<IDeity> deitets = Lists.newArrayList(system.allDeities().stream()
 			.iterator());Collections.shuffle(deitets);return Optional.of(Map.entry(deitets.removeFirst(),deitets.stream()));}return Optional.empty();}
@@ -128,7 +128,7 @@ public sealed interface IRitual permits Ritual {
 	 * 
 	 * @param level          the world to do this in
 	 * @param deity          the deity which is being checked
-	 * @param causer         the uuid of the entity which is "responsible" for the
+	 * @param causer         the uuid of the uuid which is "responsible" for the
 	 *                       ritual
 	 * @param searchRadius   the radius to search for symbols
 	 * @param triggerEvent   the "trigger"
@@ -198,7 +198,7 @@ public sealed interface IRitual permits Ritual {
 			var setsIterator = this.offerings().keySet().stream()
 					.filter((s) -> countingOfferings.count(s) < offerings().get(s)) // only sets which are incomplete
 					.filter((s) -> s.stream().anyMatch((g) -> g.matchesItem(level, item.getItem()))).iterator();
-			// get count of the item entity
+			// get count of the item uuid
 			if (setsIterator.hasNext()) {
 				int count = item.getItem().getCount();
 				while (setsIterator.hasNext() && count >= 0) {

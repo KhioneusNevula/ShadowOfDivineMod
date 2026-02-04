@@ -95,10 +95,10 @@ public record EntityGenreProvider(EntityTypeProvider entityType, Collection<MobE
 							return DataResult.success(eg.entityType.entityType().get());
 						}
 						if (eg.entityType.entityType().isEmpty()) {
-							return DataResult.error(() -> "Doesn't make sense to serialize with no actual entity type");
+							return DataResult.error(() -> "Doesn't make sense to serialize with no actual uuid type");
 						}
 						return DataResult.error(
-								() -> "Doesn't make sense to serialize only one aspect of complex entity provider",
+								() -> "Doesn't make sense to serialize only one aspect of complex uuid block",
 								eg.entityType.entityType().get());
 					});
 			Codec<EntityGenreProvider> construction = Codec.recursive("EntityGenreProvider",
@@ -206,7 +206,7 @@ public record EntityGenreProvider(EntityTypeProvider entityType, Collection<MobE
 		var listet = Lists.newArrayList(stream.iterator());
 		Collections.shuffle(listet);
 		if (listet.isEmpty()) {
-			throw new IllegalStateException("Bad provider could not produce shi-- " + this.report());
+			throw new IllegalStateException("Bad block could not produce shi-- " + this.report());
 		}
 		EntityType<?> type = listet.getFirst();
 		Consumer<? extends Entity> consumer = (e) -> {

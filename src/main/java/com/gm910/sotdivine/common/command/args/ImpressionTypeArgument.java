@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import com.gm910.sotdivine.magic.impression.ImpressionType;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.util.TextUtils;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

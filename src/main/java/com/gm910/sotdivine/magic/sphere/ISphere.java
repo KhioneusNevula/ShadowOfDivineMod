@@ -2,6 +2,7 @@ package com.gm910.sotdivine.magic.sphere;
 
 import java.util.Collection;
 
+import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.genres.GenreTypes;
 import com.gm910.sotdivine.concepts.genres.IGenreType;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;

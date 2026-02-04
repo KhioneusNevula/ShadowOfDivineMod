@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.common.command.args.GenrePlacementMapArgument;
 import com.gm910.sotdivine.common.command.args.GenreProviderArgument;
 import com.gm910.sotdivine.common.command.args.ImpressionTypeArgument;
@@ -34,8 +33,14 @@ import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
+import com.gm910.sotdivine.magic.afterlife.ISoulState;
+import com.gm910.sotdivine.magic.afterlife.ISoulState.LifeState;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;
 import com.gm910.sotdivine.magic.emanation.IEmanation;
+import com.gm910.sotdivine.magic.impression.IImpression;
+import com.gm910.sotdivine.magic.impression.ImpressionType;
+import com.gm910.sotdivine.magic.impression.cap.IMindsEye;
+import com.gm910.sotdivine.magic.impression.cap.ImpressionTimetracker;
 import com.gm910.sotdivine.magic.ritual.IRitual;
 import com.gm910.sotdivine.magic.ritual.emanate.RitualEffectType;
 import com.gm910.sotdivine.magic.ritual.emanate.RitualEmanationTargeter;
@@ -45,12 +50,9 @@ import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.ritual.properties.RitualQuality;
 import com.gm910.sotdivine.magic.ritual.properties.RitualType;
 import com.gm910.sotdivine.magic.sphere.ISphere;
-import com.gm910.sotdivine.magic.theophany.cap.IMind;
-import com.gm910.sotdivine.magic.theophany.cap.ImpressionTimetracker;
-import com.gm910.sotdivine.magic.theophany.impression.IImpression;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.util.CollectionUtils;
 import com.gm910.sotdivine.util.TextUtils;
+import com.gm910.sotdivine.util.WorldUtils;
 import com.gm910.sotdivine.villagers.ModBrainElements.MemoryModuleTypes;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.Command;
@@ -58,6 +60,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.logging.LogUtils;
 
@@ -66,7 +69,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.NbtTagArgument;
-import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -74,7 +76,6 @@ import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -124,6 +125,10 @@ public class SOTDInfoCommand {
 			p_308764_ -> TextUtils.transPrefix("cmd.genre.fail_give", p_308764_));
 	private static final DynamicCommandExceptionType ERROR_FAILED_PLACE = new DynamicCommandExceptionType(
 			p_308764_ -> TextUtils.transPrefix("cmd.genre.fail_place", p_308764_));
+	private static final Dynamic2CommandExceptionType ERROR_CANNOT_POSSESS = new Dynamic2CommandExceptionType(
+			(a, b) -> TextUtils.transPrefix("cmd.possess.cannot", a, b));
+	private static final DynamicCommandExceptionType ERROR_SOULLESS = new DynamicCommandExceptionType(
+			(a) -> TextUtils.transPrefix("cmd.soul.none", a));
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
 
@@ -208,38 +213,33 @@ public class SOTDInfoCommand {
 														DeityArgument.ERROR_DEITY_INVALID),
 												stack.getArgument("type", RitualType.class),
 												stack.getArgument("$quality", RitualQuality.class)))))
-						.then(Commands.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
+						.then(Commands.argument("quality", EnumArgument.enumArgument(RitualQuality.class))
 								.executes(stack -> listRituals(stack,
 										DeityArgument.getDeity(stack, "deity", DeityArgument.ERROR_DEITY_INVALID), null,
-										stack.getArgument("$quality", RitualQuality.class)))
+										stack.getArgument("quality", RitualQuality.class)))
 								.then(Commands.argument("type", EnumArgument.enumArgument(RitualType.class))
 										.executes(stack -> listRituals(stack,
 												DeityArgument.getDeity(stack, "deity",
 														DeityArgument.ERROR_DEITY_INVALID),
 												stack.getArgument("type", RitualType.class),
-												stack.getArgument("$quality", RitualQuality.class)))))))
+												stack.getArgument("quality", RitualQuality.class)))))))
 						.then(Commands.literal("start"))
-						.then(Commands.literal("place").then(Commands.argument("deity", DeityArgument.argument())
-								.then(Commands.argument("type", EnumArgument.enumArgument(RitualType.class))
-										.then(Commands
-												.argument("$quality", EnumArgument.enumArgument(RitualQuality.class))
-												.then(Commands.argument("pos", BlockPosArgument.blockPos())
-														.executes(stack -> placeRitual(stack,
-																BlockPosArgument.getBlockPos(stack, "pos"),
-																DeityArgument.getDeity(stack, "deity",
-																		DeityArgument.ERROR_DEITY_INVALID),
-																stack.getArgument("type", RitualType.class),
-																stack.getArgument("$quality", RitualQuality.class),
-																false))
-														.then(Commands.literal("spawn_offerings")
-																.executes(stack -> placeRitual(stack,
-																		BlockPosArgument.getBlockPos(stack, "pos"),
-																		DeityArgument.getDeity(stack, "deity",
-																				DeityArgument.ERROR_DEITY_INVALID),
-																		stack.getArgument("type", RitualType.class),
-																		stack.getArgument("$quality",
-																				RitualQuality.class),
-																		true)))))))))
+						.then(Commands.literal("place").then(Commands.argument("deity", DeityArgument.argument()).then(
+								Commands.argument("type", EnumArgument.enumArgument(RitualType.class)).then(Commands
+										.argument("quality", EnumArgument.enumArgument(RitualQuality.class))
+										.then(Commands.argument("pos", BlockPosArgument.blockPos())
+												.executes(stack -> placeRitual(stack,
+														BlockPosArgument.getBlockPos(stack, "pos"),
+														DeityArgument.getDeity(stack, "deity",
+																DeityArgument.ERROR_DEITY_INVALID),
+														stack.getArgument("type", RitualType.class),
+														stack.getArgument("quality", RitualQuality.class), false))
+												.then(Commands.literal("spawn_offerings").executes(stack -> placeRitual(
+														stack, BlockPosArgument.getBlockPos(stack, "pos"),
+														DeityArgument.getDeity(stack, "deity",
+																DeityArgument.ERROR_DEITY_INVALID),
+														stack.getArgument("type", RitualType.class),
+														stack.getArgument("quality", RitualQuality.class), true)))))))))
 				.then(Commands.literal("emanation").then(Commands.literal("list").then(Commands
 						.argument("sphere", SphereArgument.argument())
 						.then(Commands.argument("type", EnumArgument.enumArgument(DeityInteractionType.class))
@@ -296,7 +296,101 @@ public class SOTDInfoCommand {
 														IntegerArgumentType.getInteger(stack, "duration"),
 														DeityArgument.getDeity(stack, "deity", ERROR_ENTITY_INVALID),
 														NbtTagArgument.getNbtTag(stack,
-																"impression definition")))))))))));
+																"impression definition"))))))))))
+				.then(Commands.literal("afterlife")
+						.then(Commands.literal("soul").then(Commands.argument("owner", EntityArgument.entity())
+								.then(Commands.literal("query_state").executes(stack -> {
+									var entity = EntityArgument.getEntity(stack, "owner");
+									if (entity instanceof LivingEntity liven) {
+										stack.getSource().sendSystemMessage(Component.translatable(
+												"sotd.cmd.lifestate.query",
+												Component.translatable("sotd.cmd.lifestate.name."
+														+ ISoulState.get(liven).getLifeState().name().toLowerCase()),
+												liven.getDisplayName()));
+										return Command.SINGLE_SUCCESS;
+									} else {
+										throw ERROR_SOULLESS.create(entity);
+									}
+								}))
+								.then(Commands.literal("change_state")
+										.then(Commands.argument("state", EnumArgument.enumArgument(LifeState.class))
+												.executes(stack -> {
+													var entity = EntityArgument.getEntity(stack, "owner");
+													var state = stack.getArgument("state", LifeState.class);
+													if (entity instanceof LivingEntity liven) {
+														ISoulState.get(liven).changeState(state);
+														stack.getSource().sendSystemMessage(Component.translatable(
+																"sotd.cmd.lifestate.change",
+																Component.translatable(
+																		"sotd.cmd.lifestate.name." + state.name()),
+																liven.getDisplayName()));
+														return Command.SINGLE_SUCCESS;
+													} else {
+														throw ERROR_SOULLESS.create(entity);
+													}
+												}))))))
+				.then(Commands.literal("possession")
+						.then(Commands.literal("start").then(Commands.argument("possessor", EntityArgument.entity())
+								.then(Commands.argument("possessee", EntityArgument.entity()).executes(stack -> {
+									var e1 = EntityArgument.getEntity(stack, "possessor");
+									var e2 = EntityArgument.getEntity(stack, "possessee");
+									if (e1 instanceof LivingEntity posor && e2 instanceof LivingEntity pose) {
+										ISoulState.get(posor).possess(pose);
+										stack.getSource()
+												.sendSystemMessage(Component.translatable("sotd.cmd.start.possess",
+														posor.getDisplayName(), pose.getDisplayName()));
+										return Command.SINGLE_SUCCESS;
+									} else {
+										throw ERROR_CANNOT_POSSESS.create(e1, e2);
+									}
+								}))))
+						.then(Commands.literal("remove").then(Commands.literal("possessor")
+								.then(Commands.argument("of", EntityArgument.entities()).executes(stack -> {
+									var entities = EntityArgument.getEntities(stack, "of");
+									boolean printAll = entities.size() <= 5;
+									int count = 0;
+									for (var e : entities) {
+										if (e instanceof LivingEntity liven) {
+											var eref = ISoulState.get(liven).removePossessor();
+											if (eref != null && printAll && eref.getExistingEntity(liven.getServer())
+													.orElse(null) instanceof LivingEntity en) {
+												stack.getSource().sendSystemMessage(
+														Component.translatable("sotd.cmd.remove.possessor",
+																e.getDisplayName(), en.getDisplayName()));
+											}
+											count++;
+										}
+									}
+									if (!printAll) {
+										stack.getSource().sendSystemMessage(
+												Component.translatable("sotd.cmd.remove.possessors", count));
+									}
+									return Command.SINGLE_SUCCESS;
+								}))).then(Commands.literal("possessee")
+										.then(Commands.argument("of", EntityArgument.entities()).executes(stack -> {
+											var entities = EntityArgument.getEntities(stack, "of");
+											boolean printAll = entities.size() <= 5;
+											int count = 0;
+											for (var e : entities) {
+												if (e instanceof LivingEntity liven) {
+													var eref = ISoulState.get(liven).removePossessee();
+													if (eref != null && printAll
+															&& eref.getExistingEntity(liven.getServer())
+																	.orElse(null) instanceof LivingEntity en) {
+														stack.getSource()
+																.sendSystemMessage(Component.translatable(
+																		"sotd.cmd.remove.possessee", e.getDisplayName(),
+																		en.getDisplayName()));
+													}
+													count++;
+												}
+											}
+											if (!printAll) {
+												stack.getSource().sendSystemMessage(
+														Component.translatable("sotd.cmd.remove.possessees", count));
+											}
+											return Command.SINGLE_SUCCESS;
+										}))))));
 	}
 
 	private static int giveImpression(CommandContext<CommandSourceStack> stack, Collection<ServerPlayer> players,
@@ -313,7 +407,7 @@ public class SOTDInfoCommand {
 				}
 				imp = res.result().get().getFirst();
 			}
-			IMind.get(player).addImpression(imp,
+			IMindsEye.get(player).addImpression(imp,
 					new ImpressionTimetracker(dei.uniqueName(), player.level().getGameTime(), duration));
 		}
 		return Command.SINGLE_SUCCESS;
@@ -522,7 +616,7 @@ public class SOTDInfoCommand {
 			Collection<ServerPlayer> players, IGiveableGenreProvider<?, T> argument) throws CommandSyntaxException {
 		LogUtils.getLogger().debug("Attempting to give player(s) item from genre " + argument);
 		T obtained = argument.generateRandom(context.getSource().getLevel(), Optional.empty());
-		LogUtils.getLogger().debug("Obtained creator/stack " + obtained);
+		LogUtils.getLogger().debug("Obtained theme/stack " + obtained);
 
 		ItemStack stack;
 		try {

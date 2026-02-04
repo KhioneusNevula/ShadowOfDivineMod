@@ -13,8 +13,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.server.level.ServerLevel;
 
 /**
- * An emanation emanation. Emanation instances are considered identical if they
- * have the same emanation and SPELL properties. Otherwise, they are not.
+ * An instance of an emanation affecting the world. Emanation instances are
+ * considered identical if they have the same power and SPELL properties.
+ * Otherwise, they are not.
  */
 public class EmanationInstance {
 
@@ -37,8 +38,8 @@ public class EmanationInstance {
 	 */
 	public IEmanationInstanceData extraData;
 
-	public EmanationInstance(IEmanation emanation, ISpellTargetInfo target, int ticks,
-			Optional<IEmanationInstanceData> dat, float intensity) {
+	public EmanationInstance(IEmanation emanation, ISpellTargetInfo target, int ticks, Optional<IEmanationInstanceData> dat,
+			float intensity) {
 		this(emanation, target, ticks, intensity);
 		this.extraData = dat.orElse(null);
 	}

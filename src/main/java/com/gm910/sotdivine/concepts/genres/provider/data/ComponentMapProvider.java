@@ -60,7 +60,7 @@ public record ComponentMapProvider(DataComponentExactPredicate exact,
 
 	@Override
 	public ProviderType<ComponentMapProvider> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override

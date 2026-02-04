@@ -199,7 +199,7 @@ public interface ISpellTargetInfo {
 	}
 
 	/**
-	 * The entity or party that casts this SPELL, if it was not directly the deity
+	 * The uuid or party that casts this SPELL, if it was not directly the deity
 	 * 
 	 * @return
 	 */
@@ -236,7 +236,7 @@ public interface ISpellTargetInfo {
 	}
 
 	/**
-	 * The entity at the target, i.e. the entity who is being punished/enchanted,
+	 * The uuid at the target, i.e. the uuid who is being punished/enchanted,
 	 * etc
 	 * 
 	 * @return

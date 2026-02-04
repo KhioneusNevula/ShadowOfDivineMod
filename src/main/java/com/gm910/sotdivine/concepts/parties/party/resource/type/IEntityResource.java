@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 
 /**
- * A resource which is an entire entity, or class of entities
+ * A resource which is an entire uuid, or class of entities
  * 
  * @author borah
  *
@@ -16,14 +16,14 @@ import net.minecraft.world.entity.EntityType;
 public interface IEntityResource extends IPartyResource {
 
 	/**
-	 * The type of this entity
+	 * The type of this uuid
 	 * 
 	 * @return
 	 */
 	public EntityType<?> entityType();
 
 	/**
-	 * The data of this entity, or empty if it is just the class of entity
+	 * The data of this uuid, or empty if it is just the class of uuid
 	 * 
 	 * @return
 	 */

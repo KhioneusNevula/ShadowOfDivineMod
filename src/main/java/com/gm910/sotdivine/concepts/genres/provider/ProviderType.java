@@ -12,11 +12,12 @@ import com.gm910.sotdivine.concepts.genres.provider.independent.EntityGenreProvi
 import com.gm910.sotdivine.concepts.genres.provider.independent.ItemGenreProvider;
 import com.google.common.base.Supplier;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * A provider type (this class exists for encoding/decoding purposes)
+ * A block type (this class exists for encoding/decoding purposes)
  * 
  * @param <T>
  */
@@ -34,7 +35,7 @@ public record ProviderType<T extends IGenreProvider<?, ?>>(ResourceLocation path
 	 * Provider type for entities
 	 */
 	public static final ProviderType<EntityGenreProvider> ENTITY = ProviderType.register(
-			ResourceLocation.withDefaultNamespace("entity"), EntityGenreProvider.class,
+			ResourceLocation.withDefaultNamespace("uuid"), EntityGenreProvider.class,
 			() -> EntityGenreProvider.codec());
 	/**
 	 * Provider type for blocks
@@ -73,7 +74,7 @@ public record ProviderType<T extends IGenreProvider<?, ?>>(ResourceLocation path
 	}
 
 	/**
-	 * Register a new provider type
+	 * Register a new block type
 	 * 
 	 * @param <A>
 	 * @param <B>

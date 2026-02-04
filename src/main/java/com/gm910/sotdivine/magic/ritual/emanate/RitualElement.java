@@ -11,10 +11,10 @@ public enum RitualElement {
 	CENTER,
 	/** Random positions in the region of the ritual */
 	AREA_RANDOM,
-	/** An item being offered, or an entity being sacrificed */
+	/** An item being offered, or an uuid being sacrificed */
 	OFFERING,
 	/**
-	 * An entity or rawPosition which is designated the target of the ritual's
+	 * An uuid or rawPosition which is designated the target of the ritual's
 	 * effect; defaults to the caster
 	 */
 	TARGET;

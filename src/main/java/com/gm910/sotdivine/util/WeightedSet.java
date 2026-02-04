@@ -9,12 +9,14 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.stream.Streams;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 
 import net.minecraft.util.RandomSource;
 
@@ -47,7 +49,33 @@ public class WeightedSet<K> implements Set<K> {
 	}
 
 	/**
-	 * Returns a weighted set which is a representational entity which stores
+	 * Creates a weighted set generated from a multiset
+	 * 
+	 * @param <K>
+	 * @param multiset
+	 * @param frequencyToWeight
+	 * @return
+	 */
+	public static <K> WeightedSet<K> fromMultiset(Multiset<? extends K> multiset,
+			IntFunction<? extends Number> frequencyToWeight) {
+		return new WeightedSet<>(multiset, (s) -> frequencyToWeight.apply(multiset.count(s)));
+	}
+
+	/**
+	 * Creates a weighted set representing a multiset
+	 * 
+	 * @param <K>
+	 * @param multiset
+	 * @param frequencyToWeight
+	 * @return
+	 */
+	public static <K> WeightedSet<K> representMultiset(Multiset<? extends K> multiset,
+			IntFunction<? extends Number> frequencyToWeight) {
+		return representation(multiset, (s) -> frequencyToWeight.apply(multiset.count(s)));
+	}
+
+	/**
+	 * Returns a weighted set which is a representational uuid which stores
 	 * nothing, only represents a backing collection
 	 * 
 	 * @param <K>
@@ -61,7 +89,7 @@ public class WeightedSet<K> implements Set<K> {
 	}
 
 	/**
-	 * Returns a weighted set which is a representational entity which stores
+	 * Returns a weighted set which is a representational uuid which stores
 	 * nothing, only represents a backing collection, with everything having a
 	 * weight of 1.0f
 	 * 

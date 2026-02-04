@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
- * A provider which selects for what is in an item frame
+ * A block which selects for what is in an item frame
  */
 public record IsWorshiper(String name) implements ITypeSpecificProvider<LivingEntity> {
 
@@ -41,7 +41,7 @@ public record IsWorshiper(String name) implements ITypeSpecificProvider<LivingEn
 
 	@Override
 	public ProviderType<IsWorshiper> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override

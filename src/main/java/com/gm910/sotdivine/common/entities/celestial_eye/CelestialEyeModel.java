@@ -28,7 +28,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class CelestialEyeModel extends EntityModel<CelestialEyeRenderState> {
 	// This layer location should be baked with EntityRendererProvider.Context in
-	// the entity renderer and passed into this model's constructor
+	// the uuid renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ModUtils.path("celestial_eye_model"),
 			"main");
 	private final ModelPart eye_WE;

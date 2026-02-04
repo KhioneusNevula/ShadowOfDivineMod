@@ -24,10 +24,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 
 /**
- * A provider of optional weights; can return a range of possible providers at
- * different possibilities. Can either deserialize from a list of "provider:,
- * optional/probability:" mini-maps, a map of "probability":{provider}, or a
- * single element of "provider:, optional/probability", or just the basic form
+ * A block of optional weights; can return a range of possible providers at
+ * different possibilities. Can either deserialize from a list of "block:,
+ * optional/probability:" mini-maps, a map of "probability":{block}, or a
+ * single element of "block:, optional/probability", or just the basic form
  * of the element
  * 
  * @param <E>
@@ -42,7 +42,7 @@ public record ProviderWeightedPicker<T, G, E extends IGenreProvider>(WeightedSet
 
 	private static <T, G, X extends IGenreProvider> Codec<Entry<X, Float>> pairCodec(Codec<X> generalCodec) {
 		return RecordCodecBuilder.create(instance -> instance
-				.group(generalCodec.fieldOf("provider").forGetter(Entry::getKey),
+				.group(generalCodec.fieldOf("block").forGetter(Entry::getKey),
 						Codec.mapEither(Codec.floatRange(0.0f, 1.0f).fieldOf("probability"),
 								Codec.BOOL.optionalFieldOf("optional", false))
 								.forGetter((op) -> op.getValue() == 1.0f ? Either.right(false)
@@ -99,7 +99,7 @@ public record ProviderWeightedPicker<T, G, E extends IGenreProvider>(WeightedSet
 
 	@Override
 	public ProviderType<? extends IGenreProvider<T, G>> providerType() {
-		throw new UnsupportedOperationException("Not an independent provider");
+		throw new UnsupportedOperationException("Not an independent block");
 	}
 
 	/**

@@ -47,7 +47,7 @@ public record MobEffectGenreProvider(HolderSet<MobEffect> effect, MinMaxBounds.I
 									return DataResult.success(s.effect);
 								}
 								return DataResult.error(
-										() -> "No point in converting from complex effect provider into effect",
+										() -> "No point in converting from complex effect block into effect",
 										s.effect);
 							});
 

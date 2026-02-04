@@ -13,26 +13,36 @@ public class FieldUtils {
 	}
 
 	/**
-	 * Gets a field given a name from the given object
+	 * Gets a field given a name from the given object. If the field is not found in
+	 * this object, it searches up the hierarchy; hence, this method can be slow
 	 * 
 	 * @param clazz
 	 * @param name
 	 * @param obfName
 	 */
-	public static <R> R getInstanceField(String name, Object object) {
-		return FieldUtils.getInstanceField(name, name, object);
+	public static <R> R getInstanceFieldOfThisOrSupertype(String name, Object object) {
+		return FieldUtils.getInstanceFieldOfThisOrSupertype(name, name, object);
 	}
 
 	/**
-	 * Gets a field given a name and obfuscated name
+	 * Gets a field given a name and obfuscated name. If the field is not found in
+	 * this object, it searches up the hierarchy; hence, this method can be slow
 	 * 
 	 * @param clazz
 	 * @param name
 	 * @param obfName
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <R> R getInstanceField(String name, String obfName, Object object) {
-		return (R) FieldUtils.getField((Class) object.getClass(), name, obfName, object);
+	public static <R> R getInstanceFieldOfThisOrSupertype(String name, String obfName, Object object) {
+		Class<? super R> clazz = (Class<? super R>) object.getClass();
+		while (clazz != null) {
+			try {
+				return (R) FieldUtils.getField((Class) object.getClass(), name, obfName, object);
+			} catch (Exception e) {
+				clazz = clazz.getSuperclass();
+			}
+		}
+		throw new RuntimeException(new NoSuchFieldException(name + " / " + obfName));
 	}
 
 	/**
@@ -95,8 +105,8 @@ public class FieldUtils {
 	 * @param object
 	 * @param value
 	 */
-	public static <T> void setInstanceField(String name, Object object, T value) {
-		FieldUtils.setInstanceField(name, name, object, value);
+	public static <T> void setInstanceFieldOfExactType(String name, Object object, T value) {
+		FieldUtils.setInstanceFieldOfExactType(name, name, object, value);
 	}
 
 	/**
@@ -108,7 +118,7 @@ public class FieldUtils {
 	 * @param value
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> void setInstanceField(String name, String obfName, Object object, T value) {
+	public static <T> void setInstanceFieldOfExactType(String name, String obfName, Object object, T value) {
 		FieldUtils.setField((Class) object.getClass(), name, obfName, object, value);
 	}
 

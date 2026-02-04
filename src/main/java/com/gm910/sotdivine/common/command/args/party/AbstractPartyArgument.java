@@ -83,7 +83,7 @@ class AbstractPartyArgument implements ArgumentType<IPartyInfo> {
 			builder.suggest(party.uniqueName(), party.descriptiveName().orElse(TextUtils.literal("deity")));
 		} else {
 			builder.suggest(party.uniqueName(), party.descriptiveName()
-					.orElse(TextUtils.literal(party.isGroup() ? "group" : (party.isEntity() ? "entity" : "unknown"))));
+					.orElse(TextUtils.literal(party.isGroup() ? "group" : (party.isEntity() ? "uuid" : "unknown"))));
 		}
 		builder.suggest("\"" + party.descriptiveName().map(Component::getString).orElse(party.uniqueName()) + "\"");
 	}

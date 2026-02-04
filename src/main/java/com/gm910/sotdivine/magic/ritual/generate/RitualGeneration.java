@@ -42,6 +42,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -141,7 +142,7 @@ public class RitualGeneration {
 	 * @return
 	 */
 	public static Map<Set<? extends IGiveableGenreProvider<?, ?>>, Integer> makeOfferings(RitualType type,
-			RitualQuality quality, ServerLevel level, IDeity deity) {
+			RitualQuality quality, RandomSource random, IDeity deity) {
 		if (type == RitualType.VENERATION) {
 			return Map.of(deity.spheres().stream().flatMap((s) -> s.getGenres(GenreTypes.OFFERING).stream())
 					.collect(Collectors.toUnmodifiableSet()), quality.offeringsNeeded);
@@ -152,7 +153,7 @@ public class RitualGeneration {
 		final int maxGenresAllowed_TODO = 2; // TODO determine whether offerings should be individual genres or not
 		do {
 			numPortion = quality.offeringsNeeded - cumulative == 1 ? 1
-					: level.random.nextIntBetweenInclusive(1, quality.offeringsNeeded - cumulative);
+					: random.nextIntBetweenInclusive(1, quality.offeringsNeeded - cumulative);
 			cumulative += numPortion;
 			Set<? extends IGiveableGenreProvider<?, ?>> genSet = Set.of();
 			for (int i = 0; i < 10 && genSet.isEmpty(); i++) {
@@ -165,7 +166,7 @@ public class RitualGeneration {
 				}
 				Collections.shuffle(genPoss);
 				genSet = ImmutableSet.copyOf(genPoss.stream()
-						.limit(level.random.nextIntBetweenInclusive(1, maxGenresAllowed_TODO)).distinct().iterator());
+						.limit(random.nextIntBetweenInclusive(1, maxGenresAllowed_TODO)).distinct().iterator());
 			}
 			if (!genSet.isEmpty())
 				map.put(genSet, numPortion);
@@ -181,7 +182,7 @@ public class RitualGeneration {
 	 * @param ford
 	 * @return
 	 */
-	public static Collection<IRitual> generateRituals(ServerLevel level, IDeity ford) {
+	public static Collection<IRitual> generateRituals(ServerLevel level, IDeity ford, RandomSource random) {
 		Set<IRitual> rituals = new HashSet<>();
 		List<RitualType> typesShuffled = Arrays.asList(RitualType.values());
 		List<RitualQuality> qualitiesShuffled = Arrays.asList(RitualQuality.values());
@@ -190,8 +191,7 @@ public class RitualGeneration {
 		for (RitualType type : typesShuffled) {
 			for (RitualQuality quality : qualitiesShuffled) {
 				final int max = 5;
-				int tries = (type != RitualType.SPELL)
-						? Math.min(level.random.nextInt(1, max), level.random.nextInt(1, max))
+				int tries = (type != RitualType.SPELL) ? Math.min(random.nextInt(1, max), random.nextInt(1, max))
 						: (int) (ford.spheres().stream()
 								.flatMap((s) -> s.emanationsOfType(DeityInteractionType.SPELL).stream())
 								.filter((s) -> s.optionalSpellProperties().isEmpty() ? true
@@ -201,7 +201,7 @@ public class RitualGeneration {
 				LinkedHashMap<String, IncompleteRitual> failedPhases = new LinkedHashMap<>();
 				rgenTriesLoop: for (int i = 0; i < tries; i++) {
 					if (!madeARitual) {
-						tries += level.random.nextInt(0, 2); // optionally add up to two extra iterations on fails
+						tries += random.nextInt(0, 2); // optionally add up to two extra iterations on fails
 						if (tries >= max * 3)
 							break;
 					} else {
@@ -209,19 +209,17 @@ public class RitualGeneration {
 					}
 
 					IncompleteRitual gen = IncompleteRitual.phase1Effects(level, ford, type, quality);
-					var effects = RitualEmanationTargeter.createRitualEmanations(type, quality, level, ford, rituals);
+					var effects = RitualEmanationTargeter.createRitualEmanations(type, quality, random, ford, rituals);
 					if (effects == null) {
 						failedPhases.put("creating_emanations", gen);
 						continue;
 					}
 					gen = IncompleteRitual.phase2Pattern(gen, effects);
 					for (int rp = 0; rp < 7; rp++) {
-						IRitualPattern patternm = RitualPatterns.instance().getRandom(level.random,
-								quality.maxPatternBlocks,
+						IRitualPattern patternm = RitualPatterns.instance().getRandom(random, quality.maxPatternBlocks,
 								(p) -> rituals.stream().noneMatch((r) -> r.patterns().getBasePattern().equals(p)));
 						if (patternm == null) {
-							patternm = RitualPatterns.instance().getRandom(level.random, quality.maxPatternBlocks,
-									null);
+							patternm = RitualPatterns.instance().getRandom(random, quality.maxPatternBlocks, null);
 						}
 						final IRitualPattern pattern = patternm;
 						if (pattern == null) {
@@ -242,7 +240,7 @@ public class RitualGeneration {
 							break;
 						}
 					}
-					gen = IncompleteRitual.phase4Trigger(gen, makeOfferings(type, quality, level, ford));
+					gen = IncompleteRitual.phase4Trigger(gen, makeOfferings(type, quality, random, ford));
 
 					IncompleteRitual genAlias = gen;
 
@@ -251,7 +249,7 @@ public class RitualGeneration {
 									(rtt) -> CollectionUtils.streamRepetitions(max, () -> rtt.createNew(genAlias))),
 							(c) -> 1f / (rituals.stream().filter((x) -> x.trigger().equals(c)).count() + 1f));
 
-					IRitualTrigger trigger = trigs.get(level.random);
+					IRitualTrigger trigger = trigs.get(random);
 					if (trigger == null) {
 						failedPhases.put("creating_trigger", gen);
 						continue;

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import com.gm910.sotdivine.SOTDMod;
 import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.parties.IPartyLister;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
@@ -24,7 +25,6 @@ import com.gm910.sotdivine.villagers.poi.ModPoiTypes;
 import com.google.common.base.Functions;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Either;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -34,6 +34,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -53,6 +54,8 @@ import net.minecraft.world.level.entity.UniquelyIdentifyable;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
 
 /**
  * Capability that stores all parties and also deities
@@ -89,6 +92,19 @@ public interface IPartySystem extends IPartyLister {
 	}
 
 	/**
+	 * Gets a party system or creates a temporary instance if the server hassn't
+	 * quite loaded yet, which will then be loaded when the server fully loads
+	 */
+	public static IPartySystem getOrCreate(MinecraftServer server) {
+		if (server.overworld() == null) {
+			PartySystem newS = new PartySystem();
+			SpecialEventHandler.SYSTEMS.add(newS);
+			return newS;
+		}
+		return get(server.overworld());
+	}
+
+	/**
 	 * Retrieve an instance of the party system from the given level.
 	 * 
 	 * @param level
@@ -105,11 +121,9 @@ public interface IPartySystem extends IPartyLister {
 		if (PartySystem.cachedSystems.containsKey(level)) {
 			obtain = PartySystem.cachedSystems.get(level);
 		} else {
-			LogUtils.getLogger().debug(
-					"[IPartySystem] Retrieving and caching instanceof IPartySystem for world " + level.toString());
 
 			obtain = level.getDataStorage().computeIfAbsent(SAVE_TYPE);
-			obtain.allParties().stream().forEach((p) -> p.updateLevelReference(levelg));
+			obtain.allParties().stream().forEach((p) -> p.updateLevelReference(level));
 
 			PartySystem.cachedSystems.put(level, obtain);
 		}
@@ -267,7 +281,7 @@ public interface IPartySystem extends IPartyLister {
 	}
 
 	/**
-	 * Convert the given entity's held shield's deity patterns to the symbol of the
+	 * Convert the given uuid's held shield's deity patterns to the symbol of the
 	 * given deity
 	 * 
 	 * @param level
@@ -315,8 +329,8 @@ public interface IPartySystem extends IPartyLister {
 			var provider = d.symbols().get(d.patterns().getBasePattern().focusSymbol());
 			boolean mat = provider.matchesPos(level, focus);
 			/**
-			 * if (mat) { LogUtils.getLogger() .debug("Matches focuspos (" + provider + "->"
-			 * + level.getBlockState(focus) + "): " + d); }
+			 * if (mat) { LogUtils.getLogger() .debug("Matches focuspos (" + block + "->" +
+			 * level.getBlockState(focus) + "): " + d); }
 			 */
 			return mat;
 		}).flatMap((d) -> {
@@ -343,7 +357,7 @@ public interface IPartySystem extends IPartyLister {
 	 * 
 	 * @param party
 	 */
-	public void addParty(IParty party, ServerLevel level);
+	public void addParty(IParty party, MinecraftServer server);
 
 	/**
 	 * Removes a party by id
@@ -375,12 +389,19 @@ public interface IPartySystem extends IPartyLister {
 	/**
 	 * Call this when you edited stuff so that it saves properly
 	 */
-	public void markDirty(ServerLevel level);
+	public void markDirty(MinecraftServer server);
 
 	/**
-	 * return the parties this entity is a member of
+	 * Call this when you edited stuff so that it saves properly
+	 */
+	public default void markDirty(ServerLevel server) {
+		markDirty(server.getServer());
+	}
+
+	/**
+	 * return the parties this uuid is a member of
 	 * 
-	 * @param entity
+	 * @param uuid
 	 * @return
 	 */
 	public default Stream<IParty> getPartiesOf(UniquelyIdentifyable entity) {
@@ -389,9 +410,9 @@ public interface IPartySystem extends IPartyLister {
 	}
 
 	/**
-	 * return the parties this entity is a member of
+	 * return the parties this uuid is a member of
 	 * 
-	 * @param entity
+	 * @param uuid
 	 * @return
 	 */
 	public default Stream<IParty> getPartiesOf(UUID entity) {

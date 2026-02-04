@@ -12,7 +12,7 @@ public enum SpellTrait implements IExtensibleEnum {
 	 */
 	BANNER_FLIP,
 	/**
-	 * Whether this SPELL protects an entity/rawPosition from other deities' spells
+	 * Whether this SPELL protects an uuid/rawPosition from other deities' spells
 	 */
 	PROTECTION,
 	/** Whether this SPELL absorbs energy for the deity */

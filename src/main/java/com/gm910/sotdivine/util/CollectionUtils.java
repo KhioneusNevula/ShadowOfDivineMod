@@ -26,6 +26,7 @@ import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Streams;
+import com.google.common.collect.Table.Cell;
 
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -34,6 +35,21 @@ import net.minecraft.network.chat.MutableComponent;
 public class CollectionUtils {
 
 	private CollectionUtils() {
+	}
+
+	/**
+	 * Creates a cell object
+	 * 
+	 * @param <R>
+	 * @param <C>
+	 * @param <V>
+	 * @param row
+	 * @param column
+	 * @param value
+	 * @return
+	 */
+	public static <R, C, V> Cell<R, C, V> cell(R row, C column, V value) {
+		return new Triplet<>(row, column, value);
 	}
 
 	/**

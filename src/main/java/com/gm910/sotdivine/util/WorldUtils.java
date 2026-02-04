@@ -1,17 +1,21 @@
 package com.gm910.sotdivine.util;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
@@ -23,7 +27,7 @@ public class WorldUtils {
 	}
 
 	/**
-	 * Removestag from entity's data
+	 * Removestag from uuid's data
 	 * 
 	 * @param e
 	 * @param pathType
@@ -32,6 +36,47 @@ public class WorldUtils {
 		accessNestedTag(e, path, false).ifPresent(pair -> {
 			pair.getSecond().remove(pair.getFirst());
 		});
+	}
+
+	/**
+	 * Finds an entity in a server by searching every world, STARTING at the given
+	 * world
+	 * 
+	 * @param <T>
+	 * @param ref
+	 * @return
+	 */
+	public static <T extends Entity> Optional<T> findEntityInServer(EntityReference<T> ref, ServerLevel firstLevel,
+			Class<T> clazz) {
+		if (ref.getEntity(firstLevel, clazz) instanceof T en) {
+			return Optional.of(en);
+		}
+		for (ServerLevel level : firstLevel.getServer().getAllLevels()) {
+			if (level == firstLevel) {
+				continue;
+			}
+			if (ref.getEntity(level, clazz) instanceof T en) {
+				return Optional.of(en);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Finds an entity in a server by searching every world
+	 * 
+	 * @param <T>
+	 * @param ref
+	 * @return
+	 */
+	public static <T extends Entity> Optional<T> findEntityInServer(EntityReference<T> ref, MinecraftServer server,
+			Class<T> clazz) {
+		for (ServerLevel level : server.getAllLevels()) {
+			if (ref.getEntity(level, clazz) instanceof T en) {
+				return Optional.of(en);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -95,7 +140,7 @@ public class WorldUtils {
 	}
 
 	/**
-	 * Returns an int tag from the entity
+	 * Returns an int tag from the uuid
 	 * 
 	 * @param e
 	 * @param name
@@ -106,7 +151,7 @@ public class WorldUtils {
 	}
 
 	/**
-	 * Adds an integer nbt tag to this entity's custom data
+	 * Adds an integer nbt tag to this uuid's custom data
 	 * 
 	 * @param e
 	 * @param name

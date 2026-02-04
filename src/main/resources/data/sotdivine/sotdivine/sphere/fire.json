@@ -1,8 +1,36 @@
 {
 	"translation_key": "sotd.sphere.fire",
 	"genres": {
-		"sotdivine:dimension": [
-			"minecraft:the_nether"
+		"sotdivine:dimension_power":[
+			{"type":"sotdivine:undying"},
+			{"type":"sotdivine:random_levitation"}
+		],
+		"sotdivine:dimension_theme": [
+			{
+				"definition":{
+					"type":"minecraft:the_nether",
+					"generator":{
+						"type":"flat",
+						"settings": {
+							"layers":[
+								{"height":2, "block":"minecraft:glowstone" }
+							],
+							"biome":"minecraft:crimson_forest",
+							"features":true
+						}
+					}
+				}
+			},
+			{
+				"definition":{
+					"type":"minecraft:the_nether",
+					"generator":{
+						"type":"noise",
+						"biome_source": { "type":"fixed", "biome":"minecraft:nether_wastes" },
+						"settings": "minecraft:caves"
+					}
+				}
+			}
 		],
 		"sotdivine:offering": [
 			 {

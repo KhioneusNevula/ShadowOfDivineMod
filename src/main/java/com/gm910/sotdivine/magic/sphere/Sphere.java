@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.gm910.sotdivine.concepts.deity.IDeity;
 import com.gm910.sotdivine.concepts.genres.GenreTypes;
 import com.gm910.sotdivine.concepts.genres.IGenreType;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;
@@ -22,6 +23,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 
 public non-sealed class Sphere implements ISphere {
 
@@ -31,6 +33,21 @@ public non-sealed class Sphere implements ISphere {
 				Codec.STRING.fieldOf("translation_key")
 						.forGetter((s) -> ((TranslatableContents) s.displayName().getContents()).getKey()),
 				Codec.dispatchedMap(GenreTypes.genreCodec(), (x) -> x.typelessGenreSetCodec()).fieldOf("genres")
+						.forGetter((s) -> s.representedGenres().stream()
+								.collect(Collectors.toMap((g) -> g, (m) -> new ArrayList<>(s.getGenres(m))))),
+				Codec.unboundedMap(DeityInteractionType.CODEC, Codec.list(IEmanation.codec())).fieldOf("emanations")
+						.forGetter((sphere) -> Arrays.stream(DeityInteractionType.values()).collect(Collectors
+								.toMap(Functions.identity(), (o) -> new ArrayList<>(sphere.emanationsOfType(o)))))
+
+		).apply(instance, (d, g, e) -> new Sphere(d, g, e)));
+	}
+
+	public static Codec<ISphere> createNetworkCodec() {
+		return RecordCodecBuilder.create(instance -> // Given an emanation
+		instance.group(
+				Codec.STRING.fieldOf("translation_key")
+						.forGetter((s) -> ((TranslatableContents) s.displayName().getContents()).getKey()),
+				Codec.dispatchedMap(GenreTypes.genreCodec(), (x) -> x.typelessGenreSetNetworkCodec()).fieldOf("genres")
 						.forGetter((s) -> s.representedGenres().stream()
 								.collect(Collectors.toMap((g) -> g, (m) -> new ArrayList<>(s.getGenres(m))))),
 				Codec.unboundedMap(DeityInteractionType.CODEC, Codec.list(IEmanation.codec())).fieldOf("emanations")

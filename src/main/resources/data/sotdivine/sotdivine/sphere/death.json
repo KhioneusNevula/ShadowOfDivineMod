@@ -1,6 +1,53 @@
 {
 	"translation_key": "sotd.sphere.death",
 	"genres":{
+		"sotdivine:dimension_power":[
+			{"type":"sotdivine:undying"},
+			{"type":"sotdivine:random_levitation"},
+			{"type":"sotdivine:ghost_resurrection"}
+		],
+		"sotdivine:dimension_theme": [
+			{
+				"definition":{
+					"type":"minecraft:the_end",
+					"generator":{
+						"type":"noise",
+						"biome_source":{ "type":"fixed", "biome":"minecraft:warped_forest" },
+						"settings":"sotdivine:hellish_terrain"
+					}
+				}
+			},
+			{
+				"definition":{
+					"type":"minecraft:the_end",
+					"generator":{
+						"type":"noise",
+						"biome_source":{ "type":"fixed", "biome":"minecraft:pale_garden" },
+						"settings":"minecraft:floating_islands"
+					}
+				}
+			},
+			{
+				"definition":{
+					"type":"minecraft:the_nether",
+					"generator":{
+						"type":"noise",
+						"biome_source":{ "type":"fixed", "biome":"minecraft:the_end" },
+						"settings":"minecraft:caves"
+					}
+				}
+			},
+			{
+				"definition":{
+					"type":"minecraft:the_nether",
+					"generator":{
+						"type":"noise",
+						"biome_source":{ "type":"fixed", "biome":"minecraft:crimson_forest" },
+						"settings":"sotdivine:hell_islands"
+					}
+				}
+			}
+		],
 		"sotdivine:offering":[
 			{
 				"items":"#minecraft:skulls",

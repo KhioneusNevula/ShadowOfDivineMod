@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,11 +17,16 @@ import javax.annotation.Nullable;
 
 import com.gm910.sotdivine.ModRegistries;
 import com.gm910.sotdivine.concepts.deity.personality.IDeityStat;
+import com.gm910.sotdivine.concepts.genres.GenreTypes;
 import com.gm910.sotdivine.concepts.parties.IPartyLister.IDeityInfo;
 import com.gm910.sotdivine.concepts.parties.party.IParty;
 import com.gm910.sotdivine.concepts.parties.system_storage.IPartySystem;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
 import com.gm910.sotdivine.concepts.symbol.IDeitySymbol;
+import com.gm910.sotdivine.dimension.DimensionProperties;
+import com.gm910.sotdivine.dimension.DimensionTheme;
+import com.gm910.sotdivine.dimension.IDimensionSystem;
+import com.gm910.sotdivine.dimension.powers.IDimensionPower;
 import com.gm910.sotdivine.language.Languages;
 import com.gm910.sotdivine.magic.emanation.DeityInteractionType;
 import com.gm910.sotdivine.magic.emanation.EmanationInstance;
@@ -33,9 +37,12 @@ import com.gm910.sotdivine.magic.ritual.RitualInstance;
 import com.gm910.sotdivine.magic.ritual.generate.RitualGeneration;
 import com.gm910.sotdivine.magic.sphere.ISphere;
 import com.gm910.sotdivine.magic.sphere.Spheres;
+import com.gm910.sotdivine.util.ModUtils;
 import com.gm910.sotdivine.util.TextUtils;
 import com.gm910.sotdivine.util.WeightedSet;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
@@ -48,9 +55,13 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
@@ -77,8 +88,10 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 			Codec.list(EmanationInstance.CODEC).optionalFieldOf("running_emanations", List.of())
 					.forGetter((x) -> new ArrayList<>(x.runningEmanations())),
 			Codec.compoundList(EmanationInstance.CODEC, RitualInstance.codec())
-					.optionalFieldOf("ritual_emanations", List.of()).forGetter((x) -> ((Deity) x).emanationsToRituals
-							.entrySet().stream().map((p) -> Pair.of(p.getKey(), p.getValue())).toList())
+					.optionalFieldOf("ritual_emanations", List.of())
+					.forGetter((x) -> ((Deity) x).emanationsToRituals.entrySet().stream()
+							.map((p) -> Pair.of(p.getKey(), p.getValue())).toList()),
+			Codec.BOOL.optionalFieldOf("finished", true).forGetter(IDeity::finishedGeneration)
 
 	).apply(instance, Deity::new));
 
@@ -100,13 +113,14 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	 * @param system
 	 * @return
 	 */
-	public static Set<ISphere> pickSpheres(ServerLevel level, int max, int avg, Random source, IPartySystem system) {
+	public static Set<ISphere> pickSpheres(MinecraftServer server, int max, int avg, RandomSource source,
+			IPartySystem system) {
 		Set<ISphere> spheres = Spheres.instance().getSphereMap().values();
 		Map<ISphere, Integer> sphereCounts = spheres.stream().map(
 				(x) -> Map.entry(x, (int) system.allDeities().stream().filter((d) -> d.spheres().contains(x)).count()))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		WeightedSet<ISphere> sphereList = new WeightedSet<>(sphereCounts.keySet(),
-				(x) -> (1 / UNPICKED_BONUS_FACTOR) / (sphereCounts.get(x) + (1 / UNPICKED_BONUS_FACTOR)));
+		WeightedSet<ISphere> sphereList = new WeightedSet<>(spheres,
+				(x) -> (1 / UNPICKED_BONUS_FACTOR) / (sphereCounts.getOrDefault(x, 0) + (1 / UNPICKED_BONUS_FACTOR)));
 		LogUtils.getLogger().debug("Sphere distributions: " + sphereList.asWeightMap());
 		if (sphereList.isEmpty())
 			return Set.of();
@@ -114,9 +128,9 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 			return Set.of(sphereList.get(source));
 		}
 		Set<ISphere> output = new HashSet<>();
-		Registry<ISphere> sphereRegistry = level.registryAccess().lookupOrThrow(ModRegistries.SPHERES);
+		Registry<ISphere> sphereRegistry = server.registryAccess().lookupOrThrow(ModRegistries.SPHERES);
 
-		int iters = (int) Math.round(Math.max(Math.min(source.nextGaussian(avg, 1), max), 1));
+		int iters = (int) Math.round(Math.max(Math.min(source.nextGaussian() + avg, max), 1));
 		for (int i = 0; i < iters; i++) {
 			if (sphereList.get(source) instanceof ISphere sphere) {
 				if (Math.min(source.nextFloat(), source.nextFloat()) > UNPICKED_BONUS_FACTOR
@@ -145,7 +159,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	 * @param system
 	 * @return
 	 */
-	public static IDeitySymbol pickSymbol(Collection<ISphere> spheres, Random source, IPartySystem system) {
+	public static IDeitySymbol pickSymbol(Collection<ISphere> spheres, RandomSource source, IPartySystem system) {
 		Set<IDeitySymbol> symbols = new HashSet<>(DeitySymbols.instance().getDeitySymbolMap().values());
 		for (IDeitySymbol sym : DeitySymbols.instance().getDeitySymbolMap().values()) {
 			if (system.deitiesBySymbol(sym).findAny().isPresent()) {
@@ -166,17 +180,68 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	 * 
 	 * @param deity
 	 */
-	public static void addRitualsTo(ServerLevel level, IDeity deity) {
+	public static boolean addRitualsTo(ServerLevel level, IDeity deity) {
 
-		((Deity) deity).rituals.addAll(RitualGeneration.generateRituals(level, deity));
+		return ((Deity) deity).rituals.addAll(RitualGeneration.generateRituals(level, deity, level.random));
+	}
+
+	/**
+	 * Generates dimensions for this deity
+	 * 
+	 * @param level
+	 * @param deity
+	 * @return
+	 */
+	public static boolean makeNewDimensions(ServerLevel level, IDeity deity) {
+		IDimensionSystem system = IDimensionSystem.get(level);
+		int[] i = { 0 };
+		Multiset<DimensionTheme> themesUsed = HashMultiset.create();
+		Multiset<IDimensionPower> powersUsed = HashMultiset.create();
+		WeightedSet<DimensionTheme> weightedThemes = new WeightedSet<>(
+				deity.spheres().stream().flatMap((s) -> s.getGenres(GenreTypes.DIMENSION_THEME).stream()),
+				(c) -> 1f / (themesUsed.count(c) + 1f));
+
+		deity.spheres().stream()
+				.flatMap((s) -> s.getGenres(GenreTypes.DIMENSION_POWER).stream().map(g -> Pair.of(s, g)))
+				.filter(p -> p.getSecond().getImportance().canBePrimary()).forEach(pair -> {
+
+					IDimensionPower power = pair.getSecond();
+
+					powersUsed.add(power);
+					HashSet<IDimensionPower> powers = new HashSet<>();
+					powers.add(power);
+
+					WeightedSet<IDimensionPower> weightedPowers = new WeightedSet<>(
+							pair.getFirst().getGenres(GenreTypes.DIMENSION_POWER).stream()
+									.filter(xx -> xx != power && xx.getImportance().canBeSecondary()),
+							(x) -> 1f / (1f + powersUsed.count(x)));
+					int choices = level.random.nextIntBetweenInclusive(0, weightedPowers.size());
+					for (int rep = 0; rep < choices; rep++) {
+						var pow = weightedPowers.get(level.random);
+						powersUsed.add(pow);
+						powers.add(pow);
+					}
+
+					DimensionProperties properties = new DimensionProperties(weightedThemes.get(level.random),
+							deity.uniqueName(), Component.translatable("sotd.cmd.parenthetical", power.dimensionName(),
+									deity.descriptiveName().orElse(Component.literal(deity.uniqueName()))),
+							powers);
+					system.addDimension(
+							ResourceKey.create(Registries.DIMENSION,
+									ModUtils.path(power.dimensionPath() + "_" + deity.uniqueName())),
+							properties, false);
+					i[0]++;
+				});
+		return i[0] > 0;
 	}
 
 	/**
 	 * Generates a suitable deity
 	 */
-	public static IDeity generateDeity(ServerLevel level, String language, Random random, IPartySystem system) {
+	public static IDeity generateDeity(MinecraftServer server, String language, RandomSource random,
+			IPartySystem system) {
 
-		Set<ISphere> spheres = pickSpheres(level, 3, 1, random, system);
+		Set<ISphere> spheres = pickSpheres(server, 3, 1, random, system);
 		IDeitySymbol symbol = pickSymbol(spheres, random, system);
 		if (symbol == null)
 			return null;
@@ -191,7 +256,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 
 		String finalName = null;
 		for (int i = 0; i < 5; i++) {
-			Optional<String> ls = Languages.instance().get(language).map((l) -> l.generateName(1, 7, level.random));
+			Optional<String> ls = Languages.instance().get(language).map((l) -> l.generateName(1, 7, random));
 			if (ls.isPresent()) {
 				finalName = ls.get();
 				finalName = ("" + finalName.charAt(0)).toUpperCase() + finalName.substring(1);
@@ -210,11 +275,10 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 
 		Deity dimde = (Deity) IDeity.create(type.getPath() + "_" + type2.getPath(),
 				TextUtils.literal(Optional.ofNullable(finalName).orElse(type.getPath())), spheres, Map.of(), symbol);
-		addRitualsTo(level, dimde);
 
 		LogUtils.getLogger().debug("[DEITY] " + finalName + " " + dimde.report());
 
-		system.addParty(dimde, level);
+		system.addParty(dimde, server);
 
 		return dimde;
 	}
@@ -313,7 +377,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	}
 
 	/**
-	 * Stops all emanations of the given kind targeting this entity
+	 * Stops all emanations of the given kind targeting this uuid
 	 * 
 	 * @param pos
 	 */
@@ -325,7 +389,7 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	}
 
 	/**
-	 * Stops all emanations of the given kind cast by this entity
+	 * Stops all emanations of the given kind cast by this uuid
 	 * 
 	 * @param pos
 	 */
@@ -361,8 +425,20 @@ public sealed interface IDeity extends IParty, IDeityInfo permits Deity {
 	public void tick(ServerLevel level, long time);
 
 	/**
-	 * Whether this deity permits this kind of entity in its sanctuary
+	 * Whether this deity permits this kind of uuid in its sanctuary
 	 */
 	public boolean permitsInSanctuary(ServerLevel level, Entity entity);
+
+	/**
+	 * Return true if this deity was fully generated or not
+	 * 
+	 * @return
+	 */
+	public boolean finishedGeneration();
+
+	/**
+	 * Mark this deity as finished generating
+	 */
+	public void setFinished();
 
 }

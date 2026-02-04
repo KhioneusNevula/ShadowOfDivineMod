@@ -40,7 +40,7 @@ public class GiveEffectEmanation extends AbstractEmanation {
 		super(true, false, properties);
 		this.effectInstance = new MobEffectInstance(effect.getEffect(), DEFAULT_DURATION, effect.getAmplifier(),
 				effect.isAmbient(), effect.isVisible(), effect.showIcon(),
-				FieldUtils.getInstanceField("hiddenEffect", "m", effect));
+				FieldUtils.getInstanceFieldOfThisOrSupertype("hiddenEffect", "m", effect));
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class GiveEffectEmanation extends AbstractEmanation {
 	@Override
 	public boolean trigger(EmanationInstance info, float intensity) {
 		if (info.targetInfo().opTargetEntity().isEmpty()) {
-			LogUtils.getLogger().error("Received no entity targeting info; could not run " + this);
+			LogUtils.getLogger().error("Received no uuid targeting info; could not run " + this);
 			return true;
 		}
 		if (getEntity(info.targetInfo(), LivingEntity.class).orElse(null) instanceof LivingEntity creature) {

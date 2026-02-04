@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Genre creator to create an item stack
+ * Genre theme to create an item stack
  */
 public record ItemStackCreator(ItemStack stack) implements IGenreCreator {
 

@@ -16,19 +16,20 @@ import com.gm910.sotdivine.concepts.genres.provider.data.CodecsComponentMatchers
 import com.gm910.sotdivine.concepts.genres.provider.entity_preds.CodecsTypeSpecificProviders;
 import com.gm910.sotdivine.concepts.parties.party.resource.PartyResourceType;
 import com.gm910.sotdivine.concepts.symbol.DeitySymbols;
+import com.gm910.sotdivine.dimension.powers.DimensionPowerType;
 import com.gm910.sotdivine.language.Languages;
 import com.gm910.sotdivine.language.lexicon.Lexicons;
 import com.gm910.sotdivine.language.phonology.Phonologies;
+import com.gm910.sotdivine.magic.afterlife.anchors.AfterlifeAnchorType;
 import com.gm910.sotdivine.magic.emanation.EmanationType;
+import com.gm910.sotdivine.magic.impression.ImpressionType;
 import com.gm910.sotdivine.magic.ritual.pattern.RitualPatterns;
 import com.gm910.sotdivine.magic.sphere.Spheres;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionType;
 import com.gm910.sotdivine.network.ModNetwork;
 import com.gm910.sotdivine.villagers.ModBrainElements;
 import com.gm910.sotdivine.villagers.poi.ModPoiTypes;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -41,15 +42,11 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BannerPattern;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -108,6 +105,18 @@ public final class SOTDMod {
 	public static final DeferredRegister<EmanationType<?>> EMANATION_TYPES = DeferredRegister
 			.create(ModRegistries.EMANATION_TYPES, SOTDMod.MODID);
 
+	/**
+	 * Dimension Power register
+	 */
+	public static final DeferredRegister<DimensionPowerType<?>> DIMENSION_POWER_TYPES = DeferredRegister
+			.create(ModRegistries.DIMENSION_POWER_TYPES, SOTDMod.MODID);
+
+	/**
+	 * Soul anchor register
+	 */
+	public static final DeferredRegister<AfterlifeAnchorType<?>> ANCHOR_TYPES = DeferredRegister
+			.create(ModRegistries.ANCHOR_TYPES, SOTDMod.MODID);
+
 	public static final DeferredRegister<ImpressionType<?>> IMPRESSION_TYPES = DeferredRegister
 			.create(ModRegistries.IMPRESSION_TYPES, MODID);
 
@@ -146,6 +155,10 @@ public final class SOTDMod {
 		GENRE_TYPES.register(modBusGroup);
 		EmanationType.init();
 		EMANATION_TYPES.register(modBusGroup);
+		DimensionPowerType.init();
+		DIMENSION_POWER_TYPES.register(modBusGroup);
+		AfterlifeAnchorType.init();
+		ANCHOR_TYPES.register(modBusGroup);
 		PartyResourceType.init();
 		PARTY_RESOURCE_TYPES.register(modBusGroup);
 		ImpressionType.init();

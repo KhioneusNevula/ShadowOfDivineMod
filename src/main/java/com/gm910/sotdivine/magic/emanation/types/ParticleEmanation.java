@@ -65,7 +65,7 @@ public class ParticleEmanation extends AbstractEmanation {
 				}, () -> {
 					erred[0] = true;
 					LogUtils.getLogger().error(
-							"Could not find entity or rawPosition in spell targeting info for ParticleEmanation; cannot run "
+							"Could not find uuid or rawPosition in spell targeting info for ParticleEmanation; cannot run "
 									+ this);
 				});
 		return erred[0];

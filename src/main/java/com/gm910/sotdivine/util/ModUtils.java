@@ -9,6 +9,8 @@ import com.mojang.brigadier.context.CommandContextBuilder;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -36,9 +38,9 @@ public class ModUtils {
 	public static <T> void forceRegister(IForgeRegistry<T> registry, ResourceLocation location, T value) {
 
 		ForgeRegistry<T> stupidRegistry = (ForgeRegistry<T>) registry;
-		boolean frozenBefore = FieldUtils.getInstanceField("isFrozen", stupidRegistry);
+		boolean frozenBefore = FieldUtils.getInstanceFieldOfThisOrSupertype("isFrozen", stupidRegistry);
 
-		FieldUtils.setInstanceField("isFrozen", stupidRegistry, false);
+		FieldUtils.setInstanceFieldOfExactType("isFrozen", stupidRegistry, false);
 
 		if (registry.containsKey(location)) {
 			LogUtils.getLogger().debug("Re-registering " + location + " to frozen registry with value " + value);
@@ -49,7 +51,7 @@ public class ModUtils {
 		}
 		stupidRegistry.register(location, value);
 
-		FieldUtils.setInstanceField("isFrozen", stupidRegistry, frozenBefore);
+		FieldUtils.setInstanceFieldOfExactType("isFrozen", stupidRegistry, frozenBefore);
 	}
 
 	/**

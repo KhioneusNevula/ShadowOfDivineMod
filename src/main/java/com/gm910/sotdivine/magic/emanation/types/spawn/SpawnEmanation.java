@@ -25,7 +25,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 /**
- * A spawning SPELL, to spawn an entity
+ * A spawning SPELL, to spawn an uuid
  * 
  * @author borah
  *
@@ -34,7 +34,7 @@ public class SpawnEmanation extends AbstractEmanation {
 
 	public static final Codec<SpawnEmanation> CODEC = RecordCodecBuilder.create(instance -> // Given an emanation
 	instance.group(Codec.STRING.optionalFieldOf("name").forGetter((m) -> Optional.ofNullable(m.emanationName())), Codec
-			.mapEither(WeightedList.codec(EntityType.CODEC).fieldOf("entities"), EntityType.CODEC.fieldOf("entity"))
+			.mapEither(WeightedList.codec(EntityType.CODEC).fieldOf("entities"), EntityType.CODEC.fieldOf("uuid"))
 			.forGetter((sp) -> {
 				if (sp.getEntities().unwrap().size() == 1) {
 					return Either.right(sp.getEntities().unwrap().get(0).value());
@@ -117,7 +117,7 @@ public class SpawnEmanation extends AbstractEmanation {
 	}
 
 	/**
-	 * Called after the entity is spawned
+	 * Called after the uuid is spawned
 	 * 
 	 * @param genEntity
 	 * @param targetPos

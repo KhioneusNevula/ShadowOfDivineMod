@@ -7,8 +7,11 @@
   	"pathfinding.PathTypeCacheMixin",
   	"entity.ItemFrameMixin",
   	"entity.PlayerMixin",
+  	"entity.MobMixin",
+  	"entity.LivingEntityMixin",
   	"block.BlockStateMixin",
   	"gui.LoomMenuMixin",
-  	"gui.LoomScreenMixin"
+  	"gui.LoomScreenMixin",
+  	"ai.GoalSelectorMixin"
   ]
 }

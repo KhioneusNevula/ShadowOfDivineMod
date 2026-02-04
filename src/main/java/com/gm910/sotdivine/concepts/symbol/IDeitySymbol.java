@@ -3,8 +3,8 @@ package com.gm910.sotdivine.concepts.symbol;
 import java.util.Optional;
 
 import com.gm910.sotdivine.ModRegistries;
+import com.gm910.sotdivine.magic.impression.IImpression;
 import com.gm910.sotdivine.magic.sphere.ISphere;
-import com.gm910.sotdivine.magic.theophany.impression.IImpression;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 

@@ -37,7 +37,7 @@ public interface ICachedSanctuaries extends Iterable<ISanctuary> {
 	 * rawPosition; false otherwise
 	 * 
 	 * @param pos
-	 * @param entity
+	 * @param uuid
 	 * @return
 	 */
 	public boolean canStandAt(BlockPos pos, Entity entity);

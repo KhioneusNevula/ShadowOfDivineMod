@@ -1,10 +1,17 @@
 package com.gm910.sotdivine.mixins_assist.block;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import com.gm910.sotdivine.magic.afterlife.IAfterlife;
+import com.gm910.sotdivine.magic.afterlife.anchors.BlockAnchor;
 import com.gm910.sotdivine.magic.sanctuary.storage.ISanctuarySystem;
 import com.gm910.sotdivine.magic.sanctuary.type.ISanctuary;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -27,6 +34,7 @@ public class BlockMixinHelper {
 			} else {
 
 			}
+
 		}
 	}
 
@@ -37,7 +45,15 @@ public class BlockMixinHelper {
 				LogUtils.getLogger().debug("broke a block in sanctuary ");
 				system.reaffirmSanctuary(level, exPos);
 			}
-
+			IAfterlife afterlife = IAfterlife.get(level);
+			Set<BlockAnchor> toDelete = new HashSet<>();
+			afterlife.getAnchors(GlobalPos.of(level.dimension(), pos)).stream()
+					.flatMap(ip -> ip instanceof BlockAnchor ba ? Stream.of(ba) : Stream.empty()).forEach(ip -> {
+						if (ip.getAnchor(level).isEmpty()) {
+							toDelete.add(ip);
+						}
+					});
+			toDelete.forEach(ip -> afterlife.destroyAnchor(ip));
 		}
 	}
 

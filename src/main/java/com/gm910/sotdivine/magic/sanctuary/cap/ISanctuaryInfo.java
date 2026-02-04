@@ -29,7 +29,7 @@ public interface ISanctuaryInfo {
 	}
 
 	/**
-	 * return true if this entity was banned recently from a sanctuary, i.e. more
+	 * return true if this uuid was banned recently from a sanctuary, i.e. more
 	 * recently than the last time it was permitted into it
 	 * 
 	 * @return
@@ -37,7 +37,7 @@ public interface ISanctuaryInfo {
 	public boolean recentlyBanned(String sanct);
 
 	/**
-	 * return true if this entity was permitted recently from a sanctuary, i.e. more
+	 * return true if this uuid was permitted recently from a sanctuary, i.e. more
 	 * recently than the last time it was banned into it
 	 * 
 	 * @return
@@ -45,7 +45,7 @@ public interface ISanctuaryInfo {
 	public boolean recentlyPermitted(String sanct);
 
 	/**
-	 * The amount of time an entity can continue to remain in the given sanctuary;
+	 * The amount of time an uuid can continue to remain in the given sanctuary;
 	 * return -1 if this is not specified
 	 * 
 	 * @param sanctuary

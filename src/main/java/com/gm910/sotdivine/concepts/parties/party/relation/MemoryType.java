@@ -16,13 +16,13 @@ public enum MemoryType {
 	/** Memory of being attacked */
 	ATTACKED,
 	/**
-	 * Memory of another entity being attacked (e.g. a follower or something
+	 * Memory of another uuid being attacked (e.g. a follower or something
 	 * similar)
 	 */
 	ATTACKED_OTHER,
 	/** Memory of being protected */
 	PROTECTED,
-	/** Memory of another entity being protected (e.g. a follower or something) */
+	/** Memory of another uuid being protected (e.g. a follower or something) */
 	PROTECTED_OTHER;
 
 }

@@ -40,7 +40,7 @@ public interface IPartyMemory {
 			Codec.STRING.optionalFieldOf("targetPartyID").forGetter((x) -> x.opTargetParty()),
 			ItemStack.CODEC.optionalFieldOf("item").forGetter(IPartyMemory::opItem),
 			EntityType.CODEC.optionalFieldOf("entityType").forGetter((e) -> e.opEntityType()),
-			CompoundTag.CODEC.optionalFieldOf("entity").forGetter((e) -> e.opEntityTag()),
+			CompoundTag.CODEC.optionalFieldOf("uuid").forGetter((e) -> e.opEntityTag()),
 			GlobalPos.CODEC.optionalFieldOf("rawPosition").forGetter(IPartyMemory::opPos),
 			BlockState.CODEC.optionalFieldOf("block").forGetter(IPartyMemory::opBlockState),
 			IPartyResource.codec().optionalFieldOf("resource").forGetter(IPartyMemory::opResource),
@@ -103,7 +103,7 @@ public interface IPartyMemory {
 
 	/**
 	 * Uses {@link #opEntityTag()} and {@link #opEntityType()} to construct an
-	 * entity to reference
+	 * uuid to reference
 	 * 
 	 * @param level
 	 * @return
@@ -122,15 +122,15 @@ public interface IPartyMemory {
 	}
 
 	/**
-	 * If this memory involved an entity that no longer exists (i.e. one that died),
-	 * return the entity's tag
+	 * If this memory involved an uuid that no longer exists (i.e. one that died),
+	 * return the uuid's tag
 	 * 
 	 * @return
 	 */
 	public Optional<CompoundTag> opEntityTag();
 
 	/**
-	 * Paired with {@link #opEntityTag()}; returns the type of the entity in
+	 * Paired with {@link #opEntityTag()}; returns the type of the uuid in
 	 * question
 	 * 
 	 * @return

@@ -64,11 +64,11 @@ public class Party implements IParty {
 		this.members = new HashSet<>();
 		if (singleEntity.isEmpty()) {
 			if (isEntity) {
-				throw new IllegalArgumentException("Expected single entity but received none");
+				throw new IllegalArgumentException("Expected single uuid but received none");
 			}
 		} else {
 			if (!isEntity) {
-				throw new IllegalArgumentException("Expected no entity but received one: " + singleEntity.get());
+				throw new IllegalArgumentException("Expected no uuid but received one: " + singleEntity.get());
 			}
 			this.members = Set.of(singleEntity.get());
 		}
@@ -187,7 +187,7 @@ public class Party implements IParty {
 
 	@Override
 	public Component descriptiveInfo(Level level) {
-		return TextUtils.transPrefix("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "entity" : "other"))
+		return TextUtils.transPrefix("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "uuid" : "other"))
 				+ (canWorship ? ".worshiper" : ""), relations.size());
 	}
 

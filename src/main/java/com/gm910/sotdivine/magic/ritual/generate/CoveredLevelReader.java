@@ -2,31 +2,29 @@ package com.gm910.sotdivine.magic.ritual.generate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
@@ -72,10 +70,8 @@ public class CoveredLevelReader implements LevelReader {
 
 	@Override
 	public FluidState getFluidState(BlockPos p_45569_) {
-		if (blocks.get(p_45569_) instanceof BlockState state) {
-			return state.getFluidState();
-		}
-		return base.getFluidState(p_45569_);
+		return Optional.ofNullable(blocks.get(p_45569_)).map(s -> s.getFluidState())
+				.orElse(base.getFluidState(p_45569_));
 	}
 
 	@Override
@@ -89,8 +85,8 @@ public class CoveredLevelReader implements LevelReader {
 	}
 
 	@Override
-	public ChunkAccess getChunk(int p_46823_, int p_46824_, ChunkStatus p_333298_, boolean p_46826_) {
-		return base.getChunk(p_46823_, p_46824_, p_333298_, p_46826_);
+	public ChunkAccess getChunk(int x, int z, ChunkStatus p_333298_, boolean p_46826_) {
+		return base.getChunk(x, z, p_333298_, p_46826_);
 	}
 
 	@Override

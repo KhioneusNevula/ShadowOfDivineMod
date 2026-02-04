@@ -38,7 +38,7 @@ public class EntityCreator<T extends Entity> implements IGenreCreator {
 	}
 
 	/**
-	 * Create this entity without placing it
+	 * Create this uuid without placing it
 	 * 
 	 * @param level
 	 * @param at

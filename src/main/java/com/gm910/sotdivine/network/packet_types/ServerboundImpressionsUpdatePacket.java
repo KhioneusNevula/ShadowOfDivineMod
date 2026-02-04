@@ -3,9 +3,9 @@ package com.gm910.sotdivine.network.packet_types;
 import java.util.List;
 import java.util.Optional;
 
-import com.gm910.sotdivine.magic.theophany.cap.IMind;
-import com.gm910.sotdivine.magic.theophany.impression.IImpression;
-import com.gm910.sotdivine.magic.theophany.impression.ImpressionHolder;
+import com.gm910.sotdivine.magic.impression.IImpression;
+import com.gm910.sotdivine.magic.impression.ImpressionHolder;
+import com.gm910.sotdivine.magic.impression.cap.IMindsEye;
 import com.gm910.sotdivine.util.CodecUtils;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,7 +26,7 @@ public record ServerboundImpressionsUpdatePacket(Action action, Optional<Impress
 	public void handle(Context ctxt) {
 		ServerPlayer player = ctxt.getSender();
 		ctxt.setPacketHandled(true);
-		IMind experiencer = IMind.get(player);
+		IMindsEye experiencer = IMindsEye.get(player);
 		experiencer.updateServer(this);
 	}
 

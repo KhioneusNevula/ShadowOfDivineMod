@@ -98,7 +98,7 @@ public record EnchantmentsComponentMatcher(List<EnchantmentPredicate> enchantmen
 
 	@Override
 	public ProviderType<EnchantmentsComponentMatcher> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	private String prettyPrint(EnchantmentPredicate pred) {

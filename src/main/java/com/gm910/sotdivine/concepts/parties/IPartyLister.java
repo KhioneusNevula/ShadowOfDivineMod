@@ -218,14 +218,14 @@ public interface IPartyLister {
 		public String uniqueName();
 
 		/**
-		 * A string giving a name to this entity for ease of use
+		 * A string giving a name to this uuid for ease of use
 		 * 
 		 * @return
 		 */
 		public Optional<Component> descriptiveName();
 
 		/**
-		 * If this party is an entity
+		 * If this party is an uuid
 		 */
 		public boolean isEntity();
 
@@ -237,7 +237,7 @@ public interface IPartyLister {
 		public boolean isGroup();
 
 		/**
-		 * If this party is a deity (which is neither an entity nor group)
+		 * If this party is a deity (which is neither an uuid nor group)
 		 * 
 		 * @return
 		 */
@@ -473,7 +473,7 @@ public interface IPartyLister {
 
 		@Override
 		public Component descriptiveInfo(Level level) {
-			return TextUtils.transPrefix("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "entity" : "other"))
+			return TextUtils.transPrefix("sotd.cmd.partyinfo." + (isGroup ? "group" : (isEntity ? "uuid" : "other"))
 					+ (canWorship ? ".worshiper" : ""), relations.size());
 		}
 

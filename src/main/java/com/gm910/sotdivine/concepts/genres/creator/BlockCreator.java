@@ -38,7 +38,7 @@ public class BlockCreator implements IGenreCreator {
 	}
 
 	/**
-	 * The function which modifies the block entity after placement
+	 * The function which modifies the block uuid after placement
 	 * 
 	 * @return
 	 */

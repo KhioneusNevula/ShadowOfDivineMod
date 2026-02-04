@@ -62,7 +62,7 @@ public class ModCommandArgumentTypes {
 			() -> SingletonArgumentInfo.contextAware(GenrePlacementMapArgument::new));
 
 	/**
-	 * GenreType provider type
+	 * GenreType block type
 	 */
 	public static final RegistryObject<ArgumentTypeInfo<GenreProviderArgument, SingletonArgumentInfo<GenreProviderArgument>.Template>> GENRE_PROVIDER = register(
 			"genre_provider", GenreProviderArgument.class,

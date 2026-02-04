@@ -106,7 +106,7 @@ public record ClientboundTellrawNotificationPacket(Component message, EntityRefe
 							+ ") in message \"" + message + "\" (" + x.message + ") at component "
 							+ containing.getString() + " (" + containing + ")" + " with sequence " + searchSequence);
 					Component containingCopy = containing.copy();
-					FieldUtils.setInstanceField("siblings", "d", containingCopy, new ArrayList<>());
+					FieldUtils.setInstanceFieldOfExactType("siblings", "d", containingCopy, new ArrayList<>());
 					dummyPackets.put(x.message,
 							new ServerboundIncantationChatPacket(x.message, containingCopy.getString(), searchSequence,
 									m.translation(), m.translation().getString(), either, false,

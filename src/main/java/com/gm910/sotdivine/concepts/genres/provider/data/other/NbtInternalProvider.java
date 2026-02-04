@@ -36,7 +36,7 @@ public record NbtInternalProvider(CompoundTag tag) implements IGenreProvider<Tag
 
 	@Override
 	public ProviderType<NbtInternalProvider> providerType() {
-		throw new UnsupportedOperationException("Not a real provider");
+		throw new UnsupportedOperationException("Not a real block");
 	}
 
 	@Override
